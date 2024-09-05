@@ -2,14 +2,14 @@ import { StyleSheet, Text, View, Image, TextInput, Button } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import LinearGradient from "react-native-linear-gradient";
+// import LinearGradient from "react-native-linear-gradient";
 
 const LoginScreen = () => {
     return (
         <View style={styles.container}>
         <View style={styles.topImageContainer}>
             <Image
-            source={require("../../assets/Vector1.png")}
+            source={require("../../../assets/Vector1.png")}
             style={styles.topImage}
             />
         </View>
@@ -43,12 +43,12 @@ const LoginScreen = () => {
             <Text style={styles.signIn}>Sign in</Text>
         </View>
 
-        <LinearGradient
+        {/* <LinearGradient
             colors={["#4c669f", "#3b5998", "#192f6a"]}
             style={styles.linearGradient}
         >
             <Text style={styles.buttonText}>Sign in with Facebook</Text>
-        </LinearGradient>
+        </LinearGradient> */}
         </View>
     );
 };
@@ -116,12 +116,12 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginTop: 30,
     },
-    linearGradient: {
-        flex: 1,
-        paddingLeft: 15,
-        paddingRight: 15,
-        borderRadius: 5
-    },
+    // linearGradient: {
+    //     flex: 1,
+    //     paddingLeft: 15,
+    //     paddingRight: 15,
+    //     borderRadius: 5
+    // },
     buttonText: {
         fontSize: 18,
         fontFamily: 'Gill Sans',

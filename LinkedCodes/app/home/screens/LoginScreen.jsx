@@ -1,54 +1,73 @@
-import { StyleSheet, Text, View, Image, TextInput, Button } from "react-native";
+import { StyleSheet, Text, View, Image, TextInput, Button, TouchableOpacity } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
-import AntDesign from "react-native-vector-icons/AntDesign";
-// import LinearGradient from "react-native-linear-gradient";
+// import AntDesign from "react-native-vector-icons/AntDesign
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from 'react-native-vector-icons';
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
-        <View style={styles.topImageContainer}>
-            <Image
-            source={require("../../../assets/Vector1.png")}
-            style={styles.topImage}
-            />
-        </View>
+            <View style={styles.topImageContainer}>
+                <Image
+                source={require("../../../assets/Vector_1.png")}
+                style={styles.topImage}
+                />
+            </View>
 
-        <View style={styles.helloContainer}>
-            <Text style={styles.hello}>Hello</Text>
-        </View>
+            <View style={styles.helloContainer}>
+                <Text style={styles.hello}>Hello</Text>
+            </View>
 
-        <View>
-            <Text style={styles.loginText}>Sign in to your account</Text>
-        </View>
+            <View>
+                <Text style={styles.loginText}>Sign in to your account</Text>
+            </View>
 
-        <View style={styles.inputContainer}>
-            <Icon name={"user"} size={24} color={"#ccc"} style={styles.inputIcon} />
-            <TextInput style={styles.textInput} placeholder="Email" />
-        </View>
+            <View style={styles.inputContainer}>
+                <Icon name={"user"} size={24} color={"#ccc"} style={styles.inputIcon} />
+                <TextInput style={styles.textInput} placeholder="Email" />
+            </View>
 
-        <View style={styles.inputContainer}>
-            <Icon name={"lock"} size={24} color={"#ccc"} style={styles.inputIcon} />
-            <TextInput
-            style={styles.textInput}
-            placeholder="Password"
-            secureTextEntry={true}
-            />
-        </View>
+            <View style={styles.inputContainer}>
+                <Icon name={"lock"} size={24} color={"#ccc"} style={styles.inputIcon} />
+                <TextInput
+                    style={styles.textInput}
+                    placeholder="Password"
+                    secureTextEntry={true}
+                />
+            </View>
 
-        <Text style={styles.forgotPasswordText}>Forgot your password</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+                <Text style={styles.forgotPasswordText}>Forgot your password? <Text style={styles.createText}>Reset</Text></Text>
+            </TouchableOpacity>
 
-        <View style={styles.signInButtonconatiner}>
-            {/* <Button title="Sign in" color="#ccc" style={styles.signInButton} /> */}
-            <Text style={styles.signIn}>Sign in</Text>
-        </View>
+            {/* The sign in button needs to go home */}
+            <TouchableOpacity style={styles.signInButtonContainer} onPress={() => navigation.navigate('HomeScreen')}>
+                <Text  style={styles.signIn} >Sign In</Text>
+                <LinearGradient
+                    colors={["#E5C200", "#3A5CAD"]}
+                    style={styles.gradient}
+                >
+                    <MaterialIcons name="arrow-forward" size={24} color="#000" />
+                </LinearGradient>
+            </TouchableOpacity>
+            
+            <TouchableOpacity onPress={() => navigation.navigate('SignupScreen')}>
+                <Text style={styles.signUp}>Don't have account? <Text style={styles.createText}>Create</Text></Text>
+            </TouchableOpacity>
 
-        {/* <LinearGradient
-            colors={["#4c669f", "#3b5998", "#192f6a"]}
-            style={styles.linearGradient}
-        >
-            <Text style={styles.buttonText}>Sign in with Facebook</Text>
-        </LinearGradient> */}
+            <View style={styles.leftVectorContainer}>
+                <Image 
+                    source={require("../../../assets/Vector_2.png")}
+                    style={styles.leftImage}
+                />
+            </View>
+            {/* <LinearGradient
+                colors={["#FFFFFF", "#FFE998"]}
+                style={styles.linearGradient}
+            >
+                <Text style={styles.buttonText}>Sign in with Facebook</Text>
+            </LinearGradient> */}
         </View>
     );
 };
@@ -59,13 +78,15 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         color: "#F5F5F5",
+        backgroundColor: "#fff",
+        position: "relative",
     },
     topImageContainer: {
         height: 50,
     },
     topImage: {
         width: "100%",
-        height: 130,
+        height: 150,
     },
     helloContainer: {
         marginTop: 79,
@@ -74,7 +95,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         fontSize: 50,
         fontWeight: "400",
-        color: "#262626",
+        color: "#3A5CAD",
     },
     loginText: {
         textAlign: "center",
@@ -109,19 +130,42 @@ const styles = StyleSheet.create({
         fontSize: 15,
         width: "87%",
     },
-    signInButtonconatiner: {},
-    signIn: {
-        color: "#262626",
-        fontSize: 25,
-        fontWeight: "bold",
-        marginTop: 30,
+    signInButtonContainer: {
+        flexDirection: "row",
+        marginTop: 100,
+        justifyContent: "center",
+        width: "90%",
+        justifyContent: "flex-end",
     },
-    // linearGradient: {
-    //     flex: 1,
-    //     paddingLeft: 15,
-    //     paddingRight: 15,
-    //     borderRadius: 5
-    // },
+    signIn: {
+        color: "#3A5CAD",
+        fontSize: 18,
+        fontWeight: "bold",
+    },
+    gradient: {
+        height: 34,
+        width: 66,
+        borderRadius: 70,
+        alignItems: "center",
+        justifyContent: "center",
+        marginHorizontal: 10,
+    },
+    signUp: {
+        color: "#BEBEBE",
+        textAlign: "center",
+        fontSize: 13,
+        marginTop: 50,
+        marginLeft: 84,
+    },
+    createText: {
+        textDecorationLine: "underline",
+    },
+    linearGradient: {
+        flex: 1,
+        paddingLeft: 15,
+        paddingRight: 15,
+        borderRadius: 5
+    },
     buttonText: {
         fontSize: 18,
         fontFamily: 'Gill Sans',
@@ -130,4 +174,13 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         backgroundColor: 'transparent',
     },
+    leftVectorContainer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+    },
+    leftImage: {
+        width: 110,
+        height: 300, 
+    }
 });

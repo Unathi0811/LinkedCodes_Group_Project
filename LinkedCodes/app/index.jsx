@@ -1,33 +1,36 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import OnboardingScreens from "./OnboardingScreens";
-import Gov_User_screen from "./home/screens/Gov_User_screen";
-import LoginScreen from "./home/screens/LoginScreen";
-import SignupScreen from "./home/screens/SignupScreen";
-import ForgotPasswordScreen from "./home/screens/ForgotPasswordScreen";
-import HomeScreen from "./home/screens/Home"
-const Stack = createNativeStackNavigator();
+import { ActivityIndicator, Text, View } from "react-native";
+import { Redirect, router } from "expo-router";
+import { getAuth } from "firebase/auth";
+import { app, db } from "../firebase";
+import { useUser } from "../src/cxt/user";
+import { doc, getDoc  } from "firebase/firestore";
 
-const App = () => {
-    return (
-        <NavigationContainer independent={true}>
-            <Stack.Navigator
-                screenOptions={{ headerShown: false }}
-                initialRouteName="OnboardingScreens"
-            >
-                <Stack.Screen name="OnboardingScreens" component={OnboardingScreens} />
-                <Stack.Screen name="Gov_User_screen" component={Gov_User_screen} />
-                <Stack.Screen name="LoginScreen" component={LoginScreen} />
-                <Stack.Screen name="SignupScreen" component={SignupScreen} />
-                <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
-                <Stack.Screen name="HomeScreen" component={HomeScreen} />
-            </Stack.Navigator>
-        </NavigationContainer>
-    );
+const _layout = () => {
+
+  const {setUser } = useUser();
+
+  getAuth(app).onAuthStateChanged(async (user) => {
+    if (!user) return router.replace("/(auth)");
+
+    // get the user from db
+    const docRef = doc(db, "user", user.uid);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      setUser({...docSnap.data(), uid: docSnap.id});
+    } else {
+      setUser({ uid: user.uid, email: user.email });
+    }
+    return router.replace("/(tabs)/Mantain");
+  });
+
+ 
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ActivityIndicator size="large" color="#0000ff" />
+      <Text>Loading...</Text>
+    </View>
+  );
 };
 
-export default App;
-
-const styles = StyleSheet.create({});
+export default _layout;

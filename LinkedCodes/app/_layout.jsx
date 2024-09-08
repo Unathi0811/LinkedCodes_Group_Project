@@ -1,17 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { StatusBar } from 'expo-status-bar'
-import { Stack } from 'expo-router'
+import { StatusBar } from "expo-status-bar";
+import { Slot } from "expo-router";
+import { UserProvider } from "../src/cxt/user";
 
 const _layout = () => {
-    return (
-        <>
-            <StatusBar style="light" />
-            <Stack screenOptions={{ headerShown: false}} />
-        </>
-    )
-}
+  return (
+    <UserProvider>
+      <StatusBar style="light" />
+      <Slot />
+    </UserProvider>
+  );
+};
 
-export default _layout
-
-const styles = StyleSheet.create({})
+export default _layout;

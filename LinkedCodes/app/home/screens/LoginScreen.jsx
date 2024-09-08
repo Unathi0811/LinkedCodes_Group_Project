@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         fontSize: 50,
         fontWeight: "400",
-        color: "#3A5CAD",
+        color: "#000",
     },
     loginText: {
         textAlign: "center",
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
         justifyContent: "flex-end",
     },
     signIn: {
-        color: "#3A5CAD",
+        color: "#000",
         fontSize: 18,
         fontWeight: "bold",
     },

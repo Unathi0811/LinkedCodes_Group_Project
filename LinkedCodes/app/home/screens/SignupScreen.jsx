@@ -6,7 +6,7 @@ import { MaterialIcons } from 'react-native-vector-icons';
 
 const SignupScreen = ({navigation}) => {
   return (
-    <View style={styles.container}>
+    <View style={styles.container} >
         <View style={styles.topImageContainer}>
             <Image
                 source={require("../../../assets/Vector_1.png")}
@@ -52,7 +52,7 @@ const SignupScreen = ({navigation}) => {
             </LinearGradient>
         </TouchableOpacity>
 
-        {/* The idea here is to allow one to be able to sign in using their facebook, google and apple ID, by face or fingerprint if one is using an android */}
+        { /* The idea here is to allow one to be able to sign in using their facebook, google and apple ID, by face or fingerprint if one is using an android */ }
         <View style={styles.socialMediaContainer}>
           <Text style={styles.socialText}>Or create account using social media</Text>
           <View style={styles.socialIconsContainer}>
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   createAccountText: {
     fontSize: 23,
-    color: "#3A5CAD",
+    color: "#000",
     textAlign: "center",
     marginBottom: 10,
     fontWeight: "bold",
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
       justifyContent: "flex-end",
   },
   signUp: {
-      color: "#3A5CAD",
+      color: "#000",
       fontSize: 18,
       fontWeight: "bold",
   },

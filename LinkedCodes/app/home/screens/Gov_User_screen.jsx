@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         textAlign: "center",
-        color: "#3A5CAD",
+        color: "#000",
         fontSize: 16,
     },
     leftVectorContainer: {

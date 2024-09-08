@@ -2,11 +2,9 @@ import React from 'react';
 import { StyleSheet, Text, View, Button, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-
 //IN PROGRESS
 const HomeScreen = () => {
     const navigation = useNavigation();
-
     return (
         <ScrollView style={styles.container}>
             <View style={styles.header}>

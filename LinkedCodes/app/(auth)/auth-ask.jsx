@@ -5,33 +5,24 @@ const Gov_User_screen = ({ navigation }) => {
   return (
     <>
       <View style={styles.container}>
-        <View style={styles.topImageContainer}>
-          <Image
-            source={require("../../assets/Vector_1.png")}
-            style={styles.topImage}
-          />
-        </View>
         <View style={styles.buttonContainer}>
+          <Image 
+          style={styles.logo}
+            source={require('../../assets/logo.png')}
+          />
           <Link href="/login" asChild>
             <TouchableOpacity
               style={styles.button}
-              // onPress={() => ('LoginScreen')}
             >
               <Text style={styles.buttonText}>Government</Text>
             </TouchableOpacity>
           </Link>
-
+          {/* login kelly */}
           <Link href="/login" asChild>
             <TouchableOpacity style={styles.button}>
-              <Text style={styles.buttonText}>User</Text>
+              <Text style={styles.buttonText}>Citizen</Text>
             </TouchableOpacity>
           </Link>
-        </View>
-        <View style={styles.leftVectorContainer}>
-          <Image
-            source={require("../../assets/Vector_2.png")}
-            style={styles.leftImage}
-          />
         </View>
       </View>
     </>
@@ -44,14 +35,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    position: "relative",
+    justifyContent: "center",
   },
-  topImageContainer: {
-    height: 50,
-  },
-  topImage: {
-    width: "100%",
-    height: 150,
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 74,
+    marginTop: -34,
   },
   buttonContainer: {
     flex: 1,
@@ -59,7 +49,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   button: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#202A44",
     borderRadius: 20,
     height: 50,
     width: "80%",
@@ -68,20 +58,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 3, height: 10 },
     shadowOpacity: 0.1,
     shadowColor: "#000",
-    marginBottom: 30,
+    marginBottom: 15,
   },
   buttonText: {
     textAlign: "center",
-    color: "#000",
+    color: "#fff",
     fontSize: 16,
-  },
-  leftVectorContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-  },
-  leftImage: {
-    width: 110,
-    height: 300,
+    fontWeight: "bold",
   },
 });

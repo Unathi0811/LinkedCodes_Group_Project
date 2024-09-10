@@ -39,6 +39,7 @@ const SignupScreen = () => {
           username,
           email,
           mobile,
+          userType: false,
         });
       })
       .catch((error) => {
@@ -50,23 +51,17 @@ const SignupScreen = () => {
   };
 
   return (
+    //a useContext that will take evrything heare and store them in the users profile
     <Pressable onPress={Keyboard.dismiss} style={styles.container}>
-      <View style={styles.topImageContainer}>
-        <Image
-          source={require("../../assets/Vector_1.png")}
-          style={styles.topImage}
-        />
-      </View>
-
       <View>
         <Text style={styles.createAccountText}>Create Account</Text>
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name={"user"} size={24} color={"#ccc"} style={styles.inputIcon} />
+        <Icon name={"briefcase"} size={20} color={"#ccc"} style={styles.inputIcon} />
         <TextInput
           style={styles.textInput}
-          placeholder="Username"
+          placeholder="Department"
           keyboardType="default"
           autoComplete="nickname"
           onChangeText={(text) => setUserData({ ...userData, username: text })}
@@ -75,15 +70,19 @@ const SignupScreen = () => {
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name={"lock"} size={24} color={"#ccc"} style={styles.inputIcon} />
+        <Icon
+          name={"mobile"}
+          size={24}
+          color={"#ccc"}
+          style={styles.inputIcon}
+        />
         <TextInput
           style={styles.textInput}
-          placeholder="Password"
-          keyboardType="default"
-          autoComplete="new-password"
-          secureTextEntry={true}
-          onChangeText={(text) => setUserData({ ...userData, password: text })}
-          value={userData.password}
+          placeholder="Mobile"
+          onChangeText={(text) => setUserData({ ...userData, mobile: text })}
+          value={userData.mobile}
+          keyboardType="phone-pad"
+          autoComplete="tel"
         />
       </View>
 
@@ -105,30 +104,28 @@ const SignupScreen = () => {
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon
-          name={"mobile"}
-          size={24}
-          color={"#ccc"}
-          style={styles.inputIcon}
-        />
+        <Icon name={"lock"} size={24} color={"#ccc"} style={styles.inputIcon} />
         <TextInput
           style={styles.textInput}
-          placeholder="Mobile"
-          onChangeText={(text) => setUserData({ ...userData, mobile: text })}
-          value={userData.mobile}
-          keyboardType="phone-pad"
-          autoComplete="tel"
+          placeholder="Password"
+          keyboardType="default"
+          autoComplete="new-password"
+          secureTextEntry={true}
+          onChangeText={(text) => setUserData({ ...userData, password: text })}
+          value={userData.password}
         />
       </View>
 
+      {/* this touchabale should have 3 tasks 
+      1) takes to the home screen
+      2) saves the data to the local storage 
+      3) and  think use useContext to display the data in profile
+      */}
       <TouchableOpacity
         style={styles.signUpButtonContainer}
         onPress={handleSignUp}
       >
-        <Text style={styles.signUp}>Create</Text>
-        <LinearGradient colors={["#E5C200", "#3A5CAD"]} style={styles.gradient}>
-          <MaterialIcons name="arrow-forward" size={24} color="#000" />
-        </LinearGradient>
+        <Text style={styles.signUp}>Sign Up</Text>
       </TouchableOpacity>
 
       {/* The idea here is to allow one to be able to sign in using their facebook, google and apple ID, by face or fingerprint if one is using an android */}
@@ -155,23 +152,7 @@ const SignupScreen = () => {
               style={styles.iconImage}
             />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.pressedSocial}
-            onPress={() => console.log("apple pressed")}
-          >
-            <Image
-              source={require("../../assets/apple.png")}
-              style={styles.iconImage}
-            />
-          </TouchableOpacity>
         </View>
-      </View>
-
-      <View style={styles.leftVectorContainer}>
-        <Image
-          source={require("../../assets/Vector_2.png")}
-          style={styles.leftImage}
-        />
       </View>
     </Pressable>
   );
@@ -194,13 +175,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 90,
   },
-  topImageContainer: {
-    height: 50,
-  },
-  topImage: {
-    width: "100%",
-    height: 150,
-  },
   inputContainer: {
     backgroundColor: "#ffffff",
     flexDirection: "row",
@@ -213,6 +187,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 3, height: 10 },
     shadowOpacity: 0.1,
     shadowColor: "#000",
+    gap: 10,  
+    paddingHorizontal: 10,
   },
   textInput: {
     flex: 1,
@@ -246,16 +222,24 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   signUpButtonContainer: {
+    backgroundColor: "#202A44",
     flexDirection: "row",
-    marginTop: 40,
-    justifyContent: "center",
-    width: "90%",
-    justifyContent: "flex-end",
+    borderRadius: 20,
+    marginHorizontal: 40,
+    elevation: 10,
+    marginVertical: 20,
+    height: 50,
+    justifyContent: "center", 
+    alignItems: "center",
+    shadowOffset: { width: 3, height: 10 },
+    shadowOpacity: 0.1,
+    shadowColor: "#202A44",
   },
   signUp: {
-    color: "#000",
+    color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+    textAlign: "center",
   },
   gradient: {
     height: 34,
@@ -264,15 +248,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: 10,
-  },
-  leftVectorContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-  },
-  leftImage: {
-    width: 90,
-    height: 230,
-    marginRight: 3,
   },
 });

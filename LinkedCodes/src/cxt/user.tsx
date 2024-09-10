@@ -39,4 +39,5 @@ export interface User {
   email: string;
   profileImage: string;
   phone: string;
+  userType ?: boolean;
 }

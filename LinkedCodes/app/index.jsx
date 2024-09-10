@@ -15,16 +15,19 @@ const _layout = () => {
     // get the user from db
     const docRef = doc(db, "user", user.uid);
     const docSnap = await getDoc(docRef);
+    //create a variable called type
+    let userType = false;
 
     if (docSnap.exists()) {
       setUser({...docSnap.data(), uid: docSnap.id});
+      userType = docSnap.data().userType;
     } else {
       setUser({ uid: user.uid, email: user.email });
     }
-    return router.replace("/(tabs)/Mantain");
+    return userType? router.replace("/(tabs)/Mantain") : router.replace("/(userTabs)/home");
   });
 
- 
+
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <ActivityIndicator size="large" color="#0000ff" />

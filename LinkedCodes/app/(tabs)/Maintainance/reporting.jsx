@@ -5,13 +5,13 @@ const Reporting = () => {
   const reports = [
     {
       id: 1,
-      image: require('../../assets/road.png'),
+      image: require('../../../assets/road.png'),
       description: 'Pothole on Main Street',
       coordinates: 'Lat: 40.7128, Long: -74.0060',
     },
     {
       id: 2,
-      image: require('../../assets/road.png'),
+      image: require('../../../assets/road.png'),
       description: 'Bridge needs maintenance',
       coordinates: 'Lat: 34.0522, Long: -118.2437',
     },

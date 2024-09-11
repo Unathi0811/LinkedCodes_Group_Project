@@ -83,7 +83,6 @@ export default function ResetPassword({ navigation }) {
             </Link>
 
         </View>
-
         <Overlay
             isVisible={visible}
             onBackdropPress={() => setVisible(false)}
@@ -101,13 +100,13 @@ export default function ResetPassword({ navigation }) {
 const styles = StyleSheet.create({
     mainView: {
         flex: 1,
-        backgroundColor: "#F2f9FB",
+        // backgroundColor: "#F2f9FB",
     },
 
     bottomview: {
         width: "100%",
         height: "100%",
-        backgroundColor: "#F2f9FB",
+        // backgroundColor: "#F2f9FB",
         padding: 30,
     },
     Heading: {

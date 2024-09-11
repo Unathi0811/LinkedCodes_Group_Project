@@ -6,7 +6,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 const _layout = () => {
   return (
-    <Tabs screenOptions={{ headerShown: !false }} initialRouteName="Home">
+    <Tabs screenOptions={{ headerShown: false }} initialRouteName='Home' >
       <Tabs.Screen
         name="Home"
         options={{
@@ -16,7 +16,7 @@ const _layout = () => {
         }}
       />
       <Tabs.Screen
-        name="Mantain"
+        name="Maintainance"
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="cog-outline" color={color} size={size} />

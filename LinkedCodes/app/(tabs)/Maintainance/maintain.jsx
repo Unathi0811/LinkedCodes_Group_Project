@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
 import { signOut } from "firebase/auth";
-import { auth } from "../../firebase";
-import Calendar from "../components/Calender";
+import { auth } from "../../../firebase";
+import Calendar from "../../components/Calender";
 
 const Mantain = () => {
   return (

@@ -1,5 +1,4 @@
-// create a user context, and provide a user object to the context, and a function to update the user object, and a hook
-
+// this creates a user context, and provide a user object to the context, and a function to update the user object, and a hook
 import React, { createContext, useContext, useState } from "react";
 
 // create a user context
@@ -11,7 +10,6 @@ const UserContext = createContext(
 );
 
 // create a user provider
-
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   return (
@@ -22,7 +20,6 @@ export const UserProvider = ({ children }) => {
 };
 
 // create a user hook
-
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
@@ -30,8 +27,6 @@ export const useUser = () => {
   }
   return context;
 };
-
-// user object tnterface
 
 export interface User {
   uid: string;

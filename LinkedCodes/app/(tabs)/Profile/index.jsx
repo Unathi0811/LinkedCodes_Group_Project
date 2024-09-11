@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  ScrollViewBase,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import { useState } from "react";
 import { Button, Image, Pressable } from "react-native";
@@ -16,10 +23,15 @@ import { doc, updateDoc } from "firebase/firestore";
 import { useUser } from "../../../src/cxt/user";
 import { db, auth } from "../../../firebase";
 import { signOut } from "firebase/auth";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const Profile = () => {
   const { setUser, user } = useUser();
   const [image, setImage] = useState(user.profileImage);
+
+  const handleMenuPress = () => {
+    console.log("Hamburger menu pressed");
+  };
 
   const pickImage = async () => {
     try {
@@ -50,109 +62,58 @@ const Profile = () => {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        padding: 20,
-        alignItems: "center",
-        gap: 30,
-      }}
-    >
-      <View
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 10,
-        }}
-      >
-        <Pressable onPress={pickImage}>
-          <Image source={{ uri: user.profileImage }} style={styles.image} />
-        </Pressable>
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: "bold",
-          }}
+    <View style={styles.container}>
+      {/* Fixed header with hamburger button */}
+      <View style={styles.headerContainer}>
+        {/* <TouchableOpacity
+          onPress={handleMenuPress}
+          style={styles.hamburgerButton}
         >
-          {user.username ?? "Unkown Name"}
-        </Text>
-      </View>
-
-      <View
-        style={{
-          // alignItems: "center",
-          width: "90%",
-          gap: 10,
-        }}
-      >
-        <Link href="/edit-profile">
-          <Pressable
-            style={{
-              padding: 10,
-              borderRadius: 10,
-            }}
-          >
-            <Text
-              style={{
-                color: "blue",
-                fontSize: 16,
-              }}
-            >
-              Personal Information
-            </Text>
-          </Pressable>
-        </Link>
-
-        <Link href="/(tabs)/Profile/admin" asChild>
-          <Pressable
-            style={{
-              padding: 10,
-              borderRadius: 10,
-            }}
-          >
-            <Text
-              style={{
-                color: "blue",
-                fontSize: 16,
-              }}
-            >
-              Admin
-            </Text>
-          </Pressable>
-        </Link>
-
-        <Pressable
-          style={{
-            padding: 10,
-            borderRadius: 10,
-          }}
+          <Icon name="bars" size={24} color="#000" />
+        </TouchableOpacity> */}
+        <View
+        style={styles.header}
         >
+          <Pressable onPress={pickImage}>
+            <Image source={{ uri: user.profileImage }} style={styles.image} />
+          </Pressable>
+
           <Text
             style={{
-              color: "blue",
-              fontSize: 16,
+              fontSize: 15,
+              fontWeight: "bold",
+              color: "#202A44",
             }}
           >
-            Delete Account
+            Welcome {user.username ?? "Unkown Name"} !
           </Text>
-        </Pressable>
-        <Pressable
-          style={{
-            padding: 10,
-            borderRadius: 10,
-          }}
-          onPress={() => signOut(auth)}
-        >
-          <Text
-            style={{
-              color: "blue",
-              fontSize: 16,
-            }}
-          >
-            Logout
-          </Text>
-        </Pressable>
+        </View>
       </View>
+
+      <ScrollView style={styles.content}>
+        
+      <View style={styles.linksContainer}>
+          <Link href="/edit-profile" asChild>
+            <Pressable style={styles.card}>
+              <Text style={styles.cardText}>Personal Information</Text>
+            </Pressable>
+          </Link>
+
+          <Link href="/(tabs)/Profile/admin" asChild>
+            <Pressable style={styles.card}>
+              <Text style={styles.cardText}>Admin</Text>
+            </Pressable>
+          </Link>
+
+          <Pressable style={styles.card}>
+            <Text style={styles.cardText}>Delete Account</Text>
+          </Pressable>
+
+          <Pressable style={styles.card} onPress={() => signOut(auth)}>
+            <Text style={styles.cardText}>Logout</Text>
+          </Pressable>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -205,9 +166,54 @@ const saveProfileImage = async (userId, downloadUrl) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1, 
+    backgroundColor: "#F2f9FB",
+  },
+  content: {
+    marginTop: 200, 
+    paddingHorizontal: 20,
+  },
+  header: {
+    flexDirection: "row",
+    gap: 20,
+  },
+  headerContainer: {
+    position: "absolute",
+    top: 23,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    padding: 50,
+    justifyContent: "space-between",
+    alignItems: "center",
+    zIndex: 10,
+    backgroundColor: "#F2f9FB",
+  },
+  hamburgerButton: {
+    padding: 10,
+  },
   image: {
-    width: 100,
-    height: 100,
+    width: 70,
+    height: 70,
     borderRadius: 50,
+  },
+  linksContainer: {
+    width: "100%",
+    gap: 15,
+  },
+  card: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  cardText: {
+    color: "#202A44",
+    fontSize: 16,
   },
 });

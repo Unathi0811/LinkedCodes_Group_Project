@@ -6,15 +6,14 @@ import { useUser } from "../src/cxt/user";
 import { doc, getDoc  } from "firebase/firestore";
 
 const _layout = () => {
-
   const {setUser } = useUser();
-
   getAuth(app).onAuthStateChanged(async (user) => {
     if (!user) return router.replace("/(auth)");
 
     // get the user from db
     const docRef = doc(db, "user", user.uid);
     const docSnap = await getDoc(docRef);
+
     //create a variable called type
     let userType = false;
 
@@ -24,9 +23,8 @@ const _layout = () => {
     } else {
       setUser({ uid: user.uid, email: user.email });
     }
-    return userType? router.replace("/(tabs)/Mantain") : router.replace("/(userTabs)/home");
+    return userType? router.replace("/(tabs)/Home") : router.replace("/(userTabs)/home");
   });
-
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

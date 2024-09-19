@@ -9,22 +9,27 @@ const _layout = () => {
   const {setUser } = useUser();
   getAuth(app).onAuthStateChanged(async (user) => {
     if (!user) return router.replace("/(auth)");
-
-    // get the user from db
-    const docRef = doc(db, "user", user.uid);
-    const docSnap = await getDoc(docRef);
-
-    //create a variable called type
-    let userType = false;
-
-    if (docSnap.exists()) {
-      setUser({...docSnap.data(), uid: docSnap.id});
-      userType = docSnap.data().userType;
-    } else {
-      setUser({ uid: user.uid, email: user.email });
+  
+    try {
+      const docRef = doc(db, "user", user.uid);
+      const docSnap = await getDoc(docRef);
+  
+      let userType = false;
+      if (docSnap.exists()) {
+        setUser({ ...docSnap.data(), uid: docSnap.id });
+        userType = docSnap.data().userType;
+      } else {
+        setUser({ uid: user.uid, email: user.email });
+      }
+  
+      return userType
+        ? router.replace("/(tabs)/Home")
+        : router.replace("/(userTabs)/home");
+    } catch (error) {
+      console.error("Error fetching user data: ", error);
     }
-    return userType? router.replace("/(tabs)/Home") : router.replace("/(userTabs)/home");
   });
+  
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

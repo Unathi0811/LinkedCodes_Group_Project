@@ -93,7 +93,8 @@ const Profile = () => {
       <ScrollView style={styles.content}>
         
       <View style={styles.linksContainer}>
-          <Link href="/edit-profile" asChild>
+          {/* create the edit profile screen */}
+          <Link href="/(tabs)/Profile/edit-profile" asChild>
             <Pressable style={styles.card}>
               <Text style={styles.cardText}>Personal Information</Text>
             </Pressable>
@@ -168,11 +169,11 @@ const saveProfileImage = async (userId, downloadUrl) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1, 
-    backgroundColor: "#F2f9FB",
+    backgroundColor: "#fff",
   },
   content: {
     marginTop: 200, 
-    paddingHorizontal: 20,
+    paddingHorizontal: 30,
   },
   header: {
     flexDirection: "row",
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     zIndex: 10,
-    backgroundColor: "#F2f9FB",
+    backgroundColor: "#fff",
   },
   hamburgerButton: {
     padding: 10,
@@ -201,6 +202,7 @@ const styles = StyleSheet.create({
   linksContainer: {
     width: "100%",
     gap: 15,
+    marginTop: 30,
   },
   card: {
     backgroundColor: "#fff",

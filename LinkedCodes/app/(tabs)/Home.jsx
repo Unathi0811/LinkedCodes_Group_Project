@@ -1,6 +1,14 @@
-import { StyleSheet, Text, TouchableOpacity, View, Image, ScrollView } from "react-native";
+import {
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    Image,
+    ScrollView,
+} from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { Link, router } from "expo-router";
 
 const Home = () => {
     const handleMenuPress = () => {
@@ -9,32 +17,65 @@ const Home = () => {
 
     return (
         <View style={styles.container}>
-            {/* Fixed header with hamburger button */}
-            <View style={styles.headerContainer}>
-                <TouchableOpacity
-                    onPress={handleMenuPress}
-                    style={styles.hamburgerButton}
-                >
-                    <Icon name="bars" size={24} color="#202A44" />
-                </TouchableOpacity>
+        {/* Fixed header with hamburger button */}
+        <View style={styles.headerContainer}>
+            <TouchableOpacity
+            onPress={handleMenuPress}
+            style={styles.hamburgerButton}
+            >
+            <Icon name="bars" size={24} color="#202A44" />
+            </TouchableOpacity>
+            <Text style={styles.appName}>InfraSmart</Text>
+        </View>
+
+        {/* Scrollable content */}
+        <ScrollView style={styles.content}>
+            <Text style={styles.overviewText}>Overview</Text>
+
+            <Link style={styles.manageButton} asChild href="/(tabs)/Maintainance/reporting">
+            <TouchableOpacity style={styles.manageButton}>
+                <Text style={styles.manageButtonText}>Manage Reports</Text>
+            </TouchableOpacity>
+            </Link>
+
+            {/* Upcoming Maintenance Button */}
+            <Link style={styles.upcomingButton} asChild href="/(tabs)/Maintainance/maintain">
+            <TouchableOpacity style={styles.upcomingButton}>
+                <Text style={styles.upcomingButtonText}>Upcoming Maintenance</Text>
+            </TouchableOpacity>
+            </Link>
+
+            {/* Recent Updates Section */}
+            <Text style={styles.recentUpdatesTitle}>Recent Updates</Text>
+            <View style={styles.card}>
+            <Image
+                source={require("../../assets/road.png")}
+                style={styles.image}
+            />
+            <Text style={styles.headline}>Pothole Repair Completed</Text>
+            </View>
+            <View style={styles.card}>
+            <Image
+                source={require("../../assets/bridge.png")}
+                style={styles.image}
+            />
+            <Text style={styles.headline}>Bridge Inspection Scheduled</Text>
             </View>
 
-            {/* Scrollable content */}
-            <ScrollView style={styles.content}>
-                <Text style={styles.newsText}>News</Text>
-                
-                {/* News card */}
-                <View style={styles.card}>
-                    <Image source={require("../../assets/road.png")} style={styles.image} />
-                    <Text style={styles.headline}>Headline</Text>
-                </View>
-                
-                {/* Stop-and-go card */}
-                <View style={styles.card}>
-                    <Image source={require("../../assets/stop.png")} style={styles.image} />
-                    <Text style={styles.headline}>Stop-and-go roads update</Text>
-                </View>
-            </ScrollView>
+            <TouchableOpacity style={styles.viewAllButton}>
+            <Text style={styles.viewAllText}>View All Updates</Text>
+            </TouchableOpacity>
+
+            <View style={styles.educationalSection}>
+            <Text style={styles.educationalText}>
+                Learn about the latest maintenance practices and reporting tools.
+            </Text>
+            <Image
+                source={require("../../assets/road.png")}
+                style={styles.educationalIcon}
+            />
+            </View>
+        </ScrollView>
         </View>
     );
 };
@@ -43,11 +84,11 @@ export default Home;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1, // Full-screen layout
+        flex: 1,
         backgroundColor: "#F2f9FB",
     },
     headerContainer: {
-        position: "absolute", // Makes it fixed at the top
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
@@ -55,21 +96,55 @@ const styles = StyleSheet.create({
         padding: 20,
         justifyContent: "space-between",
         alignItems: "center",
-        zIndex: 10, // Ensure it's on top of other content
-        backgroundColor: "#F2f9FB", // Background to match the container
+        zIndex: 10,
+        backgroundColor: "#F2f9FB",
     },
     hamburgerButton: {
         padding: 10,
     },
+    appName: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#202A44",
+    },
     content: {
-        marginTop: 80, // Add margin to push down content so it's not behind the header
+        marginTop: 80,
         paddingHorizontal: 20,
     },
-    newsText: {
+    overviewText: {
         fontSize: 20,
         fontWeight: "bold",
         marginVertical: 20,
-        textAlign: "left",
+        color: "#202A44",
+    },
+    manageButton: {
+        backgroundColor: "#202A44",
+        borderRadius: 10,
+        paddingVertical: 15,
+        alignItems: "center",
+        marginBottom: 10,
+    },
+    manageButtonText: {
+        color: "#FFF",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    upcomingButton: {
+        backgroundColor: "#202A44",
+        borderRadius: 10,
+        paddingVertical: 15,
+        alignItems: "center",
+        marginBottom: 20,
+    },
+    upcomingButtonText: {
+        color: "#FFF",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    recentUpdatesTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginVertical: 10,
         color: "#202A44",
     },
     card: {
@@ -95,5 +170,32 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         textAlign: "center",
         color: "#202A44",
+    },
+    viewAllButton: {
+        alignItems: "center",
+        marginVertical: 10,
+    },
+    viewAllText: {
+        color: "#202A44",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    educationalSection: {
+        backgroundColor: "#E8F4F8",
+        borderRadius: 10,
+        padding: 15,
+        marginVertical: 20,
+        alignItems: "center",
+        flexDirection: "row",
+    },
+    educationalText: {
+        fontSize: 16,
+        color: "#202A44",
+        flex: 1,
+    },
+    educationalIcon: {
+        width: 30,
+        height: 30,
+        marginLeft: 10,
     },
 });

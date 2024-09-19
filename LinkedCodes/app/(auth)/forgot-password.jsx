@@ -42,6 +42,9 @@ export default function ResetPassword({ navigation }) {
 
     return (
         <View style={styles.mainView}>
+            <View style={styles.imageContainer}>
+                <Image source={require("../../assets/top.png")} style={styles.topImage} />
+            </View>
         <View style={styles.bottomview}>
             <Text style={styles.Heading}>Reset Password</Text>
             <View style={styles.formView}>
@@ -68,21 +71,22 @@ export default function ResetPassword({ navigation }) {
                 <Text style={styles.buttonText}>Send Reset Email</Text>
             </TouchableOpacity>
             </View>
-            
-            <Link href="/login" asChild>
-                <TouchableOpacity>
-                    <View style={styles.icon}>
-                        <Icon
-                        style={styles.icon}
-                        name="chevron-left"
-                        size={45}
-                        color="#202A44"
-                        />
-                    </View>
-                </TouchableOpacity>
-            </Link>
-
+            <View style={styles.bottomContainer}>
+                <Link href="/login" asChild>
+                    <TouchableOpacity>
+                        <View style={styles.icon}>
+                            <Icon
+                            style={styles.icon}
+                            name="chevron-left"
+                            size={45}
+                            color="#202A44"
+                            />
+                        </View>
+                    </TouchableOpacity>
+                </Link>
+            </View>
         </View>
+        <Image source={require("../../assets/right.png")} style={styles.rightImage} />
         <Overlay
             isVisible={visible}
             onBackdropPress={() => setVisible(false)}
@@ -100,21 +104,20 @@ export default function ResetPassword({ navigation }) {
 const styles = StyleSheet.create({
     mainView: {
         flex: 1,
-        // backgroundColor: "#F2f9FB",
+        backgroundColor: "#fff",
     },
-
     bottomview: {
         width: "100%",
         height: "100%",
-        // backgroundColor: "#F2f9FB",
+        backgroundColor: "#fff",
         padding: 30,
     },
     Heading: {
         color: "#202A44",
-        fontSize: 24,
+        fontSize: 25,
         marginRight: 30,
         fontWeight: "bold",
-        marginTop: 199,
+        marginTop: 89,
         textAlign: "center",
         marginBottom: -95,
     },
@@ -190,7 +193,7 @@ const styles = StyleSheet.create({
         width: "90%",
         alignItems: "center",
         shadowOffset: { width: 3, height: 10 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0.8,
         shadowColor: "#202A44",
         gap: 10,  
         paddingHorizontal: 10,
@@ -198,8 +201,28 @@ const styles = StyleSheet.create({
     inputHeading: {
         color: "#202A44",
         marginTop: 15,
-
         alignSelf: "flex-start",
         paddingLeft: 25,
     },
+    topImage: {
+        width: '100%',
+        height: 140,
+        resizeMode: 'cover',
+        marginBottom: 0,
+        marginLeft: -29,
+        marginTop: 0,
+      },
+      bottomContainer:{
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-between",
+      },
+      rightImage: {
+        width: 344,
+        height: 140,
+        resizeMode: 'cover',
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+      }
 });

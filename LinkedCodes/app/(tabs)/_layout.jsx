@@ -1,14 +1,13 @@
 import React from "react";
 import { Tabs } from "expo-router";
-import Home from "./Home";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
-const _layout = () => {
+const Layout = () => {
   return (
     <Tabs screenOptions={{ headerShown: false }} initialRouteName='Home' >
       <Tabs.Screen
-        name="Home"
+        name="Home" 
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" color={color} size={size} />
@@ -24,8 +23,10 @@ const _layout = () => {
         }}
       />
       <Tabs.Screen
-        name="RateUs"
+        name="rate"
         options={{
+          title: "Rate Us",
+          tabBarLabel: "Rate Us",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="star-outline"color={color} size={size} />
           ),
@@ -51,4 +52,4 @@ const _layout = () => {
   );
 };
 
-export default _layout;
+export default Layout;

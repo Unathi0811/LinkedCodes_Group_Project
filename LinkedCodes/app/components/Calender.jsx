@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Modal, StyleSheet } from 'react-native';
+import React, { useState } from 'react'; 
+import { View, Text, TextInput, Button, Modal, StyleSheet, Dimensions, Pressable} from 'react-native';
 import { Agenda } from 'react-native-calendars';
 
 const Calendar = () => {
@@ -48,108 +48,147 @@ const Calendar = () => {
 
   // Render the agenda
   return (
-    <View style={{ flex: 1 }}>
-      <Agenda
-        items={items}
-        loadItemsForMonth={loadItems}
-        selected={selectedDate || '2024-09-05'}
-        onDayPress={(day) => {
-          setSelectedDate(day.dateString); // Set the clicked date
-          setModalVisible(true); // Open the modal to add activity
-        }}
-        renderItem={(item) => (
-          <View style={styles.item}>
-            <Text>{item.name}</Text>
-          </View>
-        )}
-        renderEmptyDate={() => (
-          <View style={styles.emptyDate}>
-            <Text>No activities for this date</Text>
-          </View>
-        )}
-        rowHasChanged={(r1, r2) => r1.name !== r2.name}
-        
-        // Theme for the calendar
-        theme={{
-          backgroundColor: '#000000', // background
-          calendarBackground: '#000000', // calendar background
-          textSectionTitleColor: '#808080', //  section titles (weekdays)
-          selectedDayBackgroundColor: '#D8CA0C', //  selected day
-          selectedDayTextColor: '#000000', // text on selected day
-          todayTextColor: '#FFFFFF', // text for today's date
-          dayTextColor: '#FFFFFF', // dates text
-          textDisabledColor: '#808080', //for disabled dates
-          dotColor: '#FFD700', //  dot for days with items
-          selectedDotColor: '#FFFFFF', //dot for selected day
-          arrowColor: '#808080', // arrows
-          monthTextColor: '#808080', // month text
-        }}
-      />
+    <View style={styles.container}>
+      <View style={styles.calendarCard}>
+        <Agenda
+          items={items}
+          loadItemsForMonth={loadItems}
+          selected={selectedDate || '2024-09-05'}
+          onDayPress={(day) => {
+            setSelectedDate(day.dateString); // Set the clicked date
+            setModalVisible(true); // Open the modal to add activity
+          }}
+          renderItem={(item) => (
+            <View style={styles.item}>
+              <Text>{item.name}</Text>
+            </View>
+          )}
+          renderEmptyDate={() => (
+            <View style={styles.emptyDate}>
+              <Text>No activities for this date</Text>
+            </View>
+          )}
+          rowHasChanged={(r1, r2) => r1.name !== r2.name}
+          
+          // Theme for the calendar
+          theme={{
+            backgroundColor: '#202A44', // background
+            calendarBackground: '#202A44', // calendar background
+            textSectionTitleColor: '#FFFFFF', // section titles (weekdays)
+            selectedDayBackgroundColor: '#FFFFFF', // selected day
+            selectedDayTextColor: '#202A44', // text on selected day
+            todayTextColor: '#FFD700', // text for today's date
+            dayTextColor: '#FFFFFF', // dates text
+            textDisabledColor: '#808080', // for disabled dates
+            dotColor: '#FFD700', // dot for days with items
+            selectedDotColor: '#202A44', // dot for selected day
+            arrowColor: '#FFD700', // arrows
+            monthTextColor: '#FFFFFF', // month text
+          }}
+        />
+      </View>
 
-      {/*Modal for adding a new activity */}
-
+      {/* Modal for adding a new activity */}
       <Modal visible={modalVisible} animationType="slide">
         <View style={styles.modalContent}>
-            <Text style={styles.title}>ACTIVITY</Text>
+          <Text style={styles.title}>ACTIVITY</Text>
           <Text style={styles.activityText}>Add activity for {selectedDate}</Text>
           <TextInput
             style={styles.input}
             placeholder="Enter activity"
+            placeholderTextColor={"#D3D3D3"}
             value={newActivity}
             onChangeText={setNewActivity}
           />
-          <View style={styles.buttons}>
-          <Button   color="#000"title="Add Activity" onPress={addActivity} />
-          <Button color="#000" title="Close" onPress={() => setModalVisible(false)} />
-          </View>
+
+        <View style={styles.buttons}>
+            <Pressable style={styles.button} onPress={addActivity}>
+              <Text style={styles.buttonText}>Add Activity</Text>
+            </Pressable>
+            <Pressable style={styles.button} onPress={() => setModalVisible(false)}>
+              <Text style={styles.buttonText}>Close</Text>
+            </Pressable>
+        </View>
         </View>
       </Modal>
     </View>
   );
 };
 
-
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#fff',
+  },
+  calendarCard: {
+    flex: 1,
+    borderRadius: 10,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+    backgroundColor: '#fff',
+  },
   item: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: 10,
     marginRight: 10,
     marginTop: 17,
+    borderRadius: 5,
   },
   emptyDate: {
     padding: 10,
     marginRight: 10,
     marginTop: 17,
+    borderRadius: 5,
   },
   modalContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor:"#D8CA0C"
+    backgroundColor: '#fff',
   },
   input: {
-    borderColor: 'gray',
-    borderWidth: 1,
+    borderColor: '#202A44',
+    borderWidth: 2,
+    borderRadius: 20,
     padding: 10,
     width: '80%',
     marginBottom: 10,
   },
-  buttons:{
-    flexDirection:"row",
-    justifyContent:"space-between",
-    marginTop:30,
-    width:"80%"
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 30,
+    width: '80%',
   },
-  activityText:{
-    fontSize:15,
-    marginBottom:10
+  button: {
+    backgroundColor: '#202A44',
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: 5,
+    alignItems: 'center',
   },
-  title:{
-    fontSize:40,
-    marginBottom:30
-  }
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  activityText: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: '#202A44',
+  },
+  title: {
+    fontSize: 30,
+    marginBottom: 20,
+    color: '#202A44',
+    fontWeight: "bold",
+  },
 });
 
 export default Calendar;
-

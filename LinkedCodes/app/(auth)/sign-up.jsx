@@ -53,6 +53,9 @@ const SignupScreen = () => {
   return (
     //a useContext that will take evrything heare and store them in the users profile
     <Pressable onPress={Keyboard.dismiss} style={styles.container}>
+      <View style={styles.imageContainer}>
+        <Image source={require("../../assets/top.png")} style={styles.topImage} />
+      </View>
       <View>
         <Text style={styles.createAccountText}>Create Account</Text>
       </View>
@@ -154,6 +157,9 @@ const SignupScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+      <View style={styles.imageContainer}>
+        <Image source={require("../../assets/bottom.png")} style={styles.bottomImage} />
+      </View>
     </Pressable>
   );
 };
@@ -168,12 +174,12 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   createAccountText: {
-    fontSize: 23,
-    color: "#000",
+    fontSize: 28,
+    color: "#202A44",
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 0,
     fontWeight: "bold",
-    marginTop: 90,
+    marginTop: 20,
   },
   inputContainer: {
     backgroundColor: "#ffffff",
@@ -185,8 +191,8 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: "center",
     shadowOffset: { width: 3, height: 10 },
-    shadowOpacity: 0.1,
-    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowColor: "#202A44",
     gap: 10,  
     paddingHorizontal: 10,
   },
@@ -212,7 +218,7 @@ const styles = StyleSheet.create({
     margin: 10,
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
-    shadowColor: "#000",
+    shadowColor: "#202A44",
     shadowRadius: 10,
     elevation: 5,
   },
@@ -232,7 +238,7 @@ const styles = StyleSheet.create({
     justifyContent: "center", 
     alignItems: "center",
     shadowOffset: { width: 3, height: 10 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowColor: "#202A44",
   },
   signUp: {
@@ -248,5 +254,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: 10,
+  },
+  topImage: {
+    width: '100%',
+    height: 120,
+    resizeMode: 'cover',
+    marginBottom: 0,
+    marginLeft: -29,
+    marginTop: 0,
+  },
+  bottomImage: {
+    width: '100%',
+    height: 140,
+    resizeMode: 'cover',
+    marginLeft: -44,
+    marginTop: 30,
   },
 });

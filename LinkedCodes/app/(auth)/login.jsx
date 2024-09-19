@@ -8,8 +8,6 @@ import {
 } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { LinearGradient } from "expo-linear-gradient";
-import { MaterialIcons } from "react-native-vector-icons";
 import { Link } from "expo-router";
 
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
@@ -33,6 +31,9 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.imageContainer}>
+        <Image source={require("../../assets/top.png")} style={styles.topImage} />
+      </View>
       <View style={styles.helloContainer}>
         <Text style={styles.hello}>Hello</Text>
       </View>
@@ -90,6 +91,10 @@ const LoginScreen = () => {
           </Text>
         </TouchableOpacity>
       </Link>
+
+      <View style={styles.imageContainer}>
+        <Image source={require("../../assets/bottom.png")} style={styles.bottomImage} />
+      </View>
     </View>
   );
 };
@@ -108,7 +113,7 @@ const styles = StyleSheet.create({
     color: "#202A44",
   },
   helloContainer: {
-    marginTop: 120,
+    marginTop: 0,
   },
   hello: {
     textAlign: "center",
@@ -133,7 +138,7 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: "center",
     shadowOffset: { width: 3, height: 10 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowColor: "#202A44",
   },
   textInput: {
@@ -161,7 +166,7 @@ const styles = StyleSheet.create({
     justifyContent: "center", 
     alignItems: "center",
     shadowOffset: { width: 3, height: 10 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowColor: "#202A44",
   },
   signIn: {
@@ -201,5 +206,21 @@ const styles = StyleSheet.create({
     margin: 10,
     color: "#ffffff",
     backgroundColor: "transparent",
+  },
+  topImage: {
+    width: '100%',
+    height: 120,
+    resizeMode: 'cover',
+    marginBottom: 0,
+    marginLeft: -29,
+    marginTop: 0,
+  },
+  
+  bottomImage: {
+    width: '100%',
+    height: 140,
+    resizeMode: 'cover',
+    marginLeft: -23,
+    marginTop: 56,
   },
 });

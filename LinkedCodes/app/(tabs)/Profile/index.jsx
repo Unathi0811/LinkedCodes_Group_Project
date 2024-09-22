@@ -106,9 +106,11 @@ const Profile = () => {
             </Pressable>
           </Link>
 
-          <Pressable style={styles.card}>
-            <Text style={styles.cardText}>Delete Account</Text>
-          </Pressable>
+          <Link asChild href={"/(tabs)/Profile/edit-profile"}>
+            <Pressable style={styles.card}>
+              <Text style={styles.cardText}>Delete Account</Text>
+            </Pressable>
+          </Link>
 
           <Pressable style={styles.card} onPress={() => signOut(auth)}>
             <Text style={styles.cardText}>Logout</Text>

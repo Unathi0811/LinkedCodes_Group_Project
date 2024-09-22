@@ -1,66 +1,23 @@
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
-const reports = [
-  {
-    id: 1,
-    userProfilePhoto: require('../../../assets/user.jpeg'),
-    reportImage: require('../../../assets/road.png'),
-    description: 'Pothole on Main Street',
-    coordinates: 'Lat: 40.7128, Long: -74.0060',
-  },
-  {
-    id: 2,
-    userProfilePhoto: require('../../../assets/user.jpeg'),
-    reportImage: require('../../../assets/road.png'),
-    description: 'Bridge needs maintenance',
-    coordinates: 'Lat: 34.0522, Long: -118.2437',
-  },
-  {
-    id: 3,
-    userProfilePhoto: require('../../../assets/user.jpeg'),
-    reportImage: require('../../../assets/road.png'),
-    description: 'Cracked pavement on 5th Ave',
-    coordinates: 'Lat: 41.8781, Long: -87.6298',
-  },
-  {
-    id: 4,
-    userProfilePhoto: require('../../../assets/user.jpeg'),
-    reportImage: require('../../../assets/road.png'),
-    description: 'Flooded area near the park',
-    coordinates: 'Lat: 37.7749, Long: -122.4194',
-  },
-  {
-    id: 5,
-    userProfilePhoto: require('../../../assets/user.jpeg'),
-    reportImage: require('../../../assets/road.png'),
-    description: 'Damaged traffic light at the intersection',
-    coordinates: 'Lat: 29.7604, Long: -95.3698',
-  },
-  {
-    id: 6,
-    userProfilePhoto: require('../../../assets/user.jpeg'),
-    reportImage: require('../../../assets/road.png'),
-    description: 'Missing road sign on Elm Street',
-    coordinates: 'Lat: 39.0997, Long: -94.5786',
-  },
-];
+import { useReport } from '../../../src/cxt/reports';
 
 const Reporting = () => {
+  const { report: reports } = useReport();
   const [showAll, setShowAll] = useState(false);
 
+  // Show only 3 reports if not toggled to show all
   const visibleReports = showAll ? reports : reports.slice(0, 3);
 
   const renderItem = ({ item }) => (
     <View key={item.id} style={styles.card}>
       <View style={styles.profileContainer}>
-        <Image source={item.userProfilePhoto} style={styles.profileImage} />
+        <Image source={{ uri: item.userProfilePhoto }} style={styles.profileImage} />
       </View>
       <View style={styles.reportContainer}>
-        <Image source={item.reportImage} style={styles.reportImage} />
+        <Image source={{ uri: item.reportImage }} style={styles.reportImage} />
         <Text style={styles.description}>{item.description}</Text>
-        <Text style={styles.coordinates}>{item.coordinates}</Text>
       </View>
     </View>
   );

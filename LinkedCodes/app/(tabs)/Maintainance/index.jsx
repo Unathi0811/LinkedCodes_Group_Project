@@ -19,7 +19,8 @@ const Maintenance = () => {
       </View>
 
       <ScrollView  style={styles.contentContainer}>
-        {/* Buttons for Reporting and Maintenance */}
+        {/* Buttons for Reporting and Maintenance */ }
+        
         <View style={styles.linkContainer} asChild>
           <Link href="/(tabs)/Maintenance/reporting" asChild>
             <Pressable style={styles.linkButton}>

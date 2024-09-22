@@ -35,4 +35,7 @@ export interface User {
   profileImage: string;
   phone: string;
   userType ?: boolean;
+  blocked?: boolean,
+  deleted?: boolean,
+  admin?: boolean
 }

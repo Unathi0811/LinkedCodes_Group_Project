@@ -14,8 +14,9 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "react-native-vector-icons";
 import { doc, setDoc } from "firebase/firestore";
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import { auth , db} from "../../firebase";
+import { createUserWithEmailAndPassword, getAuth, signOut } from "firebase/auth";
+import { auth, db } from "../../../../firebase";
+import { Stack } from "expo-router";
 
 const SignupScreen = () => {
   const [userData, setUserData] = React.useState({
@@ -39,8 +40,14 @@ const SignupScreen = () => {
           username,
           email,
           mobile,
-          userType: false,
+          userType: true,
+          blocked: false,
+          deleted: false,
         });
+        
+        await signOut(auth)
+        alert("You will be logged out for security purposes please log back in")
+
       })
       .catch((error) => {
         const errorMessage = error.message;
@@ -53,18 +60,25 @@ const SignupScreen = () => {
   return (
     //a useContext that will take evrything heare and store them in the users profile
     <Pressable onPress={Keyboard.dismiss} style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image source={require("../../assets/top.png")} style={styles.topImage} />
-      </View>
+      <Stack.Screen
+        options={{
+          headerTitle: "Add New Official",
+        }}
+      />
       <View>
         <Text style={styles.createAccountText}>Create Account</Text>
       </View>
 
       <View style={styles.inputContainer}>
-        <Icon name={"user"} size={20} color={"#ccc"} style={styles.inputIcon} />
+        <Icon
+          name={"briefcase"}
+          size={20}
+          color={"#ccc"}
+          style={styles.inputIcon}
+        />
         <TextInput
           style={styles.textInput}
-          placeholder="Username"
+          placeholder="Department"
           keyboardType="default"
           autoComplete="nickname"
           onChangeText={(text) => setUserData({ ...userData, username: text })}
@@ -120,46 +134,16 @@ const SignupScreen = () => {
       </View>
 
       {/* this touchabale should have 3 tasks 
-      1) takes to the home screen
-      2) saves the data to the local storage 
-      3) and  think use useContext to display the data in profile
-      */}
+        1) takes to the home screen
+        2) saves the data to the local storage 
+        3) and  think use useContext to display the data in profile
+        */}
       <TouchableOpacity
         style={styles.signUpButtonContainer}
         onPress={handleSignUp}
       >
-        <Text style={styles.signUp}>Sign Up</Text>
+        <Text style={styles.signUp}>Add Official</Text>
       </TouchableOpacity>
-
-      {/* The idea here is to allow one to be able to sign in using their facebook, google and apple ID, by face or fingerprint if one is using an android */}
-      <View style={styles.socialMediaContainer}>
-        <Text style={styles.socialText}>
-          Or create account using social media
-        </Text>
-        <View style={styles.socialIconsContainer}>
-          <TouchableOpacity
-            style={styles.pressedSocial}
-            onPress={() => console.log("Facebook pressed")}
-          >
-            <Image
-              source={require("../../assets/facebook.png")}
-              style={styles.iconImage}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.pressedSocial}
-            onPress={() => console.log("google pressed")}
-          >
-            <Image
-              source={require("../../assets/google.png")}
-              style={styles.iconImage}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.imageContainer}>
-        <Image source={require("../../assets/bottom.png")} style={styles.bottomImage} />
-      </View>
     </Pressable>
   );
 };
@@ -193,7 +177,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 3, height: 10 },
     shadowOpacity: 0.2,
     shadowColor: "#202A44",
-    gap: 10,  
+    gap: 10,
     paddingHorizontal: 10,
   },
   textInput: {
@@ -235,7 +219,7 @@ const styles = StyleSheet.create({
     elevation: 10,
     marginVertical: 20,
     height: 50,
-    justifyContent: "center", 
+    justifyContent: "center",
     alignItems: "center",
     shadowOffset: { width: 3, height: 10 },
     shadowOpacity: 0.2,
@@ -256,17 +240,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   topImage: {
-    width: '100%',
+    width: "100%",
     height: 120,
-    resizeMode: 'cover',
+    resizeMode: "cover",
     marginBottom: 0,
     marginLeft: -29,
     marginTop: 0,
   },
   bottomImage: {
-    width: '100%',
+    width: "100%",
     height: 140,
-    resizeMode: 'cover',
+    resizeMode: "cover",
     marginLeft: -44,
     marginTop: 30,
   },

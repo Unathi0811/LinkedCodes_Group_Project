@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
-import { useUser } from '../../../src/cxt/user';
+import { useUser } from '../../../../src/cxt/user';
 import { Ionicons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { Link, Stack } from 'expo-router';
+import Octicons from '@expo/vector-icons/Octicons';
 
 const HomeScreen = () => {
   const { user } = useUser(); 
@@ -16,7 +17,16 @@ const HomeScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <>
+     <Stack.Screen 
+      options={{
+        headerTitle: 'Admin',
+       
+      }}
+    
+      />
+    <ScrollView style={styles.container}>
+     
         {/* Header */}
         <View style={styles.header}>
               <Text style={styles.dashboardText}>Admin {"\n"}Dashboard</Text>
@@ -27,7 +37,7 @@ const HomeScreen = () => {
         </View>
         
         {/* Infrastructure Stats Section */}
-        <ScrollView style={styles.statsContainer}>
+        <View style={styles.statsContainer}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Roads Monitored</Text>
             <Text style={styles.statNumber}>15</Text>
@@ -48,7 +58,7 @@ const HomeScreen = () => {
               <Text style={styles.viewReportsText}>View Reports</Text>
             </TouchableOpacity>
           </Link>
-        </ScrollView>
+        </View>
 
         {/* Admin Actions */}
         <View style={styles.adminActionsContainer}>
@@ -66,12 +76,15 @@ const HomeScreen = () => {
             <TouchableOpacity style={styles.actionButton}>
               <Text style={styles.actionButtonText}>Manage Citizens</Text>
             </TouchableOpacity>
+
+            <Link href="/(tabs)/Profile/admin/manage-officials" asChild>
             <TouchableOpacity style={styles.actionButton}>
               <Text style={styles.actionButtonText}>Manage Officials</Text>
-            </TouchableOpacity>
+            </TouchableOpacity></Link>
           </ScrollView>
         </View>
-    </View>
+    </ScrollView>
+    </>
   );
 };
 
@@ -106,7 +119,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#202A44',
     borderRadius: 10,
     padding: 20,
-    marginTop: 20,
+    minHeight: "auto"
+    // marginTop: 20,
   },
   statBox: {
     marginBottom: 10,

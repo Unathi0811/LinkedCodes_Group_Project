@@ -71,11 +71,9 @@ const Profile = () => {
         >
           <Icon name="bars" size={24} color="#000" />
         </TouchableOpacity> */}
-        <View
-        style={styles.header}
-        >
+        <View style={styles.header}>
           <Pressable onPress={pickImage}>
-            <Image source={{ uri: user.profileImage }} style={styles.image} />
+            <Image source={{ uri: user.profileImage ?? "https://via.placeholder.com/150" }} style={styles.image} />
           </Pressable>
 
           <Text
@@ -91,8 +89,7 @@ const Profile = () => {
       </View>
 
       <ScrollView style={styles.content}>
-        
-      <View style={styles.linksContainer}>
+        <View style={styles.linksContainer}>
           {/* create the edit profile screen */}
           <Link href="/(tabs)/Profile/edit-profile" asChild>
             <Pressable style={styles.card}>
@@ -100,11 +97,13 @@ const Profile = () => {
             </Pressable>
           </Link>
 
-          <Link href="/(tabs)/Profile/admin" asChild>
-            <Pressable style={styles.card}>
-              <Text style={styles.cardText}>Admin</Text>
-            </Pressable>
-          </Link>
+          {user?.admin && (
+            <Link href="/(tabs)/Profile/admin" asChild>
+              <Pressable style={styles.card}>
+                <Text style={styles.cardText}>Admin</Text>
+              </Pressable>
+            </Link>
+          )}
 
           <Link asChild href={"/(tabs)/Profile/edit-profile"}>
             <Pressable style={styles.card}>
@@ -170,11 +169,11 @@ const saveProfileImage = async (userId, downloadUrl) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, 
+    flex: 1,
     backgroundColor: "#fff",
   },
   content: {
-    marginTop: 200, 
+    marginTop: 200,
     paddingHorizontal: 30,
   },
   header: {

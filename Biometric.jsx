@@ -45,7 +45,7 @@ const BiometricSettings = ({ isDarkMode }) => {
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'An error occurred during authentication.');
+      Alert.alert('Error', 'An error occurred during authentication!!.');
     }
   };
 

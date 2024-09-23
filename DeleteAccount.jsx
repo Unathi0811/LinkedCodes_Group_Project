@@ -13,7 +13,7 @@ const DeleteAccount = () => {
       // Clear all relevant data
       await AsyncStorage.multiRemove(['authToken', 'userProfile', 'profilePicture']);
 
-      console.log('Account deleted successfully.');
+      console.log('Account deleted successfully.!');
       Alert.alert('Success', 'Your account has been deleted!.');
 
       // Reset navigation to Home screen

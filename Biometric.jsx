@@ -39,7 +39,7 @@ const BiometricSettings = ({ isDarkMode }) => {
       });
 
       if (result.success) {
-        Alert.alert('Success', 'Authentication successful!');
+        Alert.alert('Success', 'Authentication successful!!');
       } else {
         Alert.alert('Failed', 'Authentication failed.');
       }

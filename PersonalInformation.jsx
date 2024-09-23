@@ -44,7 +44,7 @@ const PersonalInformation = ({ profileImage, setProfileImage, profileData, navig
       return;
     }
     if (!validatePhone(formValues.phone)) {
-      Alert.alert('Phone number must be exactly 10 digits.');
+      Alert.alert('Phone number must be exactly 10 digits.!');
       return;
     }
 

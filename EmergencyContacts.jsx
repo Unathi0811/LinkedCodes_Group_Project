@@ -19,7 +19,7 @@ const EmergencyContact = ({ isDarkMode }) => {
         <Text style={[styles.contactItem, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>🚥 Traffic Signal Faults: 0860 012 131</Text>
 
         <Text style={[styles.category, { color: isDarkMode ? '#FFFFFF' : '#003366' }]}>🚦 Road Safety and Traffic</Text>
-        <Text style={[styles.contactItem, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>🚓 SAPS (South African Police Service): 10111</Text>
+        <Text style={[styles.contactItem, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>🚓 SAPS (South African Police Service!): 10111</Text>
         <Text style={[styles.contactItem, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>🛣️ Road Traffic Accidents: 0861 562 874</Text>
       </ScrollView>
 

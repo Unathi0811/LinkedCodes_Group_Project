@@ -28,18 +28,8 @@ const Layout = () => {
       <Tabs.Screen
         name="Maintainance"
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cog-outline" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="rate"
-        options={{
-          title: "Rate Us",
-          tabBarLabel: "Rate Us",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="star-outline" color={color} size={size} />
+          tabBarIcon: ({ color  }) => (
+            <Ionicons name="cog-outline" color={color} size={34} />
           ),
         }}
       />
@@ -59,8 +49,8 @@ const Layout = () => {
       <Tabs.Screen
         name="Settings"
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings-outline" color={color} size={size} />
+          tabBarIcon: ({ color}) => (
+            <Ionicons name="settings-outline" color={color} size={30} />
           ),
         }}
       />

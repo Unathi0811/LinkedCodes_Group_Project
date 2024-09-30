@@ -4,23 +4,23 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useReport } from '../../../src/cxt/reports';
 
 const Reporting = () => {
-  const { report: reports } = useReport();
-  const [showAll, setShowAll] = useState(false);
+  // const { report: reports } = useReport();
+  // const [showAll, setShowAll] = useState(false);
 
-  // Show only 3 reports if not toggled to show all
-  const visibleReports = showAll ? reports : reports.slice(0, 3);
+  // // Show only 3 reports if not toggled to show all
+  // const visibleReports = showAll ? reports : reports.slice(0, 3);
 
-  const renderItem = ({ item }) => (
-    <View key={item.id} style={styles.card}>
-      <View style={styles.profileContainer}>
-        <Image source={{ uri: item.userProfilePhoto }} style={styles.profileImage} />
-      </View>
-      <View style={styles.reportContainer}>
-        <Image source={{ uri: item.reportImage }} style={styles.reportImage} />
-        <Text style={styles.description}>{item.description}</Text>
-      </View>
-    </View>
-  );
+  // const renderItem = ({ item }) => (
+  //   <View key={item.id} style={styles.card}>
+  //     <View style={styles.profileContainer}>
+  //       <Image source={{ uri: item.userProfilePhoto }} style={styles.profileImage} />
+  //     </View>
+  //     <View style={styles.reportContainer}>
+  //       <Image source={{ uri: item.reportImage }} style={styles.reportImage} />
+  //       <Text style={styles.description}>{item.description}</Text>
+  //     </View>
+  //   </View>
+  // );
 
   const handleMenuPress = () => {
     console.log("Hamburger menu pressed");
@@ -35,7 +35,7 @@ const Reporting = () => {
         <Text style={styles.appName}>InfraSmart</Text>
       </View>
 
-      <FlatList
+      {/* <FlatList
         style={styles.list}
         data={visibleReports}
         renderItem={renderItem}
@@ -47,7 +47,7 @@ const Reporting = () => {
             </TouchableOpacity>
           )
         }
-      />
+      /> */}
     </View>
   );
 };

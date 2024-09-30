@@ -48,7 +48,7 @@ const Profile = () => {
         const uploadResp = await uploadToFirebase(
           result.assets[0].uri,
           fileName,
-          (v) => console.log(v) // use this to show progress
+          (v) => console.log(v) //to show progress
         );
         await saveProfileImage(user.uid, uploadResp.downloadUrl);
         setUser({
@@ -65,12 +65,14 @@ const Profile = () => {
     <View style={styles.container}>
       {/* Fixed header with hamburger button */}
       <View style={styles.headerContainer}>
-        {/* <TouchableOpacity
+        {/* 
+        <TouchableOpacity
           onPress={handleMenuPress}
           style={styles.hamburgerButton}
         >
           <Icon name="bars" size={24} color="#000" />
-        </TouchableOpacity> */}
+        </TouchableOpacity> */
+        }
         <View style={styles.header}>
           <Pressable onPress={pickImage}>
             <Image source={{ uri: user.profileImage ?? "https://via.placeholder.com/150" }} style={styles.image} />
@@ -104,12 +106,6 @@ const Profile = () => {
               </Pressable>
             </Link>
           )}
-
-          <Link asChild href={"/(tabs)/Profile/edit-profile"}>
-            <Pressable style={styles.card}>
-              <Text style={styles.cardText}>Delete Account</Text>
-            </Pressable>
-          </Link>
 
           <Pressable style={styles.card} onPress={() => signOut(auth)}>
             <Text style={styles.cardText}>Logout</Text>

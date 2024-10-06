@@ -1,26 +1,80 @@
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useReport } from '../../../src/cxt/reports';
 
 const Reporting = () => {
-  // const { report: reports } = useReport();
-  // const [showAll, setShowAll] = useState(false);
+  const reports = [
+    {
+      id: 1,
+      userProfilePhoto: 'https://via.placeholder.com/60',
+      reportImage: 'https://via.placeholder.com/100',
+      description: 'Report 1 description',
+      userName: 'Uathi Suru',
+      coordinates: '12.34, 56.78',
+    },
+    {
+      id: 2,
+      userProfilePhoto: 'https://via.placeholder.com/60',
+      reportImage: 'https://via.placeholder.com/100',
+      description: 'Report 2 description',
+      userName: 'Lina Zulu',
+      coordinates: '98.76, 54.32',
+    },
+    {
+      id: 3,
+      userProfilePhoto: 'https://via.placeholder.com/60',
+      reportImage: 'https://via.placeholder.com/100',
+      description: 'Report 3 description',
+      userName: 'Chris Noah',
+      coordinates: '34.56, 78.90',
+    },
+  ];
 
-  // // Show only 3 reports if not toggled to show all
-  // const visibleReports = showAll ? reports : reports.slice(0, 3);
+  const [trackedReports, setTrackedReports] = useState([]);
+  const [showAll, setShowAll] = useState(false);
 
-  // const renderItem = ({ item }) => (
-  //   <View key={item.id} style={styles.card}>
-  //     <View style={styles.profileContainer}>
-  //       <Image source={{ uri: item.userProfilePhoto }} style={styles.profileImage} />
-  //     </View>
-  //     <View style={styles.reportContainer}>
-  //       <Image source={{ uri: item.reportImage }} style={styles.reportImage} />
-  //       <Text style={styles.description}>{item.description}</Text>
-  //     </View>
-  //   </View>
-  // );
+  const toggleTrackReport = (id) => {
+    if (trackedReports.includes(id)) {
+      setTrackedReports(trackedReports.filter((reportId) => reportId !== id));
+    } else {
+      setTrackedReports([...trackedReports, id]);
+    }
+  };
+
+  const getInitials = (name) => {
+    const [firstName, lastName] = name.split(' ');
+    return firstName[0] + (lastName ? lastName[0] : '');
+  };
+
+  const renderItem = ({ item }) => (
+    <View key={item.id} style={styles.card}>
+      <View style={styles.profileContainer}>
+        <Image source={{ uri: item.userProfilePhoto }} style={styles.profileImage} />
+        <Text style={styles.initials}>{getInitials(item.userName)}</Text>
+      </View>
+      <View style={styles.reportContainer}>
+        <Image source={{ uri: item.reportImage }} style={styles.reportImage} />
+        <Text style={styles.description}>{item.description}</Text>
+        <Text style={styles.coordinates}>Coordinates: {item.coordinates}</Text>
+
+        <View style={styles.iconContainer}>
+          {/* Map icon */}
+          <TouchableOpacity style={styles.iconButton}>
+            <Icon name="map-marker" size={24} color="#202A44" />
+          </TouchableOpacity>
+
+          {/* Eye icon for tracking */}
+          <TouchableOpacity onPress={() => toggleTrackReport(item.id)} style={styles.iconButton}>
+            <Icon
+              name={trackedReports.includes(item.id) ? 'eye' : 'eye-slash'}
+              size={24}
+              color="#202A44"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
 
   const handleMenuPress = () => {
     console.log("Hamburger menu pressed");
@@ -28,6 +82,7 @@ const Reporting = () => {
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={handleMenuPress} style={styles.hamburgerButton}>
           <Icon name="bars" size={24} color="#202A44" />
@@ -35,9 +90,10 @@ const Reporting = () => {
         <Text style={styles.appName}>InfraSmart</Text>
       </View>
 
-      {/* <FlatList
+      {/* Report List */}
+      <FlatList
         style={styles.list}
-        data={visibleReports}
+        data={showAll ? reports : reports.slice(0, 3)}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         ListFooterComponent={
@@ -47,7 +103,7 @@ const Reporting = () => {
             </TouchableOpacity>
           )
         }
-      /> */}
+      />
     </View>
   );
 };
@@ -80,12 +136,12 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   list: {
-    marginTop: 80,
+    marginTop: 80, // Adjusting margin to account for header
     padding: 20,
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: "#F2f9FB",
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
@@ -105,6 +161,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#202A44',
   },
+  initials: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#202A44',
+    textAlign: 'center',
+    marginTop: 5,
+  },
   reportContainer: {
     flex: 1,
   },
@@ -122,6 +185,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#888',
     marginTop: 5,
+  },
+  iconContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginTop: 10,
+  },
+  iconButton: {
+    marginRight: 15,
   },
   moreButton: {
     paddingVertical: 10,

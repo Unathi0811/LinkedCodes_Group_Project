@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-
 import { router } from 'expo-router';
 
 const Settings = () => {
@@ -15,8 +14,7 @@ const Settings = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Settings</Text>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-
+      <ScrollView contentContainerStyle={styles.scrollContainer} >
         <TouchableOpacity style={styles.option}
           onPress={() => {
             router.push('/(tabs)/Settings/notifications');
@@ -30,7 +28,6 @@ const Settings = () => {
             name='bell' color="#202A44" size={22}
           />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.option}>
           <Text style={styles.optionText}>Theme</Text>
           <Icon 
@@ -40,7 +37,6 @@ const Settings = () => {
             style={styles.themeIcon} 
           />
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.option}
         onPress={() => {
           router.push('/(tabs)/Maintainance/reporting');
@@ -48,7 +44,6 @@ const Settings = () => {
         >
           <Text style={styles.optionText}>Reported Issues</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.option}
         onPress={() => {
           router.push('/(tabs)/Settings/support-page');
@@ -56,7 +51,6 @@ const Settings = () => {
         >
           <Text style={styles.optionText}>Feedback and Support</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={styles.option}
         // onPress={() => {
         //   router.push('/(tabs)/Maintainance/analytics');

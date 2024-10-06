@@ -63,7 +63,7 @@ const HomeScreen = () => {
         {/* Admin Actions */}
         <View style={styles.adminActionsContainer}>
           <Text style={styles.adminActionsText}>Admin Actions</Text>
-          <ScrollView style={styles.actionButtons}>
+          <ScrollView style={styles.actionButtons}  >
             <TouchableOpacity style={styles.actionButton}>
               <Text style={styles.actionButtonText}>Manage Infrastructure</Text>
             </TouchableOpacity>
@@ -76,7 +76,10 @@ const HomeScreen = () => {
             <TouchableOpacity style={styles.actionButton}>
               <Text style={styles.actionButtonText}>Manage Citizens</Text>
             </TouchableOpacity>
-
+            <Link href="/(tabs)/Profile/admin/audit-log" asChild>
+            <TouchableOpacity style={styles.actionButton}>
+              <Text style={styles.actionButtonText}>Audit Log</Text>
+            </TouchableOpacity></Link>
             <Link href="/(tabs)/Profile/admin/manage-officials" asChild>
             <TouchableOpacity style={styles.actionButton}>
               <Text style={styles.actionButtonText}>Manage Officials</Text>
@@ -152,12 +155,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   adminActionsText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   actionButtons: {
     flexDirection: 'column',
+    height: 233,
   },
   actionButton: {
     backgroundColor: '#F1F1F1',
@@ -165,8 +169,8 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     width: '100%',
-    height: '17%',
-    marginBottom: 10,
+    height: '15%',
+    marginBottom: 9,
   },
   actionButtonText: {
     fontSize: 14,

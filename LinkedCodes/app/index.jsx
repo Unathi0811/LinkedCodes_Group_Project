@@ -41,7 +41,7 @@ const _layout = () => {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ActivityIndicator size="large" color="#0000ff" />
+      <ActivityIndicator size="large" color="#202A44" />
       <Text>Loading...</Text>
     </View>
   );

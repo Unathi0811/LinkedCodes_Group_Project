@@ -63,52 +63,43 @@ const Profile = () => {
 
   return (
     <View style={styles.container}>
-      {/* Fixed header with hamburger button */}
+      {/* Fixed header with profile details */}
       <View style={styles.headerContainer}>
-        {/* 
-        <TouchableOpacity
-          onPress={handleMenuPress}
-          style={styles.hamburgerButton}
-        >
-          <Icon name="bars" size={24} color="#000" />
-        </TouchableOpacity> */
-        }
         <View style={styles.header}>
           <Pressable onPress={pickImage}>
             <Image source={{ uri: user.profileImage ?? "https://via.placeholder.com/150" }} style={styles.image} />
           </Pressable>
 
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: "bold",
-              color: "#202A44",
-            }}
-          >
-            Welcome {user.username ?? "Unkown Name"} !
-          </Text>
+          <Text style={styles.username}>{user.username ?? "Unknown Name"}</Text>
+          <Text style={styles.email}>{user.email ?? "Unknown Email"}</Text>
         </View>
       </View>
 
+      {/* Links and buttons */}
       <ScrollView style={styles.content}>
         <View style={styles.linksContainer}>
-          {/* create the edit profile screen */}
+          {/* Personal Information link */}
           <Link href="/(tabs)/Profile/edit-profile" asChild>
             <Pressable style={styles.card}>
               <Text style={styles.cardText}>Personal Information</Text>
+              <Icon name="chevron-right" size={20} color="#202A44" style={styles.icon} />
             </Pressable>
           </Link>
 
+          {/* Admin link (only if the user is an admin) */}
           {user?.admin && (
             <Link href="/(tabs)/Profile/admin" asChild>
               <Pressable style={styles.card}>
                 <Text style={styles.cardText}>Admin</Text>
+                <Icon name="chevron-right" size={20} color="#202A44" style={styles.icon} />
               </Pressable>
             </Link>
           )}
 
+          {/* Logout button */}
           <Pressable style={styles.card} onPress={() => signOut(auth)}>
             <Text style={styles.cardText}>Logout</Text>
+            <Icon name="sign-out" size={25} color="#202A44" style={styles.icon} />
           </Pressable>
         </View>
       </ScrollView>
@@ -118,83 +109,45 @@ const Profile = () => {
 
 export default Profile;
 
-//The following code does the following:
-// uploadToFirebase is a function that uploads an image to Firebase Storage
-// it takes three arguments: the image URI, the file name, and a callback function
-// the callback function is called with the upload progress (in bytes)
-const uploadToFirebase = async (uri, name, onProgress) => {
-  const fetchResponse = await fetch(uri);
-  const theBlob = await fetchResponse.blob();
-  const imageRef = ref(getStorage(), `profiles/${name}`);
-  const uploadTask = uploadBytesResumable(imageRef, theBlob);
-
-  return new Promise((resolve, reject) => {
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        onProgress && onProgress(progress);
-      },
-      (error) => {
-        // Handle unsuccessful uploads
-        console.log("Upload ERROR", error);
-        reject(error);
-      },
-      async () => {
-        const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
-        resolve({
-          downloadUrl,
-          metadata: uploadTask.snapshot.metadata,
-        });
-      }
-    );
-  });
-};
-
-//explaination of the code
-//The following code is a function that handles the upload of an image to Firebase Storage
-//It takes three arguments: the image URI, the file name, and a callback function
-//The callback function is called with the upload progress (in bytes)
-const saveProfileImage = async (userId, downloadUrl) => {
-  const userDoc = doc(db, "user", userId);
-  await updateDoc(userDoc, {
-    profileImage: downloadUrl,
-  });
-};
-
+// Styles for the layout
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
   },
-  content: {
-    marginTop: 200,
-    paddingHorizontal: 30,
-  },
-  header: {
-    flexDirection: "row",
-    gap: 20,
-  },
   headerContainer: {
     position: "absolute",
-    top: 23,
+    top: 0,
     left: 0,
     right: 0,
-    flexDirection: "row",
-    padding: 50,
-    justifyContent: "space-between",
-    alignItems: "center",
-    zIndex: 10,
-    backgroundColor: "#fff",
+    paddingHorizontal: 20,
+    paddingVertical: 50,
+    backgroundColor: "#202A44",
+    zIndex: 1,
   },
-  hamburgerButton: {
-    padding: 10,
+  header: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   image: {
-    width: 70,
-    height: 70,
+    width: 100,
+    height: 100,
     borderRadius: 50,
+    marginBottom: 20,
+  },
+  username: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 20,
+  },
+  email: {
+    fontSize: 12,
+    color: "#fff",
+  },
+  content: {
+    marginTop: 280, 
+    paddingHorizontal: 30,
   },
   linksContainer: {
     width: "100%",
@@ -202,6 +155,9 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   card: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     backgroundColor: "#fff",
     padding: 15,
     borderRadius: 10,
@@ -215,4 +171,52 @@ const styles = StyleSheet.create({
     color: "#202A44",
     fontSize: 16,
   },
+  icon: {
+    marginLeft: 10,
+  },
 });
+
+  //The following code does the following:
+  // uploadToFirebase is a function that uploads an image to Firebase Storage
+  // it takes three arguments: the image URI, the file name, and a callback function
+  // the callback function is called with the upload progress (in bytes)
+  const uploadToFirebase = async (uri, name, onProgress) => {
+    const fetchResponse = await fetch(uri);
+    const theBlob = await fetchResponse.blob();
+    const imageRef = ref(getStorage(), `profiles/${name}`);
+    const uploadTask = uploadBytesResumable(imageRef, theBlob);
+  
+    return new Promise((resolve, reject) => {
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          onProgress && onProgress(progress);
+        },
+        (error) => {
+          // Handle unsuccessful uploads
+          console.log("Upload ERROR", error);
+          reject(error);
+        },
+        async () => {
+          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve({
+            downloadUrl,
+            metadata: uploadTask.snapshot.metadata,
+          });
+        }
+      );
+    });
+  };
+  
+  //explaination of the code
+  //The following code is a function that handles the upload of an image to Firebase Storage
+  //It takes three arguments: the image URI, the file name, and a callback function
+  //The callback function is called with the upload progress (in bytes)
+  const saveProfileImage = async (userId, downloadUrl) => {
+    const userDoc = doc(db, "user", userId);
+    await updateDoc(userDoc, {
+      profileImage: downloadUrl,
+    });
+  };

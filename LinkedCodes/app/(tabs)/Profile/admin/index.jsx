@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useUser } from '../../../../src/cxt/user';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, Octicons  } from '@expo/vector-icons';
 import { Link, Stack } from 'expo-router';
-import Octicons from '@expo/vector-icons/Octicons';
 
 const HomeScreen = () => {
   const { user } = useUser(); 
@@ -18,25 +17,23 @@ const HomeScreen = () => {
 
   return (
     <>
-     <Stack.Screen 
-      options={{
-        headerTitle: 'Admin',
-       
-      }}
-    
+      <Stack.Screen 
+        options={{
+          headerShown: false,
+        }}
       />
-    <ScrollView style={styles.container}>
-     
-        {/* Header */}
-        <View style={styles.header}>
-              <Text style={styles.dashboardText}>Admin {"\n"}Dashboard</Text>
-              <Image
-                source={{ uri: user.profileImage || 'https://via.placeholder.com/150' }}
-                style={styles.profileImage}
-              />
-        </View>
-        
-        {/* Infrastructure Stats Section */}
+      
+      {/* Fixed Header */}
+      <View style={styles.header}>
+        <Text style={styles.dashboardText}>Dashboard</Text>
+        <Image
+          source={{ uri: user.profileImage || 'https://via.placeholder.com/150' }}
+          style={styles.profileImage}
+        />
+      </View>
+
+      {/* Scrollable Content */}
+      <ScrollView style={styles.container}>
         <View style={styles.statsContainer}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Roads Monitored</Text>
@@ -60,10 +57,24 @@ const HomeScreen = () => {
           </Link>
         </View>
 
-        {/* Admin Actions */}
         <View style={styles.adminActionsContainer}>
           <Text style={styles.adminActionsText}>Admin Actions</Text>
-          <ScrollView style={styles.actionButtons}  >
+          <ScrollView style={styles.actionButtons}>
+            <Link href="/(tabs)/Profile/admin/audit-log" asChild>
+              <TouchableOpacity style={styles.actionButton}>
+                <Text style={styles.actionButtonText}>Audit Log</Text>
+              </TouchableOpacity>
+            </Link>
+            <Link href="/(tabs)/Profile/admin/manage-officials" asChild>
+              <TouchableOpacity style={styles.actionButton}>
+                <Text style={styles.actionButtonText}>Manage Officials</Text>
+              </TouchableOpacity>
+            </Link>
+            <Link href="/(tabs)/Profile/admin/manage-citizens" asChild>
+              <TouchableOpacity style={styles.actionButton}>
+                <Text style={styles.actionButtonText}>Manage Citizens</Text>
+              </TouchableOpacity>
+            </Link>
             <TouchableOpacity style={styles.actionButton}>
               <Text style={styles.actionButtonText}>Manage Infrastructure</Text>
             </TouchableOpacity>
@@ -73,20 +84,9 @@ const HomeScreen = () => {
             <TouchableOpacity style={styles.actionButton}>
               <Text style={styles.actionButtonText}>View Analytics</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Manage Citizens</Text>
-            </TouchableOpacity>
-            <Link href="/(tabs)/Profile/admin/audit-log" asChild>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Audit Log</Text>
-            </TouchableOpacity></Link>
-            <Link href="/(tabs)/Profile/admin/manage-officials" asChild>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Manage Officials</Text>
-            </TouchableOpacity></Link>
           </ScrollView>
         </View>
-    </ScrollView>
+      </ScrollView>
     </>
   );
 };
@@ -98,20 +98,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   profileImage: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-      },
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 40,
+    position: 'absolute',  
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingTop: 40,
+    paddingHorizontal: 20,
+    backgroundColor: '#202A44',  
+    zIndex: 10,  
+    paddingBottom: 10,
+    height: 100,
   },
   dashboardText: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#202A44',
+    color: '#fff',
   },
   greetingText: {
     fontSize: 16,
@@ -122,8 +131,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#202A44',
     borderRadius: 10,
     padding: 20,
-    minHeight: "auto"
-    // marginTop: 20,
+    marginTop: 120, 
   },
   statBox: {
     marginBottom: 10,

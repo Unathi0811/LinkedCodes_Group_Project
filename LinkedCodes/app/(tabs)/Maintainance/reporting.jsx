@@ -10,7 +10,6 @@ const Reporting = () => {
       reportImage: 'https://via.placeholder.com/100',
       description: 'Report 1 description',
       userName: 'Uathi Suru',
-      coordinates: '12.34, 56.78',
     },
     {
       id: 2,
@@ -18,7 +17,6 @@ const Reporting = () => {
       reportImage: 'https://via.placeholder.com/100',
       description: 'Report 2 description',
       userName: 'Lina Zulu',
-      coordinates: '98.76, 54.32',
     },
     {
       id: 3,
@@ -26,7 +24,6 @@ const Reporting = () => {
       reportImage: 'https://via.placeholder.com/100',
       description: 'Report 3 description',
       userName: 'Chris Noah',
-      coordinates: '34.56, 78.90',
     },
   ];
 
@@ -55,12 +52,10 @@ const Reporting = () => {
       <View style={styles.reportContainer}>
         <Image source={{ uri: item.reportImage }} style={styles.reportImage} />
         <Text style={styles.description}>{item.description}</Text>
-        <Text style={styles.coordinates}>Coordinates: {item.coordinates}</Text>
-
         <View style={styles.iconContainer}>
           {/* Map icon */}
           <TouchableOpacity style={styles.iconButton}>
-            <Icon name="map-marker" size={24} color="#202A44" />
+            <Icon name="map-marker" size={24} color="#fff" />
           </TouchableOpacity>
 
           {/* Eye icon for tracking */}
@@ -68,7 +63,7 @@ const Reporting = () => {
             <Icon
               name={trackedReports.includes(item.id) ? 'eye' : 'eye-slash'}
               size={24}
-              color="#202A44"
+              color="#fff"
             />
           </TouchableOpacity>
         </View>
@@ -89,7 +84,22 @@ const Reporting = () => {
         </TouchableOpacity>
         <Text style={styles.appName}>InfraSmart</Text>
       </View>
-
+      
+      <View style={styles.buttonContainer}>
+      <TouchableOpacity style={styles.btn}>
+        <Text style={styles.btnText}>Submitted</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.btn}>
+        <Text 
+        style={styles.btnText}>In-Progress</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.btn}>
+        <Text style={styles.btnText}>Completed</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.btn}>
+        <Text style={styles.btnText}>Rejected</Text>
+      </TouchableOpacity>
+      </View>
       {/* Report List */}
       <FlatList
         style={styles.list}
@@ -113,6 +123,7 @@ export default Reporting;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   headerContainer: {
     position: "absolute",
@@ -136,19 +147,19 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   list: {
-    marginTop: 80, // Adjusting margin to account for header
+    marginTop: 80, 
     padding: 20,
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: "#F2f9FB",
+    backgroundColor: "#202A44",
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    shadowColor: '#000',
+    shadowColor: '#202A44',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
+    shadowRadius: 7,
     elevation: 3,
   },
   profileContainer: {
@@ -180,11 +191,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginTop: 10,
-  },
-  coordinates: {
-    fontSize: 14,
-    color: '#888',
-    marginTop: 5,
+    color: "#fff"
   },
   iconContainer: {
     flexDirection: 'row',
@@ -203,4 +210,24 @@ const styles = StyleSheet.create({
     color: '#202A44',
     fontWeight: 'bold',
   },
+  btn: {
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "80%",
+    padding: 15,
+    marginTop: 10,
+    backgroundColor: "#202A44"
+  },
+  btnText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  buttonContainer: {
+    marginTop: 157,
+    flexDirection: "column",
+    alignContent: "center",
+    alignItems: "center",
+  }
 });

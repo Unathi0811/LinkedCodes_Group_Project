@@ -21,9 +21,9 @@ const AdminAuditLogs = () => {
 
     return (
         <View>
-            {logs.map(log => (
-                <Text key={log.id}>{`${log.timestamp}: ${log.action} by ${log.userId}`}</Text>
-            ))}
+            { logs.map(log => (
+                <Text key={log.id}>{ `${log.Timestamp}: ${log.Action} by ${log.UserID}`}</Text>
+            )) }
         </View>
     );
 };
@@ -31,18 +31,17 @@ const AdminAuditLogs = () => {
 export default AdminAuditLogs;
 
 //idea below
-
 //STEP1
 // Whenever a user-related action occurs (create(signUp, Login) , update(userprofile), delete(delete account, reports, deleting users by admin)), 
 //you should call a function that writes an entry to the audit log. 
 //first import firestore, collection, and try create a context and more
 //my function idea below:
-// const logAudit = async (userId, action, targetUserId, ActionDetails) => {
+// const logAudit = async (UserID, Action, TargetUserID, TargetResource, ActionDetails) => {
 //     const logEntry = {
-//       timestamp: new Date().toISOString(),
-//       userId,
-//       action,
-//       targetUserId,
+//       Timestamp: new Date().toISOString(),
+//       UserID,
+//       Action,
+//       TargetUserID,
 //       ActionDetails,
 //     };
 
@@ -81,8 +80,6 @@ export default AdminAuditLogs;
 // Make sure to secure your audit_logs collection. Only authorized users (like admins) should be able to read these logs. Update your Firestore security rules accordingly.
 
 // Example Firestore Security Rule
-// javascript
-// Copy code
 // service cloud.firestore {
 //   match /databases/{database}/documents {
 //     match /audit_logs/{logId} {

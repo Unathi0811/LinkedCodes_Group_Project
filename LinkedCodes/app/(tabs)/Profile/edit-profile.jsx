@@ -11,7 +11,13 @@ import {
 } from "react-native";
 import { useUser } from "../../../src/cxt/user";
 import { auth, db } from "../../../firebase";
-import { doc, updateDoc, deleteDoc, addDoc, collection } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  deleteDoc,
+  addDoc,
+  collection,
+} from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
 import {
   getStorage,
@@ -96,22 +102,22 @@ const EditProfile = () => {
   //       email: user.email,
   //       department: user.department,
   //       timestamp: new Date(),
-  //       status: "pending", 
+  //       status: "pending",
   //     };
-  
+
   //     // Save the deletion request in the 'delete_requests' collection
   //     const requestRef = await addDoc(collection(db, "delete_requests"), deleteRequestDoc);
-  
+
   //     // Add a notification related to this deletion request
   //     const notificationDoc = {
   //       message: `${user.email} has requested account deletion.`,
   //       timestamp: new Date(),
   //       isRead: false, // Flag for unread notification
   //     };
-  
+
   //     // Add notification as a subcollection to the deletion request
   //     await addDoc(collection(db, `delete_requests/${requestRef.id}/notifications`), notificationDoc);
-    
+
   //     console.log("Account deletion request submitted successfully");
   //     alert("Your account deletion request has been submitted.");
   //   } catch (error) {
@@ -132,61 +138,61 @@ const EditProfile = () => {
           <Icon name="camera" size={24} color="#202A44" />
         </TouchableOpacity>
       </View>
+      <ScrollView style={styles.scrollContainer}>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Username</Text>
+          <TextInput
+            style={styles.input}
+            value={username}
+            onChangeText={setUsername}
+          />
+        </View>
 
-      <ScrollView>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Username</Text>
-        <TextInput
-          style={styles.input}
-          value={username}
-          onChangeText={setUsername}
-        />
-      </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+          />
+        </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-      </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={true}
+          />
+        </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={true}
-        />
-      </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Mobile</Text>
+          <TextInput
+            style={styles.input}
+            value={mobile}
+            onChangeText={setMobile}
+            keyboardType="numeric"
+          />
+        </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Mobile</Text>
-        <TextInput
-          style={styles.input}
-          value={mobile}
-          onChangeText={setMobile}
-          keyboardType="numeric"
-        />
-      </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            // onPress={handleDeleteRequest}
+          >
+            <Text style={styles.deleteButtonText}>
+              Delete Account
+            </Text>
+          </TouchableOpacity>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.deleteButton}
-          // onPress={handleDeleteRequest}
-        >
-          <Text style={styles.deleteButtonText}>Request Account Deletion</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={handleSave}>
-          <Text style={styles.buttonText}>Save Changes</Text>
-        </TouchableOpacity>
-      </View>
-
-    </ScrollView>
+          <TouchableOpacity style={styles.button} onPress={handleSave}>
+            <Text style={styles.buttonText}>Save Changes</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -227,11 +233,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     color: "#202A44",
   },
+  scrollContainer: {
+    marginTop: 160,
+  },
   profileImageContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
-    marginBottom: 30,
-    marginTop: 44,
-    position: 'relative',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingTop: 40,
+    paddingHorizontal: 20,
+    backgroundColor: "#202A44",
+    zIndex: 10,
+    paddingBottom: 30,
+    height: 150,
   },
   profileImage: {
     width: 100,
@@ -239,12 +257,14 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     borderColor: "#202A44",
     borderWidth: 2,
+    marginTop: 30,
+    marginBottom: 10,
   },
   cameraIcon: {
-    position: 'absolute', 
-    bottom: 30, 
-    right: 150,
-    padding: 5, 
+    position: "absolute",
+    bottom: 40,
+    right: 170,
+    padding: 5,
   },
   inputContainer: {
     marginBottom: 18,
@@ -277,11 +297,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#202A44",
     fontWeight: "bold",
-    marginLeft: 84,
+    marginLeft: 64,
     fontSize: 18,
   },
   deleteButton: {
-    backgroundColor: "#fff",
+    backgroundColor: "#202A44",
     borderRadius: 12,
     paddingVertical: 12,
     marginHorizontal: 20,
@@ -293,10 +313,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowColor: "#000",
-    marginTop: 0
+    marginTop: 0,
   },
   deleteButtonText: {
-    color: "red",
+    color: "#fff",
     fontWeight: "bold",
     fontSize: 18,
   },

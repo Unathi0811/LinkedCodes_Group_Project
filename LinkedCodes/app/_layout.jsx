@@ -39,7 +39,7 @@ const _layout = () => {
         setInactivityTimeoutCount(inactivityTimeoutCount + 1);
         handleInactivity(); // Call the logout function
       }}
-      timeForInactivity={1800000} // 60000 is 1 minute, u30 miuntes ngu 1800000
+      timeForInactivity={1300000} // 60000 is 1 minute, u30 miuntes ngu 1800000
       restartTimerOnActivityAfterExpiration={false}
       loop={loop}
     >

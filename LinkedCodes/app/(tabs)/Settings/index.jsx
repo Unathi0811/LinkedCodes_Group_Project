@@ -66,7 +66,6 @@ const Settings = () => {
         >
           <Text style={styles.optionText}>Biometrics</Text>
         </TouchableOpacity>
-
       </ScrollView>
     </View>
   );
@@ -81,15 +80,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    fontSize: 24,
+    fontSize: 27,
     fontWeight: 'bold',
-    color: '#202A44',
+    color: '#fff',
     marginBottom: 20,
-    marginTop: 20,
-    textAlign: 'center', 
+    textAlign: 'center',
+    backgroundColor: "#202A44",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 20,
+    paddingVertical: 50,
+    backgroundColor: "#202A44",
+    zIndex: 1,
   },
   scrollContainer: {
     paddingBottom: 20,
+    paddingTop: 130,
   },
   option: {
     padding: 15,

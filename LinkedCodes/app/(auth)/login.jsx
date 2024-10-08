@@ -9,7 +9,6 @@ import {
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Link } from "expo-router";
-
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 const LoginScreen = () => {

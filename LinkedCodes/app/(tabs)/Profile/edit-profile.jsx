@@ -165,6 +165,7 @@ const EditProfile = () => {
             value={password}
             onChangeText={setPassword}
             secureTextEntry={true}
+            placeholder="**********"
           />
         </View>
 
@@ -179,17 +180,14 @@ const EditProfile = () => {
         </View>
 
         <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.deleteButton} onPress={handleSave}>
+            <Text style={styles.deleteButtonText}>Save Changes</Text>
+          </TouchableOpacity>
           <TouchableOpacity
-            style={styles.deleteButton}
+            style={styles.button}
             // onPress={handleDeleteRequest}
           >
-            <Text style={styles.deleteButtonText}>
-              Delete Account
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button} onPress={handleSave}>
-            <Text style={styles.buttonText}>Save Changes</Text>
+            <Text style={styles.buttonText} >Delete Account </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -298,7 +296,7 @@ const styles = StyleSheet.create({
     color: "#202A44",
     fontWeight: "bold",
     marginLeft: 64,
-    fontSize: 18,
+    fontSize: 15,
   },
   deleteButton: {
     backgroundColor: "#202A44",
@@ -312,7 +310,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    shadowColor: "#000",
+    shadowColor: "#202A44",
     marginTop: 0,
   },
   deleteButtonText: {

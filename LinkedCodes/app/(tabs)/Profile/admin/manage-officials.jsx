@@ -95,6 +95,8 @@ const ManageOfficials = () => {
   //   fetchAllNotifications(); // Fetch notifications when the component mounts
   // }, []);
   
+  const placeholderImage = "https://via.placeholder.com/60"
+
   return (
     <>
       <Stack.Screen
@@ -139,7 +141,7 @@ const ManageOfficials = () => {
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.profileContainer}>
-              <Image source={{ uri: item.profileImage }} style={styles.profileImage} />
+              <Image source={{ uri: item.profileImage || placeholderImage}} style={styles.profileImage} />
               <View style={styles.textContainer}>
                 <Text style={styles.title}>{item.username}</Text>
                 <Text style={styles.description}>{item.email}</Text>

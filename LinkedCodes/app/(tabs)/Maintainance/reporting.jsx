@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -47,7 +47,7 @@ const Reporting = () => {
     <View key={item.id} style={styles.card}>
       <View style={styles.profileContainer}>
         <Image source={{ uri: item.userProfilePhoto }} style={styles.profileImage} />
-        <Text style={styles.initials}>{getInitials(item.userName)}</Text>
+        <Text style={styles.initials}> {getInitials(item.userName)}</Text>
       </View>
       <View style={styles.reportContainer}>
         <Image source={{ uri: item.reportImage }} style={styles.reportImage} />
@@ -79,27 +79,36 @@ const Reporting = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={handleMenuPress} style={styles.hamburgerButton}>
-          <Icon name="bars" size={24} color="#202A44" />
-        </TouchableOpacity>
         <Text style={styles.appName}>InfraSmart</Text>
+        {/* <TouchableOpacity onPress={handleMenuPress} style={styles.hamburgerButton}>
+          <Icon name="bars" size={24} color="#202A44" />
+        </TouchableOpacity> */}
       </View>
       
-      <View style={styles.buttonContainer}>
-      <TouchableOpacity style={styles.btn}>
-        <Text style={styles.btnText}>Submitted</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.btn}>
-        <Text 
-        style={styles.btnText}>In-Progress</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.btn}>
-        <Text style={styles.btnText}>Completed</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.btn}>
-        <Text style={styles.btnText}>Rejected</Text>
-      </TouchableOpacity>
-      </View>
+      {/* filters, put them in a scrollview, that scrolls horizontally */}
+      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.horScrollView}>
+        <TouchableOpacity style={styles.btn}>
+          <Text style={styles.btnText}>Submitted</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn}>
+          <Text 
+          style={styles.btnText}>In-Progress</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn}>
+          <Text style={styles.btnText}>Completed</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.btn}>
+          <Text style={styles.btnText}>Rejected</Text>
+        </TouchableOpacity>
+      </ScrollView>
+        
+      <TouchableOpacity style={styles.option}
+
+        >
+          <Text style={styles.optionText}>Reported Issues</Text>
+        </TouchableOpacity>
+      {/* <View style={styles.buttonContainer}>
+      </View> */}
       {/* Report List */}
       <FlatList
         style={styles.list}
@@ -142,9 +151,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#202A44",
-  },
-  hamburgerButton: {
-    padding: 10,
+    marginTop: 20,
   },
   list: {
     marginTop: 80, 
@@ -210,12 +217,19 @@ const styles = StyleSheet.create({
     color: '#202A44',
     fontWeight: 'bold',
   },
+  horScrollView: {
+    flex: 1,
+    padding: 10,
+    width: "100%",
+    height: 140,
+    backgroundColor: "#202A44",
+  },
   btn: {
     borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",
-    width: "80%",
-    padding: 15,
+    width: 100,
+    height: 100,
     marginTop: 10,
     backgroundColor: "#202A44"
   },
@@ -224,10 +238,4 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-  buttonContainer: {
-    marginTop: 157,
-    flexDirection: "column",
-    alignContent: "center",
-    alignItems: "center",
-  }
 });

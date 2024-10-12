@@ -31,7 +31,8 @@
         {
           "photosPermission": "The app accesses your photos to let you pick images."
         }
-      ]
+      ],
+      "expo-video"
     ]
   }
 }

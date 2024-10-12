@@ -37,13 +37,7 @@ const Settings = () => {
             style={styles.themeIcon} 
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.option}
-        onPress={() => {
-          router.push('/(tabs)/Maintainance/reporting');
-          }}
-        >
-          <Text style={styles.optionText}>Reported Issues</Text>
-        </TouchableOpacity>
+        
         <TouchableOpacity style={styles.option}
         onPress={() => {
           router.push('/(tabs)/Settings/support-page');
@@ -51,14 +45,7 @@ const Settings = () => {
         >
           <Text style={styles.optionText}>Feedback and Support</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.option}
-        // onPress={() => {
-        //   router.push('/(tabs)/Maintainance/analytics');
-        //   }}
-        >
-          <Text style={styles.optionText}>Analytics</Text>
-
-        </TouchableOpacity>
+        
         {/* when this touchable opacity is pressed it should pop up an alert that has fingerprint and face recognition, both with an enable and disable button of some sort, so when pressed it can enabe the biometrics
           for the user, which means they dont have to use their passwords to login anymore, they can login using either fo thr two.
         */}

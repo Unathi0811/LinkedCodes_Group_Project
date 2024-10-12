@@ -47,7 +47,8 @@
     "react-native-screens": "3.31.1",
     "react-native-super-grid": "^6.0.1",
     "react-native-vector-icons": "^10.2.0",
-    "react-step-builder": "^3.0.6"
+    "react-step-builder": "^3.0.6",
+    "expo-device": "~6.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

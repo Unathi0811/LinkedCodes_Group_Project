@@ -9,67 +9,46 @@ const Reporting = () => {
       userProfilePhoto: 'https://via.placeholder.com/60',
       reportImage: 'https://via.placeholder.com/100',
       description: 'Report 1 description',
-      userName: 'Uathi Suru',
+      userName: 'Uahi Suru',
     },
     {
       id: 2,
       userProfilePhoto: 'https://via.placeholder.com/60',
       reportImage: 'https://via.placeholder.com/100',
       description: 'Report 2 description',
-      userName: 'Lina Zulu',
+      userName: 'Lia Zulu',
     },
     {
       id: 3,
       userProfilePhoto: 'https://via.placeholder.com/60',
       reportImage: 'https://via.placeholder.com/100',
       description: 'Report 3 description',
-      userName: 'Chris Noah',
+      userName: 'Chis Noah',
     },
   ];
 
-  const [trackedReports, setTrackedReports] = useState([]);
-  const [showAll, setShowAll] = useState(false);
 
-  const toggleTrackReport = (id) => {
-    if (trackedReports.includes(id)) {
-      setTrackedReports(trackedReports.filter((reportId) => reportId !== id));
-    } else {
-      setTrackedReports([...trackedReports, id]);
-    }
-  };
-
-  const getInitials = (name) => {
-    const [firstName, lastName] = name.split(' ');
-    return firstName[0] + (lastName ? lastName[0] : '');
-  };
-
-  const renderItem = ({ item }) => (
+  const renderItem = (item) => (
+    
     <View key={item.id} style={styles.card}>
       <View style={styles.profileContainer}>
         <Image source={{ uri: item.userProfilePhoto }} style={styles.profileImage} />
-        <Text style={styles.initials}> {getInitials(item.userName)}</Text>
+        <Text style={styles.initials}>{item.userName}</Text>
       </View>
       <View style={styles.reportContainer}>
         <Image source={{ uri: item.reportImage }} style={styles.reportImage} />
         <Text style={styles.description}>{item.description}</Text>
         <View style={styles.iconContainer}>
-          {/* Map icon */}
           <TouchableOpacity style={styles.iconButton}>
-            <Icon name="map-marker" size={24} color="#fff" />
+            <Icon name="map-marker" size={24} color="#202A44" />
           </TouchableOpacity>
-
-          {/* Eye icon for tracking */}
-          <TouchableOpacity onPress={() => toggleTrackReport(item.id)} style={styles.iconButton}>
-            <Icon
-              name={trackedReports.includes(item.id) ? 'eye' : 'eye-slash'}
-              size={24}
-              color="#fff"
-            />
+          <TouchableOpacity style={styles.iconButton}>
+            <Icon name="eye" size={24} color="#202A44" />
           </TouchableOpacity>
         </View>
       </View>
     </View>
-  );
+    );
 
   const handleMenuPress = () => {
     console.log("Hamburger menu pressed");
@@ -80,9 +59,6 @@ const Reporting = () => {
       {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={styles.appName}>InfraSmart</Text>
-        {/* <TouchableOpacity onPress={handleMenuPress} style={styles.hamburgerButton}>
-          <Icon name="bars" size={24} color="#202A44" />
-        </TouchableOpacity> */}
       </View>
       
       {/* filters, put them in a scrollview, that scrolls horizontally */}
@@ -102,27 +78,18 @@ const Reporting = () => {
         </TouchableOpacity>
       </ScrollView>
         
-      <TouchableOpacity style={styles.option}
-
+        {/* <TouchableOpacity style={{
+          marginTop: 34,
+        }}
         >
-          <Text style={styles.optionText}>Reported Issues</Text>
-        </TouchableOpacity>
-      {/* <View style={styles.buttonContainer}>
-      </View> */}
-      {/* Report List */}
-      <FlatList
-        style={styles.list}
-        data={showAll ? reports : reports.slice(0, 3)}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        ListFooterComponent={
-          !showAll && reports.length > 3 && (
-            <TouchableOpacity style={styles.moreButton} onPress={() => setShowAll(true)}>
-              <Text style={styles.moreButtonText}>Show More</Text>
-            </TouchableOpacity>
-          )
-        }
-      />
+            <Text style={styles.optionText}>Reported Issues</Text>
+        </TouchableOpacity> */}
+
+        <ScrollView style={{
+          marginTop: 34,
+        }}>
+        {reports.map((report) => renderItem(report))}
+        </ScrollView>
     </View>
   );
 };
@@ -132,7 +99,7 @@ export default Reporting;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F2f9FB',
   },
   headerContainer: {
     position: "absolute",
@@ -159,13 +126,15 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: "#202A44",
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
+    width: "95%",
     marginBottom: 15,
+    marginLeft: 10,
     shadowColor: '#202A44',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.6,
     shadowRadius: 7,
     elevation: 3,
   },
@@ -198,7 +167,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginTop: 10,
-    color: "#fff"
+    color: "#202A44"
   },
   iconContainer: {
     flexDirection: 'row',
@@ -218,20 +187,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   horScrollView: {
-    flex: 1,
-    padding: 10,
-    width: "100%",
-    height: 140,
-    backgroundColor: "#202A44",
+    marginTop: 100,
   },
   btn: {
-    borderRadius: 25,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    width: 100,
-    height: 100,
-    marginTop: 10,
-    backgroundColor: "#202A44"
+    width: 184,
+    height: 50,
+    marginTop: 15,
+    marginBottom: 15,
+    backgroundColor: "#202A44",
+    marginLeft: 13,
   },
   btnText: {
     fontSize: 16,

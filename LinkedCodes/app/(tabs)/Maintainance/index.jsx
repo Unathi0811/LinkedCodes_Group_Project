@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View, Pressable, ScrollView } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Pressable, ScrollView, Image } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Link } from "expo-router";
@@ -11,49 +11,49 @@ const Maintenance = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
+        <Text style={styles.appName}>InfraSmart</Text>
         <TouchableOpacity onPress={handleMenuPress} style={styles.hamburgerButton}>
           <Icon name="bars" size={24} color="#202A44" />
         </TouchableOpacity>
-
-        <Text style={styles.appName}>InfraSmart</Text>
       </View>
-
       <ScrollView  style={styles.contentContainer}>
         {/* Buttons for Reporting and Maintenance */ }
-        
         <View style={styles.linkContainer} asChild>
           <Link href="/(tabs)/Maintenance/reporting" asChild>
-            <Pressable style={styles.linkButton}>
+            <TouchableOpacity style={styles.linkButton}>
               <Text style={styles.linkText}>REPORTING</Text>
-            </Pressable>
+              <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
+            </TouchableOpacity>
           </Link>
 
           <Link href="/(tabs)/Maintenance/maintain" asChild>
-            <Pressable style={styles.linkButton}>
+            <TouchableOpacity style={styles.linkButton}>
               <Text style={styles.linkText}>MAINTAIN</Text>
-            </Pressable>
+              <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
+            </TouchableOpacity>
+          </Link> 
+          <Link href="/(tabs)/Maintenance/analytics" asChild>
+            <TouchableOpacity style={styles.linkButton}>
+              <Text style={styles.linkText}>ANALYTICS</Text>
+              <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
+            </TouchableOpacity>
+          </Link>
+
+          <Link href="/(tabs)/Maintenance/statistics" asChild>
+            <TouchableOpacity style={styles.linkButton}>
+              <Text style={styles.linkText}>STATISTICS</Text>
+              <Icon name="chevron-down" size={20} color="#fff" style={styles.icon} />
+            </TouchableOpacity>
           </Link>
         </View>
-
-        {/* Statistics Section 
-          this is where I was thining of putting the analytics charts, for repairs and life span for the repairs
-        */}
-        <View style={styles.statsSection}>
-          <Text style={styles.statsTitle}>Repair Statistics</Text>
-          <Text style={styles.stat}>Average Repair Duration: 6 months</Text>
-          <Text style={styles.stat}>Percentage of Repairs Lasting Beyond 1 Year: 75%</Text>
-          <Text style={styles.stat}>Average Time Between Repairs: 9 months</Text>
+        <View
+        style={styles.card}
+        >
+        <Image 
+          source={require("../../../assets/graph1.jpeg")}
+          style={styles.image}
+        />
         </View>
-
-        {/* Predictions Section 
-          this is where I was thining of putting the analytics charts, for predictions and how accurate the predictions are
-        */}
-        <View style={styles.predictionsSection}>
-          <Text style={styles.predictionsTitle}>Predictions</Text>
-          <Text style={styles.prediction}>Estimated Lifespan of Recent Repairs: 8 months</Text>
-          <Text style={styles.prediction}>Likely Failure Points: 20% on Bridges</Text>
-        </View>
-
       </ScrollView>
     </View>
   );
@@ -64,11 +64,11 @@ export default Maintenance;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F2f9FB",
   },
   headerContainer: {
     position: "absolute",
-    top: 0,
+    top: 6,
     left: 0,
     right: 0,
     flexDirection: "row",
@@ -88,11 +88,11 @@ appName: {
   },
   contentContainer: {
     marginTop: 90,
-        paddingHorizontal: 20,
+    paddingHorizontal: 20,
   },
   linkContainer: {
     width: "100%",
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-around",
     marginBottom: 20,
   },
@@ -100,62 +100,33 @@ appName: {
     padding: 10,
     borderRadius: 10,
     backgroundColor: "#202A44",
+    height: 53,
+    marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   linkText: {
     color: "#fff",
     fontSize: 16,
+    marginRight: 123,
   },
-  statsSection: {
-    width: "100%",
-    backgroundColor: "#E8F4F8",
-    borderRadius: 10,
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    shadowColor: "#202A44",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.6,
+    shadowRadius: 5,
+    elevation: 5,
     padding: 15,
-    marginBottom: 20,
+    marginVertical: 10,
+    height: 280 ,
+    flexDirection: "column"
   },
-  statsTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#202A44",
-  },
-  stat: {
-    fontSize: 16,
-    color: "#202A44",
-    marginBottom: 5,
-  },
-  predictionsSection: {
+  image: {
     width: "100%",
-    backgroundColor: "#E8F4F8",
+    height: 250,
     borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-  },
-  predictionsTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
     marginBottom: 10,
-    color: "#202A44",
-  },
-  prediction: {
-    fontSize: 16,
-    color: "#202A44",
-    marginBottom: 5,
-  },
-  suggestionsSection: {
-    width: "100%",
-    backgroundColor: "#E8F4F8",
-    borderRadius: 10,
-    padding: 15,
-  },
-  suggestionsTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#202A44",
-  },
-  suggestion: {
-    fontSize: 16,
-    color: "#202A44",
-    marginBottom: 5,
   },
 });

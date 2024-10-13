@@ -187,6 +187,35 @@ const Home = () => {
         <TouchableOpacity style={styles.viewAllButton}>
           <Text style={styles.viewAllText}>View All Updates</Text>
         </TouchableOpacity>
+
+        <View style={styles.educationalSection}>
+          <Text style={styles.educationalText}>
+            Learn about the latest maintenance practices and reporting tools.
+          </Text>
+          {/* infraSmart Video */}
+          {/* <View style={styles.contentContainer}>
+            <VideoView
+              ref={ref}
+              style={styles.video}
+              player={player}
+              allowsFullscreen
+              allowsPictureInPicture
+            />
+            <View style={styles.controlsContainer}>
+              <Button
+                title={isPlaying ? "Pause" : "Play"}
+                onPress={() => {
+                  if (isPlaying) {
+                    player.pause();
+                  } else {
+                    player.play();
+                  }
+                  setIsPlaying(!isPlaying);
+                }}
+              />
+            </View>
+          </View> */}
+        </View>
       </ScrollView>
     </View>
   );

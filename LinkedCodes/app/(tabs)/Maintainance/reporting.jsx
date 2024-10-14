@@ -1,54 +1,41 @@
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native';
-import React, { useState } from 'react';
+import { StyleSheet, Text, View, Image, FlatList, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { db } from '../../../firebase'; 
+import { collection, getDocs } from 'firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Reporting = () => {
-  const reports = [
-    {
-      id: 1,
-      userProfilePhoto: 'https://via.placeholder.com/60',
-      reportImage: 'https://via.placeholder.com/100',
-      description: 'Report 1 description',
-      userName: 'Uahi Suru',
-    },
-    {
-      id: 2,
-      userProfilePhoto: 'https://via.placeholder.com/60',
-      reportImage: 'https://via.placeholder.com/100',
-      description: 'Report 2 description',
-      userName: 'Lia Zulu',
-    },
-    {
-      id: 3,
-      userProfilePhoto: 'https://via.placeholder.com/60',
-      reportImage: 'https://via.placeholder.com/100',
-      description: 'Report 3 description',
-      userName: 'Chis Noah',
-    },
-  ];
+  const [reports, setReports] = useState([]);
 
+  useEffect(() => {
+    const fetchReports = async () => {
+      const reportsCollection = collection(db, 'reports');
+      const reportSnapshot = await getDocs(reportsCollection);
+      const reportList = reportSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setReports(reportList);
+    };
+    fetchReports();
+  }, []);
 
-  const renderItem = (item) => (
-    
+  const renderItem = ({ item }) => (
     <View key={item.id} style={styles.card}>
       <View style={styles.profileContainer}>
-        <Image source={{ uri: item.userProfilePhoto }} style={styles.profileImage} />
-        <Text style={styles.initials}>{item.userName}</Text>
+        <Image source={{ uri: item.userProfilePhoto || 'https://via.placeholder.com/60' }} style={styles.profileImage} />
+        <Text style={styles.initials}>{item.name || 'Unknown User'}</Text>
       </View>
       <View style={styles.reportContainer}>
-        <Image source={{ uri: item.reportImage }} style={styles.reportImage} />
+        <Image source={{ uri: item.image[0] || 'https://via.placeholder.com/100' }} style={styles.reportImage} />
         <Text style={styles.description}>{item.description}</Text>
         <View style={styles.iconContainer}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Icon name="map-marker" size={24} color="#202A44" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-            <Icon name="eye" size={24} color="#202A44" />
-          </TouchableOpacity>
+          <Icon name="map-marker" size={24} color="#202A44" />
+          <Icon name="eye" size={24} color="#202A44" />
         </View>
       </View>
     </View>
-    );
+  );
 
   const handleMenuPress = () => {
     console.log("Hamburger menu pressed");
@@ -85,11 +72,21 @@ const Reporting = () => {
             <Text style={styles.optionText}>Reported Issues</Text>
         </TouchableOpacity> */}
 
-        <ScrollView style={{
-          marginTop: 34,
-        }}>
-        {reports.map((report) => renderItem(report))}
-        </ScrollView>
+       <ScrollView 
+        style={{marginTop: 34}}
+       >
+        { reports.length > 0 ? (
+          <FlatList
+            data={reports}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.list}
+          />
+        ) : (
+          <Text>No reports available.</Text>
+        ) 
+        }
+      </ScrollView>
     </View>
   );
 };

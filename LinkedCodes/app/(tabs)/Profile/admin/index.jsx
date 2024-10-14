@@ -19,7 +19,6 @@ const HomeScreen = () => {
     );
   }
 
-
   // grid items, a usestate with all items in it 
   const [items, setItems] = useState(
     [

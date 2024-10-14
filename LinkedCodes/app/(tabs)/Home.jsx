@@ -12,11 +12,8 @@ import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Link, router } from "expo-router";
 import { useUser } from "../../src/cxt/user";
-import { useVideoPlayer, VideoView } from "expo-video";
 import { useEffect, useRef, useState } from "react";
 
-const videoSource =
-  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
 const Home = () => {
   const handleMenuPress = () => {
@@ -24,23 +21,6 @@ const Home = () => {
   };
 
   const { setUser, user } = useUser();
-
-  const ref = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const player = useVideoPlayer(videoSource, (player) => {
-    player.loop = true;
-    player.play();
-  });
-
-  useEffect(() => {
-    const subscription = player.addListener("playingChange", (isPlaying) => {
-      setIsPlaying(isPlaying);
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [player]);
 
   return (
     <View style={styles.container}>
@@ -130,29 +110,7 @@ const Home = () => {
           <Text style={styles.educationalText}>
             Learn about the latest maintenance practices and reporting tools.
           </Text>
-          {/* infraSmart Video */}
-          {/* <View style={styles.contentContainer}>
-            <VideoView
-              ref={ref}
-              style={styles.video}
-              player={player}
-              allowsFullscreen
-              allowsPictureInPicture
-            />
-            <View style={styles.controlsContainer}>
-              <Button
-                title={isPlaying ? "Pause" : "Play"}
-                onPress={() => {
-                  if (isPlaying) {
-                    player.pause();
-                  } else {
-                    player.play();
-                  }
-                  setIsPlaying(!isPlaying);
-                }}
-              />
-            </View>
-          </View> */}
+         
         </View>
       </ScrollView>
     </View>

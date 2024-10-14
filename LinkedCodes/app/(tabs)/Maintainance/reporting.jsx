@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon2 from "react-native-vector-icons/Ionicons"
 
 const Reporting = () => {
   const reports = [
@@ -29,6 +30,9 @@ const Reporting = () => {
 
   const [trackedReports, setTrackedReports] = useState([]);
   const [showAll, setShowAll] = useState(false);
+  const [modalVisible2, setModalVisible2] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [status, setStatus] = useState('Not started');
 
   const toggleTrackReport = (id) => {
     if (trackedReports.includes(id)) {
@@ -43,8 +47,15 @@ const Reporting = () => {
     return firstName[0] + (lastName ? lastName[0] : '');
   };
 
+  
+
+  const openModal = (report) => {
+    setSelectedReport(report);
+    setModalVisible2(true);
+  };
+
   const renderItem = ({ item }) => (
-    <View key={item.id} style={styles.card}>
+    <TouchableOpacity key={item.id} style={styles.card} onPress={() => openModal(item)}>
       <View style={styles.profileContainer}>
         <Image source={{ uri: item.userProfilePhoto }} style={styles.profileImage} />
         <Text style={styles.initials}> {getInitials(item.userName)}</Text>
@@ -57,7 +68,7 @@ const Reporting = () => {
           <TouchableOpacity style={styles.iconButton}>
             <Icon name="map-marker" size={24} color="#fff" />
           </TouchableOpacity>
-
+  
           {/* Eye icon for tracking */}
           <TouchableOpacity onPress={() => toggleTrackReport(item.id)} style={styles.iconButton}>
             <Icon
@@ -66,9 +77,14 @@ const Reporting = () => {
               color="#fff"
             />
           </TouchableOpacity>
+  
+          {/* Message icon */}
+          <TouchableOpacity style={styles.iconButton}>
+            <Icon2 name="chatbox-outline" size={24} color="#fff" />
+          </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const handleMenuPress = () => {
@@ -80,19 +96,15 @@ const Reporting = () => {
       {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={styles.appName}>InfraSmart</Text>
-        {/* <TouchableOpacity onPress={handleMenuPress} style={styles.hamburgerButton}>
-          <Icon name="bars" size={24} color="#202A44" />
-        </TouchableOpacity> */}
       </View>
-      
-      {/* filters, put them in a scrollview, that scrolls horizontally */}
+
+      {/* Filters */}
       <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.horScrollView}>
         <TouchableOpacity style={styles.btn}>
           <Text style={styles.btnText}>Submitted</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn}>
-          <Text 
-          style={styles.btnText}>In-Progress</Text>
+          <Text style={styles.btnText}>In-Progress</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn}>
           <Text style={styles.btnText}>Completed</Text>
@@ -101,14 +113,11 @@ const Reporting = () => {
           <Text style={styles.btnText}>Rejected</Text>
         </TouchableOpacity>
       </ScrollView>
-        
-      <TouchableOpacity style={styles.option}
 
-        >
-          <Text style={styles.optionText}>Reported Issues</Text>
-        </TouchableOpacity>
-      {/* <View style={styles.buttonContainer}>
-      </View> */}
+      <TouchableOpacity style={styles.option}>
+        <Text style={styles.optionText}>Reported Issues</Text>
+      </TouchableOpacity>
+
       {/* Report List */}
       <FlatList
         style={styles.list}
@@ -117,12 +126,42 @@ const Reporting = () => {
         keyExtractor={(item) => item.id.toString()}
         ListFooterComponent={
           !showAll && reports.length > 3 && (
-            <TouchableOpacity style={styles.moreButton} onPress={() => setShowAll(true)}>
+            <TouchableOpacity style={styles.moreButton} onPress={() => setModalVisible2(true)}>
               <Text style={styles.moreButtonText}>Show More</Text>
             </TouchableOpacity>
           )
         }
       />
+
+      {/* Modal for selecting status */}
+      <Modal transparent={true} visible={modalVisible2} animationType="slide">
+        <TouchableOpacity style={styles.modalBackground} onPress={() => setModalVisible2(false)}>
+          <TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
+            {selectedReport && (
+              <>
+                <Text style={styles.modalHeader}>Report Details</Text>
+                <Text style={styles.description}>Description: {selectedReport.description}</Text>
+
+                {/* Status selection */}
+                <View style={styles.statusContainer}>
+                  <TouchableOpacity onPress={() => setStatus('In Progress')} style={styles.statusButton}>
+                    <Text style={styles.statusText}>In Progress</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setStatus('Completed')} style={styles.statusButton}>
+                    <Text style={styles.statusText}>Completed</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={styles.statusDisplay}>Status: {status}</Text>
+
+                <TouchableOpacity style={styles.button} onPress={() => setModalVisible2(false)}>
+                  <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -238,4 +277,60 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+ 
+  statusContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+  },
+  statusButton: {
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+  },
+  statusText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  statusDisplay: {
+    marginTop: 10,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign:"center"
+  },
+  modalHeader: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign:"center"
+  },
+    modalBackground: {
+          flex: 1,
+           justifyContent: "center",
+          alignItems: "center",
+         backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+    
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+  },
+  button: {
+        width: "90%",
+        height: 52,
+        backgroundColor: "#202A44",
+        borderRadius: 10,
+        marginTop: 20,
+       justifyContent: "center",
+        alignItems: "center",
+        marginLeft:12
+      },
+       buttonText: {
+        fontSize: 18,
+        fontWeight: "bold",
+         color: "#fff",
+       },
 });

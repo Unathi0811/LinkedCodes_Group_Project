@@ -1,36 +1,12 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import {View,Text,TextInput,Button,Image,StyleSheet,TouchableOpacity,ScrollView,} from "react-native";
 import { useUser } from "../../../src/cxt/user";
 import { auth, db } from "../../../firebase";
-import {
-  doc,
-  updateDoc,
-  deleteDoc,
-  addDoc,
-  collection,
-} from "firebase/firestore";
+import {doc,updateDoc,deleteDoc,addDoc,collection,} from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "firebase/storage";
+import {getStorage,ref,uploadBytesResumable,getDownloadURL,} from "firebase/storage";
 import Icon from "react-native-vector-icons/FontAwesome";
-import {
-  deleteUser,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
-} from "firebase/auth";
+import {deleteUser,reauthenticateWithCredential,EmailAuthProvider,} from "firebase/auth";
 
 const EditProfile = () => {
   const { user, setUser } = useUser();
@@ -39,6 +15,7 @@ const EditProfile = () => {
   const [mobile, setMobile] = useState(user?.mobile || "");
   const [image, setImage] = useState(user.profileImage);
   const [password, setPassword] = useState("");
+  const [overlayMessage, setOverlayMessage] = useState("");
 
   const handleSave = async () => {
     try {
@@ -63,6 +40,10 @@ const EditProfile = () => {
       console.error("Error updating profile:", error);
     }
   };
+   // Toggle overlay for error messages
+ const toggleOverlay = () => {
+    setVisible(!visible);
+   };
 
   const pickImage = async () => {
     try {
@@ -318,6 +299,25 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
   },
+     overlay: {
+     width: '80%',
+     height: 320,
+     borderRadius: 10,
+     padding: 20,
+     backgroundColor: "#EAF1FF",
+     alignItems: 'center',
+     justifyContent: 'center',
+ },
+ overlayContent: {
+     alignItems: 'center',
+ },
+ overlayIcon: {
+    marginBottom: 15,
+},
+overlayText: {
+    fontSize: 16,
+    textAlign: 'center',}
+
 });
 
 export default EditProfile;

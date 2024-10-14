@@ -43,7 +43,7 @@ const Home = () => {
   }
 
   const renderItem = ({ item }) => (
-    <SafeAreaView style={{padding:1, backgroundColor:'#EAF1FF'}}>
+    <SafeAreaView style={{padding:1, backgroundColor:'#EAF1FF', }}>
  
         <View style={{padding:10,borderBottomWidth: 1,borderBottomColor:'black',backgroundColor:'#fff',
           borderRadius:5, marginVertical:-8, }}>
@@ -104,5 +104,6 @@ const Home = () => {
     </View>
   );
 };
+
 
 export default Home;

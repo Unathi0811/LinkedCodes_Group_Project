@@ -1,90 +1,40 @@
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView, Modal } from 'react-native';
-import React, { useState } from 'react';
+import { StyleSheet, Text, View, Image, FlatList, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { db } from '../../../firebase'; 
+import { collection, getDocs } from 'firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Icon2 from "react-native-vector-icons/Ionicons"
 
 const Reporting = () => {
-  const reports = [
-    {
-      id: 1,
-      userProfilePhoto: 'https://via.placeholder.com/60',
-      reportImage: 'https://via.placeholder.com/100',
-      description: 'Report 1 description',
-      userName: 'Uathi Suru',
-    },
-    {
-      id: 2,
-      userProfilePhoto: 'https://via.placeholder.com/60',
-      reportImage: 'https://via.placeholder.com/100',
-      description: 'Report 2 description',
-      userName: 'Lina Zulu',
-    },
-    {
-      id: 3,
-      userProfilePhoto: 'https://via.placeholder.com/60',
-      reportImage: 'https://via.placeholder.com/100',
-      description: 'Report 3 description',
-      userName: 'Chris Noah',
-    },
-  ];
+  const [reports, setReports] = useState([]);
 
-  const [trackedReports, setTrackedReports] = useState([]);
-  const [showAll, setShowAll] = useState(false);
-  const [modalVisible2, setModalVisible2] = useState(false);
-  const [selectedReport, setSelectedReport] = useState(null);
-  const [status, setStatus] = useState('Not started');
-
-  const toggleTrackReport = (id) => {
-    if (trackedReports.includes(id)) {
-      setTrackedReports(trackedReports.filter((reportId) => reportId !== id));
-    } else {
-      setTrackedReports([...trackedReports, id]);
-    }
-  };
-
-  const getInitials = (name) => {
-    const [firstName, lastName] = name.split(' ');
-    return firstName[0] + (lastName ? lastName[0] : '');
-  };
-
-  
-
-  const openModal = (report) => {
-    setSelectedReport(report);
-    setModalVisible2(true);
-  };
+  useEffect(() => {
+    const fetchReports = async () => {
+      const reportsCollection = collection(db, 'reports');
+      const reportSnapshot = await getDocs(reportsCollection);
+      const reportList = reportSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setReports(reportList);
+    };
+    fetchReports();
+  }, []);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity key={item.id} style={styles.card} onPress={() => openModal(item)}>
+    <View key={item.id} style={styles.card}>
       <View style={styles.profileContainer}>
-        <Image source={{ uri: item.userProfilePhoto }} style={styles.profileImage} />
-        <Text style={styles.initials}> {getInitials(item.userName)}</Text>
+        <Image source={{ uri: item.userProfilePhoto || 'https://via.placeholder.com/60' }} style={styles.profileImage} />
+        <Text style={styles.initials}>{item.name || 'Unknown User'}</Text>
       </View>
       <View style={styles.reportContainer}>
-        <Image source={{ uri: item.reportImage }} style={styles.reportImage} />
+        <Image source={{ uri: item.image[0] || 'https://via.placeholder.com/100' }} style={styles.reportImage} />
         <Text style={styles.description}>{item.description}</Text>
         <View style={styles.iconContainer}>
-          {/* Map icon */}
-          <TouchableOpacity style={styles.iconButton}>
-            <Icon name="map-marker" size={24} color="#fff" />
-          </TouchableOpacity>
-  
-          {/* Eye icon for tracking */}
-          <TouchableOpacity onPress={() => toggleTrackReport(item.id)} style={styles.iconButton}>
-            <Icon
-              name={trackedReports.includes(item.id) ? 'eye' : 'eye-slash'}
-              size={24}
-              color="#fff"
-            />
-          </TouchableOpacity>
-  
-          {/* Message icon */}
-          <TouchableOpacity style={styles.iconButton}>
-            <Icon2 name="chatbox-outline" size={24} color="#fff" />
-          </TouchableOpacity>
+          <Icon name="map-marker" size={24} color="#202A44" />
+          <Icon name="eye" size={24} color="#202A44" />
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
   const handleMenuPress = () => {
@@ -97,14 +47,15 @@ const Reporting = () => {
       <View style={styles.headerContainer}>
         <Text style={styles.appName}>InfraSmart</Text>
       </View>
-
-      {/* Filters */}
+      
+      {/* filters, put them in a scrollview, that scrolls horizontally */}
       <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.horScrollView}>
         <TouchableOpacity style={styles.btn}>
           <Text style={styles.btnText}>Submitted</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn}>
-          <Text style={styles.btnText}>In-Progress</Text>
+          <Text 
+          style={styles.btnText}>In-Progress</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btn}>
           <Text style={styles.btnText}>Completed</Text>
@@ -113,55 +64,29 @@ const Reporting = () => {
           <Text style={styles.btnText}>Rejected</Text>
         </TouchableOpacity>
       </ScrollView>
+        
+        {/* <TouchableOpacity style={{
+          marginTop: 34,
+        }}
+        >
+            <Text style={styles.optionText}>Reported Issues</Text>
+        </TouchableOpacity> */}
 
-      <TouchableOpacity style={styles.option}>
-        <Text style={styles.optionText}>Reported Issues</Text>
-      </TouchableOpacity>
-
-      {/* Report List */}
-      <FlatList
-        style={styles.list}
-        data={showAll ? reports : reports.slice(0, 3)}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        ListFooterComponent={
-          !showAll && reports.length > 3 && (
-            <TouchableOpacity style={styles.moreButton} onPress={() => setModalVisible2(true)}>
-              <Text style={styles.moreButtonText}>Show More</Text>
-            </TouchableOpacity>
-          )
+       <ScrollView 
+        style={{marginTop: 34}}
+       >
+        { reports.length > 0 ? (
+          <FlatList
+            data={reports}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+            contentContainerStyle={styles.list}
+          />
+        ) : (
+          <Text>No reports available.</Text>
+        ) 
         }
-      />
-
-      {/* Modal for selecting status */}
-      <Modal transparent={true} visible={modalVisible2} animationType="slide">
-        <TouchableOpacity style={styles.modalBackground} onPress={() => setModalVisible2(false)}>
-          <TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
-            {selectedReport && (
-              <>
-                <Text style={styles.modalHeader}>Report Details</Text>
-                <Text style={styles.description}>Description: {selectedReport.description}</Text>
-
-                {/* Status selection */}
-                <View style={styles.statusContainer}>
-                  <TouchableOpacity onPress={() => setStatus('In Progress')} style={styles.statusButton}>
-                    <Text style={styles.statusText}>In Progress</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setStatus('Completed')} style={styles.statusButton}>
-                    <Text style={styles.statusText}>Completed</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <Text style={styles.statusDisplay}>Status: {status}</Text>
-
-                <TouchableOpacity style={styles.button} onPress={() => setModalVisible2(false)}>
-                  <Text style={styles.buttonText}>Close</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </Modal>
+      </ScrollView>
     </View>
   );
 };
@@ -171,7 +96,7 @@ export default Reporting;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F2f9FB',
   },
   headerContainer: {
     position: "absolute",
@@ -198,13 +123,15 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: "#202A44",
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
+    width: "95%",
     marginBottom: 15,
+    marginLeft: 10,
     shadowColor: '#202A44',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.6,
     shadowRadius: 7,
     elevation: 3,
   },
@@ -237,7 +164,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginTop: 10,
-    color: "#fff"
+    color: "#202A44"
   },
   iconContainer: {
     flexDirection: 'row',
@@ -257,80 +184,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   horScrollView: {
-    flex: 1,
-    padding: 10,
-    width: "100%",
-    height: 140,
-    backgroundColor: "#202A44",
+    marginTop: 100,
   },
   btn: {
-    borderRadius: 25,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    width: 100,
-    height: 100,
-    marginTop: 10,
-    backgroundColor: "#202A44"
+    width: 184,
+    height: 50,
+    marginTop: 15,
+    marginBottom: 15,
+    backgroundColor: "#202A44",
+    marginLeft: 13,
   },
   btnText: {
     fontSize: 16,
     color: "#fff",
     fontWeight: "bold",
   },
- 
-  statusContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
-  },
-  statusButton: {
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-  },
-  statusText: {
-    fontSize: 16,
-    color: '#000',
-  },
-  statusDisplay: {
-    marginTop: 10,
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign:"center"
-  },
-  modalHeader: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign:"center"
-  },
-    modalBackground: {
-          flex: 1,
-           justifyContent: "center",
-          alignItems: "center",
-         backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
-    
-  },
-  modalContainer: {
-    width: '80%',
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-  },
-  button: {
-        width: "90%",
-        height: 52,
-        backgroundColor: "#202A44",
-        borderRadius: 10,
-        marginTop: 20,
-       justifyContent: "center",
-        alignItems: "center",
-        marginLeft:12
-      },
-       buttonText: {
-        fontSize: 18,
-        fontWeight: "bold",
-         color: "#fff",
-       },
 });

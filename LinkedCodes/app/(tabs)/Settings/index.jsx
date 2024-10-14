@@ -17,22 +17,22 @@ const Settings = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer} >
         <TouchableOpacity style={styles.option}
           onPress={() => {
-            router.push('/(tabs)/Settings/notifications');
+            router.push('/(tabs)/Settings/notifications' );
             }}
         >
           <Text style={styles.optionText}>Notification Settings
             {/* a bell icon that shows how many noticifications the admin has... */}
           </Text>
           <Icon 
-          style={styles.bellIcon}
-            name='bell' color="#202A44" size={22}
+            style={styles.bellIcon}
+            name='bell' color="#fff" size={22}
           />
         </TouchableOpacity>
         <TouchableOpacity style={styles.option}>
           <Text style={styles.optionText}>Theme</Text>
           <Icon 
-            name={isLightTheme ? 'moon' : 'sun'} 
-            color="#202A44" 
+            name={ isLightTheme ? 'moon' : 'sun'} 
+            color="#fff" 
             size={22}
             style={styles.themeIcon} 
           />
@@ -40,10 +40,17 @@ const Settings = () => {
         
         <TouchableOpacity style={styles.option}
         onPress={() => {
-          router.push('/(tabs)/Settings/support-page');
+          router.push('/(tabs)/Settings/support-page' );
           }}
         >
           <Text style={styles.optionText}>Feedback and Support</Text>
+          <Icon 
+          style={styles.feedbackIcon}
+          name='comments' 
+          color="#fff" 
+          size={22} 
+        />
+
         </TouchableOpacity>
         
         {/* when this touchable opacity is pressed it should pop up an alert that has fingerprint and face recognition, both with an enable and disable button of some sort, so when pressed it can enabe the biometrics
@@ -52,6 +59,12 @@ const Settings = () => {
         <TouchableOpacity style={styles.option}
         >
           <Text style={styles.optionText}>Biometrics</Text>
+          <Icon 
+          style={styles.biometricsIcon}
+          name='fingerprint' 
+          color="#fff" 
+          size={22} 
+        /> 
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -64,7 +77,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#F2f9FB",
   },
   header: {
     fontSize: 27,
@@ -88,8 +101,8 @@ const styles = StyleSheet.create({
   },
   option: {
     padding: 15,
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    backgroundColor: '#202A44',
+    borderRadius: 10,
     marginVertical: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -100,13 +113,19 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 18,
-    color: '#202A44',
+    color: '#fff',
   },
   bellIcon: {
     marginTop: 4,
     marginLeft: 21,
   },
+  biometricsIcon: {
+    marginLeft: 120,
+  },
   themeIcon: {
     marginLeft: 156,
+  },
+  feedbackIcon: {
+    marginRight: 166,
   }
 });

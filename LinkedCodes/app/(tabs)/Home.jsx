@@ -12,8 +12,9 @@ import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Link, router } from "expo-router";
 import { useUser } from "../../src/cxt/user";
-import { useEffect, useRef, useState } from "react";
+// // import { useEffect, useRef, useState } from "react";
 
+const videoSource = require("../../assets/video.mp4");
 
 const Home = () => {
   const handleMenuPress = () => {
@@ -21,6 +22,23 @@ const Home = () => {
   };
 
   const { setUser, user } = useUser();
+
+  // const ref = useRef(null);
+  // const [isPlaying, setIsPlaying] = useState(true);
+  // const player = useVideoPlayer(videoSource, (player) => {
+  //   player.loop = true;
+  //   player.play();
+  // });
+
+  // useEffect(() => {
+  //   const subscription = player.addListener("playingChange", (isPlaying) => {
+  //     setIsPlaying(isPlaying);
+  //   });
+
+  //   return () => {
+  //     subscription.remove();
+  //   };
+  // }, [player]);
 
   return (
     <View style={styles.container}>
@@ -37,7 +55,33 @@ const Home = () => {
 
       {/* Scrollable content */}
       <ScrollView style={styles.content}>
-        {/* <Text style={styles.username}>Hi {user.username ?? "Unknown Name"}!</Text> */}
+        {/* infraSmart Video */}
+        {/* <View style={styles.contentContainer}>
+          <VideoView
+            ref={ref}
+            style={styles.video}
+            player={player}
+            allowsFullscreen
+            allowsPictureInPicture
+          />
+          <View style={styles.controlsContainer}>
+            <TouchableOpacity
+              style={styles.customButton}
+              onPress={() => {
+                if (isPlaying) {
+                  player.pause();
+                } else {
+                  player.play();
+                }
+                setIsPlaying(!isPlaying);
+              }}
+            >
+              <Text style={styles.buttonText}>
+                {isPlaying ? "Pause" : "Play"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View> */}
 
         <Link
           style={styles.manageButton}
@@ -46,6 +90,7 @@ const Home = () => {
         >
           <TouchableOpacity style={styles.manageButton}>
             <Text style={styles.manageButtonText}>Manage Reports</Text>
+            <Icon name="file-text" size={24} color="#FFF" style={styles.buttonIcon} />
           </TouchableOpacity>
         </Link>
 
@@ -56,51 +101,87 @@ const Home = () => {
           href="/(tabs)/Maintainance/maintain"
         >
           <TouchableOpacity style={styles.upcomingButton}>
-            <Text style={styles.upcomingButtonText}>Upcoming Maintenance</Text>
+            <Text style={styles.upcomingButtonText}>Maintenance</Text>
+            <Icon name="wrench" size={24} color="#FFF" style={styles.buttonIcon} />
           </TouchableOpacity>
         </Link>
 
         {/* analytics graphs down here, also they should scroll horizontally, still coming up with an idea*/}
         <Text style={styles.overviewText}>Analytics</Text>
-        <View style={styles.card}>
-          <Image
-            source={require("../../assets/graph1.jpeg")}
-            style={styles.image}
-          />
-          <Text style={styles.headline}>Predictive Analysis</Text>
-        </View>
-        <View style={styles.card}>
-          <Image
-            source={require("../../assets/graph1.jpeg")}
-            style={styles.image}
-          />
-          <Text style={styles.headline}>Maintainance History</Text>
-        </View>
+        <Link
+          style={styles.upcomingButton}
+          asChild
+          href="/(tabs)/Maintainance/analytics"
+        >
+          <TouchableOpacity style={styles.card}>
+            <Image
+              source={require("../../assets/graph1.jpeg")}
+              style={styles.image}
+            />
+            <Text style={styles.headline}>Predictive Analysis</Text>
+          </TouchableOpacity>
+        </Link>
 
-        <View style={styles.card}>
-          <Image
-            source={require("../../assets/graph2.jpeg")}
-            style={styles.image}
-          />
-          <Text style={styles.headline}>User Satisfaction</Text>
-        </View>
+        <Link
+          style={styles.upcomingButton}
+          asChild
+          href="/(tabs)/Maintainance/analytics"
+        >
+          <TouchableOpacity style={styles.card}>
+            <Image
+              source={require("../../assets/graph1.jpeg")}
+              style={styles.image}
+            />
+            <Text style={styles.headline}>Maintainance History</Text>
+          </TouchableOpacity>
+        </Link>
+
+        <Link
+          style={styles.upcomingButton}
+          asChild
+          href="/(tabs)/Maintainance/analytics"
+        >
+          <TouchableOpacity style={styles.card}>
+            <Image
+              source={require("../../assets/graph2.jpeg")}
+              style={styles.image}
+            />
+            <Text style={styles.headline}>User Satisfaction</Text>
+          </TouchableOpacity>
+        </Link>
 
         {/* Recent Updates Section */}
         <Text style={styles.recentUpdatesTitle}>Recent Updates</Text>
-        <View style={styles.card}>
+        
+        <Link
+          style={styles.upcomingButton}
+          asChild
+          href="/(tabs)/Maintainance/reporting"
+        >
+
+        <TouchableOpacity style={styles.card}>
           <Image
             source={require("../../assets/road.png")}
             style={styles.image}
           />
           <Text style={styles.headline}>Pothole Repair Completed</Text>
-        </View>
-        <View style={styles.card}>
+        </TouchableOpacity>
+        </Link>
+
+        <Link
+          style={styles.upcomingButton}
+          asChild
+          href="/(tabs)/Maintainance/maintain"
+        >
+          
+        <TouchableOpacity style={styles.card}>
           <Image
             source={require("../../assets/bridge.png")}
             style={styles.image}
           />
           <Text style={styles.headline}>Bridge Inspection Scheduled</Text>
-        </View>
+        </TouchableOpacity>
+        </Link>
 
         <TouchableOpacity style={styles.viewAllButton}>
           <Text style={styles.viewAllText}>View All Updates</Text>
@@ -166,13 +247,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#202A44",
     borderRadius: 10,
     paddingVertical: 15,
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   manageButtonText: {
     color: "#FFF",
     fontSize: 16,
     fontWeight: "bold",
+    marginLeft: 10,
   },
   upcomingButton: {
     backgroundColor: "#202A44",
@@ -180,11 +264,14 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     alignItems: "center",
     marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   upcomingButtonText: {
     color: "#FFF",
     fontSize: 16,
     fontWeight: "bold",
+    marginLeft: 10,
   },
   recentUpdatesTitle: {
     fontSize: 18,
@@ -202,7 +289,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     padding: 15,
     marginVertical: 10,
-    alignItems: "center",
+    flexDirection: "column"
   },
   image: {
     width: "100%",
@@ -213,7 +300,7 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "center",
+    textAlign: "left",
     color: "#202A44",
   },
   viewAllButton: {
@@ -225,24 +312,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  educationalSection: {
-    backgroundColor: "#E8F4F8",
-    borderRadius: 10,
-    padding: 15,
-    marginVertical: 20,
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  educationalText: {
-    fontSize: 16,
-    color: "#202A44",
-    flex: 1,
-  },
-  educationalIcon: {
-    width: 30,
-    height: 30,
-    marginLeft: 10,
-  },
   contentContainer: {
     flex: 1,
     padding: 10,
@@ -251,21 +320,45 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     width: "100%",
     height: 275,
-    backgroundColor: "#fff",
+    backgroundColor: "#202A44",
     borderRadius: 15,
     shadowColor: "#202A44",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.6,
+    shadowOpacity: 0.8,
     shadowRadius: 5,
     elevation: 5,
     marginVertical: 10,
     alignItems: "center",
+    marginBottom: 34,
   },
   video: {
-    width: 350,
-    height: 275,
+    width: 310,
+    height: 200,
+    borderRadius: 30,
+    shadowColor: "#202A44",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 5,
+    elevation: 5,
+    marginVertical: 10,
+    marginBottom: -20,
   },
   controlsContainer: {
     padding: 10,
   },
+  customButton: {
+    backgroundColor: "#202A44",
+    padding: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  buttonIcon: {
+    marginRight: 15,
+  }
+  
 });

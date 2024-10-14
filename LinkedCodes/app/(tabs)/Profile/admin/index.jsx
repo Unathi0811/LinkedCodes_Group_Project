@@ -19,24 +19,28 @@ const HomeScreen = () => {
     );
   }
 
-
   // grid items, a usestate with all items in it 
   const [items, setItems] = useState(
     [
       {
-        title: 'Roads Monitored',
+        title: 'ROADS MONITORED',
         number: '15',
       }, 
       {
-        title: 'Bridges Monitored',
+        title: 'BRIDGES MONITORED',
         number: '15',
       }, 
       {
-          title: 'Incidents Reported',
+          title: 'INCIDENTS REPORTED',
+        number: '15',
+      }, 
+      {
+          title: 'ISSUES REPORTED',
         number: '15',
       }
     ]
   )
+
   return (
     <>
       <Stack.Screen 
@@ -55,16 +59,16 @@ const HomeScreen = () => {
       </View>
           {/* create a grid here of the three statBoxes */}
           <FlatGrid
-            itemDimension={130}
+            itemDimension={120}
+            spacing={10}
             data={items}
             style={styles.gridView}
-            // staticDimension={300}
-            // fixed
-            spacing={10}
             renderItem={({ item }) => (
+              <View style={styles.statBox}>
               <View style={styles.itemContainer}>
                 <Text style={styles.itemName}>{item.title}</Text>
                 <Text style={styles.itemCode}>{item.number}</Text>
+              </View>
               </View>
             )} 
           />
@@ -124,7 +128,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F2f9FB',
     paddingHorizontal: 20,
   },
   profileImage: {
@@ -152,36 +156,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
-  greetingText: {
-    fontSize: 16,
-    color: '#202A44',
-    marginTop: 10,
-  },
-  statsContainer: {
-    backgroundColor: '#202A44',
-    borderRadius: 10,
-    padding: 20,
-    marginTop: 120, 
-  },
-  statBox: {
-    marginBottom: 10,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#fff',
-  },
-  statNumber: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
   viewReportsButton: {
     backgroundColor: '#202A44',
     borderRadius: 10,
     width: "90%",
+    height: 50,
     alignSelf: "center",
     paddingVertical: 10,
     alignItems: 'center',
+    marginTop: -22,
   },
   viewReportsText: {
     color: '#fff',
@@ -193,6 +176,12 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     padding: 20,
     marginTop: 20,
+    shadowColor: "#202A44",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.6,
+    shadowRadius: 5,
+    elevation: 5,
+    height: 500,
   },
   adminActionsText: {
     fontSize: 15,
@@ -230,26 +219,38 @@ const styles = StyleSheet.create({
   },
   gridView: {
     marginTop: 100,
-    marginBottom: -180,
+    marginBottom: -10,
     flex: 1,
   },
   itemContainer: {
-    justifyContent: 'flex-end',
+    justifyContent: 'space-evenly',
     borderRadius: 5,
     padding: 5,
-    backgroundColor: "#202A44",
+    backgroundColor: "#fff",
     marginTop: 10,
+    height: 90,
+    marginBottom: 12,
+    width: "100%",
+    shadowColor: "#202A44",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.6,
+    shadowRadius: 5,
+    elevation: 5,
   },
   itemName: {
     fontSize: 14,
-    color: '#fff',
-    fontWeight: '600',
+    color: '#202A44',
+    marginTop: 0,
+    fontWeight: 'bold',
   },
   itemCode: {
     fontWeight: '400',
     fontSize: 16,
-    color: '#fff',
+    color: '#202A44',
   },
+  statBox: {
+    flexDirection: "row"
+  }
 });
 
 export default HomeScreen;

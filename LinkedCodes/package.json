@@ -13,6 +13,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@material-tailwind/react": "^2.1.10",
     "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-community/netinfo": "^11.4.1",
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
@@ -22,6 +23,7 @@
     "axios": "^1.7.7",
     "expo": "^51.0.32",
     "expo-constants": "~16.0.2",
+    "expo-device": "~6.0.2",
     "expo-image-picker": "~15.0.7",
     "expo-linear-gradient": "~13.0.2",
     "expo-linking": "~6.3.1",
@@ -29,6 +31,7 @@
     "expo-notifications": "~0.28.18",
     "expo-router": "~3.5.23",
     "expo-status-bar": "~1.12.1",
+    "expo-system-ui": "~3.0.7",
     "expo-video": "^1.2.7",
     "firebase": "^10.13.1",
     "lucide-react-native": "^0.428.0",
@@ -47,8 +50,7 @@
     "react-native-screens": "3.31.1",
     "react-native-super-grid": "^6.0.1",
     "react-native-vector-icons": "^10.2.0",
-    "react-step-builder": "^3.0.6",
-    "expo-device": "~6.0.2"
+    "react-step-builder": "^3.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -1,4 +1,5 @@
 import {
+  Alert,
   ScrollView,
   ScrollViewBase,
   StyleSheet,
@@ -69,9 +70,7 @@ const Profile = () => {
           <Pressable onPress={pickImage}>
             <Image source={{ uri: user.profileImage ?? "https://via.placeholder.com/150" }} style={styles.image} />
           </Pressable>
-
           <Text style={styles.username}>{user.username ?? "Unknown Name"}</Text>
-          <Text style={styles.email}>{user.email ?? "Unknown Email"}</Text>
         </View>
       </View>
 
@@ -82,7 +81,7 @@ const Profile = () => {
           <Link href="/(tabs)/Profile/edit-profile" asChild>
             <Pressable style={styles.card}>
               <Text style={styles.cardText}>Personal Information</Text>
-              <Icon name="chevron-right" size={20} color="#202A44" style={styles.icon} />
+              <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
             </Pressable>
           </Link>
 
@@ -91,15 +90,33 @@ const Profile = () => {
             <Link href="/(tabs)/Profile/admin" asChild>
               <Pressable style={styles.card}>
                 <Text style={styles.cardText}>Admin</Text>
-                <Icon name="chevron-right" size={20} color="#202A44" style={styles.icon} />
+                <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
               </Pressable>
             </Link>
           )}
 
           {/* Logout button */}
-          <Pressable style={styles.card} onPress={() => signOut(auth)}>
+          <Pressable style={styles.card} onPress={() => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Logout canceled"),
+          style: "cancel",
+        },
+        {
+          text: "Logout",
+          onPress: () => signOut(auth),
+          style: "destructive",
+        },
+      ],
+      { cancelable: true }
+    );
+  }}>
             <Text style={styles.cardText}>Logout</Text>
-            <Icon name="sign-out" size={25} color="#202A44" style={styles.icon} />
+            <Icon name="sign-out" size={25} color="#fff" style={styles.icon} />
           </Pressable>
         </View>
       </ScrollView>
@@ -113,13 +130,15 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F2f9FB",
   },
   headerContainer: {
     position: "absolute",
-    top: 0,
+    top: -35,
     left: 0,
     right: 0,
+    marginBottom: 0,
+    borderRadius: 50,
     paddingHorizontal: 20,
     paddingVertical: 50,
     backgroundColor: "#202A44",
@@ -128,12 +147,14 @@ const styles = StyleSheet.create({
   header: {
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: 50,
   },
   image: {
     width: 100,
     height: 100,
     borderRadius: 50,
     marginBottom: 20,
+    marginTop: 20,
   },
   username: {
     fontSize: 20,
@@ -158,17 +179,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#202A44",
     padding: 15,
     borderRadius: 10,
-    shadowColor: "#000",
+    shadowColor: "#202A44",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 5,
   },
   cardText: {
-    color: "#202A44",
+    color: "#fff",
     fontSize: 16,
   },
   icon: {

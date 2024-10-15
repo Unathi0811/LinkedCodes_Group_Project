@@ -13,13 +13,27 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to scan barcodes and images.",
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location for location-based features.",
+        "NSPhotoLibraryUsageDescription": "This app accesses your photos to let you pick images.",
+        "NSContactsUsageDescription": "This app requires access to your contacts to connect with friends.",
+        "NSFaceIDUsageDescription": "This app uses Face ID for biometric authentication."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.READ_CONTACTS",
+        "android.permission.USE_BIOMETRIC"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,7 +46,13 @@
           "photosPermission": "The app accesses your photos to let you pick images."
         }
       ],
-      "expo-video"
+      "expo-video",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow LinkedCodes to use Face ID." 
+        }
+      ]
     ]
   }
 }

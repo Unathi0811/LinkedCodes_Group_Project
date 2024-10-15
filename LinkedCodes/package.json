@@ -21,8 +21,10 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@types/react": "~18.2.79",
     "axios": "^1.7.7",
-    "expo": "^51.0.32",
+    "expo": "~51.0.37",
+    "expo-camera": "~15.0.16",
     "expo-constants": "~16.0.2",
+    "expo-contacts": "~13.0.5",
     "expo-device": "~6.0.2",
     "expo-image-picker": "~15.0.7",
     "expo-linear-gradient": "~13.0.2",
@@ -39,6 +41,7 @@
     "react": "18.2.0",
     "react-native": "0.74.5",
     "react-native-calendars": "^1.1306.0",
+    "react-native-drawer-layout": "^3.3.2",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-inactivity": "^0.1.8",
     "react-native-linear-gradient": "^2.8.3",
@@ -50,7 +53,8 @@
     "react-native-screens": "3.31.1",
     "react-native-super-grid": "^6.0.1",
     "react-native-vector-icons": "^10.2.0",
-    "react-step-builder": "^3.0.6"
+    "react-step-builder": "^3.0.6",
+    "expo-local-authentication": "~14.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

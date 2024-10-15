@@ -1,37 +1,34 @@
 import { View, Text, Image, FlatList, ActivityIndicator, Linking,TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { signOut } from "firebase/auth";
-import { auth } from "../../firebase";
-import axios from 'axios';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import CurrentDay from "../components/weather-API/CurrentDay";
-import { News } from '../components/News-API/News';
-import { router } from 'expo-router';
+import { NewsFromGoogleSerpApi } from '../components/News-API/News';
+import { useRouter } from 'expo-router';
 
 
-const Home = ({route}) => {
-
+const Home = () => {
+  const router = useRouter()
   const [news, setNews] = useState([]);
   const [error, setErrors] = useState(null);
 
   useEffect(() => {
-
     const GettingNews = async () => {
       try {
-        const FromNews24 = await News();
+        const FromGoogleSerpApi = await NewsFromGoogleSerpApi();
 
-        const filteredNews = FromNews24.filter(item =>
+        const filteredNews = FromGoogleSerpApi.filter(item =>
           item.title.toLowerCase().includes('traffic') ||
           item.title.toLowerCase().includes('road') ||
-          item.title.toLowerCase().includes('accident') ||
-          item.title.toLowerCase().includes('roadblock') ||
-          (item.description && item.description.toLowerCase().includes('traffic')) ||
-          (item.description && item.description.toLowerCase().includes('roadblock')) ||
-          (item.description && item.description.toLowerCase().includes('accident')) ||
-          (item.description && item.description.toLowerCase().includes('road')) 
+          item.title.toLowerCase().includes('roadblock')
         );
-        setNews(filteredNews);
 
+
+        const sortedNews = filteredNews.sort((a, b) => {
+          const dateA = new Date(a.date.replace(/, \+0000 UTC/, ' GMT'));
+          const dateB = new Date(b.date.replace(/, \+0000 UTC/, ' GMT'));
+          return dateB - dateA; 
+        });
+
+        setNews(sortedNews);
       } catch (error) {
         setErrors(error.message);
       }
@@ -40,60 +37,55 @@ const Home = ({route}) => {
     GettingNews();
   }, []);
 
-  if (error){
-    return(<Text> </Text>)
+  if (error) {
+    return (<Text>Error: {error}</Text>);
   }
 
-  const renderItem = ({ item }) => (
-    <SafeAreaView style={{padding:1, backgroundColor:'#EAF1FF'}}>
- 
-      <View style={{padding:10,borderBottomWidth: 1,borderBottomColor:'black',backgroundColor:'#EAF1FF',
-          borderRadius:5, }}>
+  const renderItem = ({ item }) => {
+    const dateString = item.date; 
 
-          <Text style={{fontSize: 22,fontWeight: 'bold', marginBottom:10 }}>
-            {item.title}
-          </Text>
-          {item.urlToImage && <Image source={{ uri: item.urlToImage }}
-                  style={{width:'100%', height:200, marginBottom:10,borderRadius:9}} />}
-
-          <Text style={{fontSize: 16,color: 'black',fontStyle: 'italic', fontWeight:'bold'}}>
-            By {item.author || 'Unknown'}
-          </Text>
-          <Text style={{fontSize: 16,marginVertical: 10,}}>
-            {item.description}
-          </Text>
-          <Text style={{fontSize: 12,color: 'black', fontStyle:'italic',marginBottom:5  }}>
-            Published on: {new Date(item.publishedAt).toLocaleDateString()}
-            {/* Published on: {item.publishedAt} */}
-            </Text>
-          <Text style={{ fontSize: 14, color: 'blue', marginBottom:5 }} 
-                onPress={() => Linking.openURL(item.url)}>
-              Click to read more....
-          </Text>
+    return (
+      <View style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: 'black', backgroundColor: '#EAF1FF', borderRadius: 5 }}>
+        <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 10 }}>
+          {item.title}
+        </Text>
+        {item.thumbnail && (
+          <Image source={{ uri: item.thumbnail }} style={{ width: '100%', height: 200, marginBottom: 10, borderRadius: 9 }} />
+        )}
+        <Text style={{ fontSize: 16, color: 'black', fontStyle: 'italic', fontWeight: 'bold' }}>
+          By {item.author?.name || 'Unknown'} from {item.source?.name || 'Unknown'}
+        </Text>
+        <Text style={{ fontSize: 12, color: 'black', fontStyle: 'italic', marginBottom: 5 }}>
+          Published on: {dateString}
+        </Text>
+        <Text style={{ fontSize: 14, color: 'blue', marginBottom: 5 }} onPress={() => Linking.openURL(item.link)}>
+          Click to read more....
+        </Text>
       </View>
-    </SafeAreaView>
-  );
+    );
+  };
+
+  const handleChat = () => {
+      router.push('../components/chatBot/ChatBot')
+  }
 
   return (
-    <View style={{marginBottom:5,padding:0,backgroundColor:'#EAF1FF' }}>
+    <View style={{ marginBottom: 5, padding: 0, backgroundColor: '#EAF1FF' }}>
+      <View style={{ height: '18%' }}>
+        <CurrentDay />
+      </View>
 
-      <View style={{height:'18%'}}>
-        <CurrentDay/>
-      </View>
-      <View style={{height:'83%'}}>
+      <View style={{ height: '83%' }}>
         <FlatList
-            data={news}
-            renderItem={renderItem}
-            keyExtractor={item => item.url}
-          />
+          data={news}
+          renderItem={renderItem}
+          keyExtractor={item => item.link}
+        />
       </View>
-      <TouchableOpacity style={{ position: 'absolute',bottom: 20, right: 20, backgroundColor: '#202A44',
-             borderRadius: 25,  
-             padding: 10,
-             elevation: 5,
-            }}
-              >
-        <Text style={{fontSize:40,color:'white'}}> c </Text>
+      <TouchableOpacity style={{ position: 'absolute', bottom: 20, right: 20, backgroundColor: '#202A44', borderRadius: 250, padding: 10, elevation: 5,width:'20%',height:'10%' }}
+               onPress={handleChat}
+               >
+        <Text style={{ fontSize: 40, color: 'white' }}>  </Text>
       </TouchableOpacity>
     </View>
   );

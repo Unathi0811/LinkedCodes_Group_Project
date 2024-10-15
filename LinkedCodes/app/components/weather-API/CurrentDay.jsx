@@ -4,7 +4,7 @@ import axios from 'axios';
 import * as Location from 'expo-location';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { router,useRouter } from 'expo-router';
+import { Link, router,useRouter } from 'expo-router';
 
 const API_KEY = '4f2f439b78ba6d3fc2a94a59bd39287a';
 
@@ -66,9 +66,10 @@ const CurrentDay = () => {
     return <Text>Error: {error}</Text>;
   }
 
-  const handleRouter = () => {
-    router.push('./Forecast')
-  }
+  // const handleRouter = () => {
+  //   router.push('/Forecast')
+  // }
+
   return (
     <ScrollView >
 
@@ -99,7 +100,10 @@ const CurrentDay = () => {
                   <Text style={{marginRight:'20%',fontSize: 16, fontWeight: 'bold'}}>
                     {new Date(todayWeather.dt * 1000).toLocaleDateString('en-US',{weekday:'long'})}, {new Date(todayWeather.dt * 1000).toLocaleDateString()}
                   </Text>
-                  <TouchableOpacity onPress={handleRouter} > 
+                  
+                  <TouchableOpacity  onPress={()=>{
+                    router.push("/components/weather-API/Forecast")
+                  }}> 
                     <Text>
                       <MaterialIcons name="east" size={20}color={'#202A44'} />
                     </Text>
@@ -119,9 +123,6 @@ const CurrentDay = () => {
                     <Text >  <MaterialIcons name="water" size={12} />  {todayWeather.rain ? todayWeather.rain['1h'] : '0'} mm</Text>
                   </View>
               </View>
-
-
-
         </View>
       </View>
       )}

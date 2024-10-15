@@ -30,6 +30,7 @@
     "expo-image-picker": "~15.0.7",
     "expo-linear-gradient": "~13.0.2",
     "expo-linking": "~6.3.1",
+    "expo-local-authentication": "~14.0.1",
     "expo-location": "~17.0.1",
     "expo-notifications": "~0.28.18",
     "expo-router": "~3.5.23",
@@ -54,8 +55,7 @@
     "react-native-screens": "3.31.1",
     "react-native-super-grid": "^6.0.1",
     "react-native-vector-icons": "^10.2.0",
-    "react-step-builder": "^3.0.6",
-    "expo-local-authentication": "~14.0.1"
+    "react-step-builder": "^3.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",

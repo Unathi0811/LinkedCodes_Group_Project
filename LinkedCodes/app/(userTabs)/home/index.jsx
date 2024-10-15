@@ -1,88 +1,31 @@
-import { View, Text, Image, FlatList, ActivityIndicator, Linking, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import React, { useEffect, useState } from 'react';
 import { signOut } from "firebase/auth";
-import { auth } from "../../../firebase";
-import axios from 'axios';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import CurrentDay from "../../components/weather-API/CurrentDay";
-import { News } from '../../components/News-API/News';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  ScrollView,
+  Button,
+  PixelRatio,
+  Alert,
+} from "react-native";
+import * as React from "react";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { Link, router } from "expo-router";
 import { useUser } from "../../../src/cxt/user";
 import "react-native-gesture-handler";
 import { Drawer } from "react-native-drawer-layout";
 import Icon2 from "react-native-vector-icons/MaterialIcons";
-import Icon from "react-native-vector-icons/FontAwesome";
 
 const Home = () => {
-  const [news, setNews] = useState([]);
-  const [error, setErrors] = useState(null);
   const [open, setOpen] = React.useState(false);
-  
-  const { setUser, user } = useUser();
 
   const handleMenuPress = () => {
     setOpen(!open);
   };
 
-  useEffect(() => {
-
-    const GettingNews = async () => {
-      try {
-        const FromNews24 = await News();
-
-        const filteredNews = FromNews24.filter(item =>
-          item.title.toLowerCase().includes('traffic') ||
-          item.title.toLowerCase().includes('road') ||
-          item.title.toLowerCase().includes('accident') ||
-          item.title.toLowerCase().includes('roadblock') ||
-          (item.description && item.description.toLowerCase().includes('traffic')) ||
-          (item.description && item.description.toLowerCase().includes('roadblock')) ||
-          (item.description && item.description.toLowerCase().includes('accident')) ||
-          (item.description && item.description.toLowerCase().includes('road')) 
-        );
-        setNews(filteredNews);
-
-      } catch (error) {
-        setErrors(error.message);
-      }
-    };
-
-    GettingNews();
-  }, []);
-
-  if (error){
-    return(<Text> </Text>)
-  }
-
-  const renderItem = ({ item }) => (
-    <SafeAreaView style={{padding:1, backgroundColor:'#EAF1FF'}}>
- 
-        <View style={{padding:10,borderBottomWidth: 1,borderBottomColor:'black',backgroundColor:'#fff',
-          borderRadius:5, marginVertical:-8, }}>
-
-          <Text style={{fontSize: 22,fontWeight: 'bold', marginBottom:10 }}>
-            {item.title}
-          </Text>
-          {item.urlToImage && <Image source={{ uri: item.urlToImage }}
-                  style={{width:'100%', height:200, marginBottom:10,borderRadius:5}} />}
-
-          <Text style={{fontSize: 16,color: 'black',fontStyle: 'italic', fontWeight:'bold'}}>
-            By {item.author || 'Unknown'}
-          </Text>
-          <Text style={{fontSize: 16,marginVertical: 10,}}>
-            {item.description}
-          </Text>
-          <Text style={{fontSize: 12,color: 'black', fontStyle:'italic',marginBottom:5  }}>
-            Published on: {new Date(item.publishedAt).toLocaleDateString()}
-            {/* Published on: {item.publishedAt} */}
-            </Text>
-          <Text style={{ fontSize: 14, color: 'blue', marginBottom:5 }} 
-                onPress={() => Linking.openURL(item.url)}>
-              Click to read more....
-          </Text>
-       </View>
-    </SafeAreaView>
-  );
+  const { setUser, user } = useUser();
 
   return (
     <Drawer
@@ -124,15 +67,7 @@ const Home = () => {
               style={styles.drawerItem}
               onPress={() => router.push("/(userTabs)/home/rate")}
             >
-              <Text style={styles.drawerItemText}>RateUs</Text>
-              <Icon2 name="fingerprint" size={20} color="#fff" style={styles.drawerIcon} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => router.push("/(userTabs)/home/emergency")}
-            >
-              <Text style={styles.drawerItemText}>Emergency</Text>
+              <Text style={styles.drawerItemText}>Rate Us</Text>
               <Icon2 name="fingerprint" size={20} color="#fff" style={styles.drawerIcon} />
             </TouchableOpacity>
 
@@ -166,9 +101,9 @@ const Home = () => {
         )
       }}
     >
-    <View style={styles.container}>
-      {/* Fixed header with hamburger button */}
-      <View style={styles.headerContainer}>
+      <View style={styles.container}>
+        {/* Fixed header with hamburger button */}
+        <View style={styles.headerContainer}>
           <TouchableOpacity
             onPress={handleMenuPress}
             style={styles.hamburgerButton}
@@ -177,17 +112,99 @@ const Home = () => {
           </TouchableOpacity>
           <Text style={styles.appName}>InfraSmart</Text>
         </View>
-      <View style={{}}>
-        <CurrentDay/>
+
+        {/* Scrollable content */}
+        <ScrollView style={styles.content}>
+          <Link
+            style={styles.manageButton}
+            asChild
+            href="/(userTabs)/Maintainance/reporting"
+          >
+            <TouchableOpacity style={styles.manageButton}>
+              <Text style={styles.manageButtonText}>Manage Reports</Text>
+              <Icon
+                name="file-text"
+                size={24}
+                color="#FFF"
+                style={styles.buttonIcon}
+              />
+            </TouchableOpacity>
+          </Link>
+          {/* Upcoming Maintenance Button */}
+          <Link
+            style={styles.upcomingButton}
+            asChild
+            href="/(userTabs)/Maintainance/maintain"
+          >
+            <TouchableOpacity style={styles.upcomingButton}>
+              <Text style={styles.upcomingButtonText}>Maintenance</Text>
+              <Icon
+                name="wrench"
+                size={24}
+                color="#FFF"
+                style={styles.buttonIcon}
+              />
+            </TouchableOpacity>
+          </Link>
+
+          {/* analytics graphs down here, also they should scroll horizontally, still coming up with an idea*/}
+          <Text style={styles.overviewText}>NEWS</Text>
+
+          <Link
+            style={styles.upcomingButton}
+            asChild
+            href="/(userTabs)/Maintainance/analytics"
+          >
+            <TouchableOpacity style={styles.card}>
+              <Image
+                source={require("../../../assets/graph2.jpeg")}
+                style={styles.image}
+              />
+              <Text style={styles.headline}>User Satisfaction</Text>
+            </TouchableOpacity>
+          </Link>
+
+          {/* Recent Updates Section */}
+          <Text style={styles.recentUpdatesTitle}>Recent Updates</Text>
+          <Link
+            style={styles.upcomingButton}
+            asChild
+            href="/(userTabs)/Maintainance/reporting"
+          >
+            <TouchableOpacity style={styles.card}>
+              <Image
+                source={require("../../../assets/road.png")}
+                style={styles.image}
+              />
+              <Text style={styles.headline}>Pothole Repair Completed</Text>
+            </TouchableOpacity>
+          </Link>
+
+          <Link
+            style={styles.upcomingButton}
+            asChild
+            href="/(userTabs)/Maintainance/maintain"
+          >
+            <TouchableOpacity style={styles.card}>
+              <Image
+                source={require("../../../assets/bridge.png")}
+                style={styles.image}
+              />
+              <Text style={styles.headline}>Bridge Inspection Scheduled</Text>
+            </TouchableOpacity>
+          </Link>
+
+          <TouchableOpacity style={styles.viewAllButton}>
+            <Text style={styles.viewAllText}>View All Updates</Text>
+          </TouchableOpacity>
+
+          <View style={styles.educationalSection}>
+            <Text style={styles.educationalText}>
+              Learn about the latest maintenance practices and reporting tools.
+            </Text>
+          </View>
+        </ScrollView>
       </View>
-      <View style={{height:'83%'}}>
-        <FlatList
-            data={news}
-            renderItem={renderItem}
-            keyExtractor={item => item.url}
-          />
-      </View>
-    </View>
     </Drawer>
   );
 };
@@ -198,6 +215,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F2f9FB",
+  },
+  username: {
+    fontSize: 20,
+    color: "#202A44",
+    fontWeight: "bold",
+    marginBottom: 34,
   },
   headerContainer: {
     position: "absolute",
@@ -220,6 +243,121 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#202A44",
     marginTop: 20,
+  },
+  content: {
+    marginTop: 130,
+    paddingHorizontal: 20,
+  },
+  overviewText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginVertical: 20,
+    color: "#202A44",
+  },
+  manageButton: {
+    backgroundColor: "#202A44",
+    borderRadius: 10,
+    paddingVertical: 15,
+    alignItems: "flex-start",
+    marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  manageButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 10,
+  },
+  upcomingButton: {
+    backgroundColor: "#202A44",
+    borderRadius: 10,
+    paddingVertical: 15,
+    alignItems: "center",
+    marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  upcomingButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 10,
+  },
+  recentUpdatesTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 10,
+    color: "#202A44",
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    shadowColor: "#202A44",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.6,
+    shadowRadius: 5,
+    elevation: 5,
+    padding: 15,
+    marginVertical: 10,
+    flexDirection: "column",
+  },
+  image: {
+    width: "100%",
+    height: 150,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  headline: {
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "left",
+    color: "#202A44",
+  },
+  viewAllButton: {
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  viewAllText: {
+    color: "#202A44",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  contentContainer: {
+    flex: 1,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 50,
+    width: "100%",
+    height: 275,
+    backgroundColor: "#202A44",
+    borderRadius: 15,
+    shadowColor: "#202A44",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 5,
+    elevation: 5,
+    marginVertical: 10,
+    alignItems: "center",
+    marginBottom: 34,
+  },
+  controlsContainer: {
+    padding: 10,
+  },
+  customButton: {
+    backgroundColor: "#202A44",
+    padding: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  buttonIcon: {
+    marginRight: 15,
   },
   drawer: {
     flex: 1,
@@ -255,6 +393,6 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   drawerIcon: {
-    marginLeft: 23,
+      marginLeft: 23,
   }
-})
+});

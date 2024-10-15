@@ -6,7 +6,6 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 const _layout = () => {
     return (
         <Tabs initialRouteName="home" 
-        
         screenOptions={{
             headerShown: false,
             tabBarActiveTintColor: '#202A44', 

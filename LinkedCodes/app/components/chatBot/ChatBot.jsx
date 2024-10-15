@@ -14,7 +14,6 @@ const ChatBot = () => {
     const startChat = async () => {
       const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(API_KEY);
       const model = genAI.getGenerativeModel({ model: "tunedModels/linked-sfiswuck2nye" });
-
       const prompt = "Hi";
       const result = await model.generateContent(prompt);
       const response = result.response;

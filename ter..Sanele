@@ -1,0 +1,120 @@
+[33mcommit c045a58dcb305f4665ff3327b24492f71e373d83[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mSanele[m[33m, [m[1;31morigin/Sanele[m[33m)[m
+Author: SANELE-221053955 <221053955@student.uj.ac.za>
+Date:   Tue Oct 15 16:40:33 2024 +0200
+
+    updated user home
+
+[33mcommit 5bc47bb82cd854678f36d2a0c25d5a44b4653557[m
+Author: SANELE-221053955 <221053955@student.uj.ac.za>
+Date:   Mon Oct 14 17:14:42 2024 +0200
+
+    updated the user home page,added forecast, and chatBot
+
+[33mcommit 443c49ba04803421433d2a2ddf51b366e22c5b5c[m
+Author: SANELE-221053955 <221053955@student.uj.ac.za>
+Date:   Sun Sep 22 14:16:09 2024 +0200
+
+    added the news and the weather APIs for the user
+
+[33mcommit b60560ca6da02950254318a1549ec18e8fad7c25[m
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Fri Sep 13 09:33:19 2024 +0200
+
+    expo update
+
+[33mcommit 1011ee00dfa3b583cd3645669e07690eef7c6d01[m
+Merge: 38c4b03 da50799
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Wed Sep 11 20:55:05 2024 +0200
+
+    Merge branch 'master' of https://github.com/Unathi0811/LinkedCodes_Group_Project
+
+[33mcommit 38c4b034ecf12df7851a8aee513ee0b7d28a891f[m
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Wed Sep 11 20:54:27 2024 +0200
+
+    Admin, home, profile and tabs reOrdering
+
+[33mcommit da507995db26d3e4c0aa51cd9f03c583aa956d1e[m
+Merge: 28f9d58 ba93ca8
+Author: kobk246 <145791871+kobk246@users.noreply.github.com>
+Date:   Wed Sep 11 15:30:10 2024 +0200
+
+    Merge pull request #1 from Unathi0811/kanya
+    
+    i created a new file
+
+[33mcommit ba93ca834d982549ef5d0d1843f3eeefff90df4e[m[33m ([m[1;31morigin/kanya[m[33m)[m
+Author: Sibonelo Cuambe <kobk246@gmail.com>
+Date:   Wed Sep 11 15:25:19 2024 +0200
+
+    i created a new file
+
+[33mcommit 28f9d581a41ce8e8171335765dd9fc00aa92a41f[m
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Wed Sep 11 01:07:25 2024 +0200
+
+    Login user and gov, using the same firestore database, authentication forgot pass and more...
+
+[33mcommit 40f22ab6759bbdc3e1af6be4ddce7176a229f909[m
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Sun Sep 8 15:47:12 2024 +0200
+
+    Authentication, router and re setting up the app for better routing
+
+[33mcommit d2d4fdb86924005535ba1176d2a67a6727c9d01a[m
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Sun Sep 8 15:45:51 2024 +0200
+
+    set up Firebase authentication and router
+
+[33mcommit bde2969072ba37f5c266754e391b04febb5f49d6[m
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Thu Sep 5 18:22:33 2024 +0200
+
+    #Finished LOGIN AND SUGNUP SCREENS GOV
+
+[33mcommit 8eb32f953434a4ee5cad381a13ee44cf7ab2595f[m
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Thu Sep 5 08:20:32 2024 +0200
+
+    #GOV SIDE
+
+[33mcommit 4d203a0c1d91b52cabb3a78b10f64b93a1a163da[m
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Sun Aug 25 16:01:07 2024 +0200
+
+    -
+
+[33mcommit dc881ae6f9c822a64fef748c6f4d757d80215efe[m
+Merge: a27f6b3 09041bd
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Sun Aug 25 15:59:17 2024 +0200
+
+    sanele
+
+[33mcommit a27f6b3541b5ccc16d1aaa05d12168d1f5195598[m
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Sun Aug 25 15:44:28 2024 +0200
+
+    login and signup start
+
+[33mcommit 09041bd64d11efb5185bcb401bb194cddf20119e[m
+Author: SANELE-525 <sbonisosanele525@gmail.com>
+Date:   Sun Aug 18 19:04:22 2024 +0200
+
+     Add pages
+    
+    added splash , onboardings and a home page.
+
+[33mcommit dffd2e6ab90a380dbab36221e0b9eed797aa53c8[m
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Fri Aug 16 22:26:47 2024 +0200
+
+    changing from app to the app folder
+
+[33mcommit 42c1bc4b42a6faefdff82603d1bb7869cb141135[m
+Author: Skyler <skylersur0811@gmail.com>
+Date:   Fri Aug 16 22:05:06 2024 +0200
+
+    hy

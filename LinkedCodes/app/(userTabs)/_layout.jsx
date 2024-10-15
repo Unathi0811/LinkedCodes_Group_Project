@@ -3,7 +3,7 @@ import { Slot,Tabs } from "expo-router";
 
 const _layout = () => {
     return (
-        <Tabs initialRouteName="home">
+        <Tabs initialRouteName="home" screenOptions={{headerShown:false}}>
             <Tabs.Screen 
                 name="home"
                 

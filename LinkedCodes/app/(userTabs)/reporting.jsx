@@ -1,4 +1,4 @@
-import {View,Image,TouchableWithoutFeedback,Keyboard,TouchableOpacity,Text,StyleSheet,TextInput,FlatList,Modal,} from "react-native";
+import {View,Image,TouchableWithoutFeedback,Keyboard,TouchableOpacity,Text,StyleSheet,TextInput,FlatList,Modal,ActivityIndicator} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/Feather";
 import React, { useState, useEffect } from "react";
@@ -23,6 +23,7 @@ export default function Reporting() {
   const [modalVisible2, setModalVisible2] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const auth = getAuth(); // Get the current authenticated user
+  const [loading, setLoading] = useState(false); 
 
   // Get the current user ID
   const userId = auth.currentUser ? auth.currentUser.uid : null;
@@ -95,7 +96,7 @@ export default function Reporting() {
           const imageUrl = await getDownloadURL(imageRef);
           // Update the report with the correct image URL
           const updatedReport = { ...report, image: imageUrl };
-          await setDoc(doc(firestore, "reports", report.id), updatedReport);
+          await setDoc(doc(db, "reports", report.id), updatedReport);
         }
         // Clear offline reports after successful sync
         await AsyncStorage.removeItem("offlineReports");
@@ -122,6 +123,7 @@ export default function Reporting() {
   const submitReport = async () => {
     if (image && input && userId) {
       try {
+        setLoading(true)
         const newReportId = uuidv4();
         const newReport = {
           id: newReportId,
@@ -147,7 +149,7 @@ export default function Reporting() {
           newReport.image = imageUrl; // Update image URL after upload
 
           // Add the new report to Firestore
-          await setDoc(doc(firestore, "reports", newReportId), newReport);
+          await setDoc(doc(db, "reports", newReportId), newReport);
         } else {
           // If offline, save the report locally using AsyncStorage
           const storedReports = await AsyncStorage.getItem("offlineReports");
@@ -165,6 +167,8 @@ export default function Reporting() {
       } catch (error) {
         setOverlayMessage("Error submitting report: " + error.message);
         setVisible(true);
+      } finally {
+        setLoading(false); // Set loading to false when done
       }
     } else {
       setOverlayMessage("Please add both an image and a description.");
@@ -179,7 +183,7 @@ export default function Reporting() {
       const isOnline = await checkIfOnline();
       if (isOnline) {
         console.log("Deleting report from Firebase...");
-        const reportRef = doc(firestore, "reports", reportId); // Access the specific document
+        const reportRef = doc(db, "reports", reportId); // Access the specific document
         await deleteDoc(reportRef); // Delete the document
 
         // Delete image from Firebase Storage if it exists
@@ -254,15 +258,22 @@ export default function Reporting() {
   // Render individual report item in the list
   const renderItem = ({ item }) => (
     <TouchableOpacity
-      onPress={() => openReportDetails(item)}
-      style={styles.cardContainer}
-    >
-      <View style={styles.card}>
-        <Text>{item.description}</Text>
-        <Text>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+    onPress={() => openReportDetails(item)}
+    style={styles.cardContainer}
+  >
+    <View style={styles.card}>
+      {loading ? ( // Show Activity Indicator when loading
+        <ActivityIndicator size="large" color="#ffffff" />
+      ) : (
+        <>
+          <Text>{item.description}</Text>
+          <Text>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</Text>
+        </>
+      )}
+    </View>
+  </TouchableOpacity>
+);
+  
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -320,9 +331,13 @@ export default function Reporting() {
           placeholder="Description"
         />
 
-        <TouchableOpacity style={styles.button} onPress={submitReport}>
+<TouchableOpacity style={styles.button} onPress={submitReport} disabled={loading}>
+        {loading ? ( // Show Activity Indicator when loading
+          <ActivityIndicator size="small" color="#ffffff" />
+        ) : (
           <Text style={styles.buttonText}>Submit Report</Text>
-        </TouchableOpacity>
+        )}
+      </TouchableOpacity>
 
         {/* Historical Reports */}
         <View style={styles.container2}>
@@ -403,10 +418,12 @@ const styles = StyleSheet.create({
     borderColor: "#000",
     borderWidth: 2,
     height: 100,
-    borderRadius: 30,
+    borderRadius: 10,
     width: "90%",
     marginTop: 10,
     padding: 5,
+    
+    
   },
   container2: {
     flex: 2,
@@ -414,15 +431,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#EAF1FF",
   },
   reportItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderWidth: 2,
+    flexDirection: 'row',
+    backgroundColor: "#fff",
     borderRadius: 10,
-    borderColor: "#202A44",
-    marginBottom: 50,
-    padding: 10,
-  },
+    padding: 15,
+    width: "95%",
+    marginBottom: 15,
+    marginLeft: 10,
+    shadowColor: '#202A44',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.6,
+    shadowRadius: 7,
+    elevation: 3,}
+  ,
   imageThumbnail: {
     width: 100,
     height: 100,
@@ -438,7 +459,7 @@ const styles = StyleSheet.create({
     marginTop: 79,
     textAlign: "center",
     fontSize: 40,
-    fontWeight: "bold",
+  
     marginBottom: 50,
   },
   Heading2: {
@@ -446,7 +467,7 @@ const styles = StyleSheet.create({
     marginTop: 79,
     textAlign: "center",
     fontSize: 40,
-    fontWeight: "bold",
+    
   },
   button: {
     width: "90%",
@@ -508,7 +529,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   imageheader: {
-    fontWeight: "bold",
+   
     fontSize: 20
   },
   overlay: {

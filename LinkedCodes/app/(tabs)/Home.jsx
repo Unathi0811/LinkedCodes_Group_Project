@@ -14,7 +14,7 @@ import { Link, router } from "expo-router";
 import { useUser } from "../../src/cxt/user";
 // // import { useEffect, useRef, useState } from "react";
 
-const videoSource = require("../../assets/video.mp4");
+//const videoSource = require("../../assets/video.mp4");
 
 const Home = () => {
   const handleMenuPress = () => {

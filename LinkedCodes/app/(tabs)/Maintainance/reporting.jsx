@@ -1,45 +1,154 @@
-import { StyleSheet, Text, View, Image, FlatList, ScrollView } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { db } from '../../../firebase'; 
-import { collection, getDocs } from 'firebase/firestore';
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, Pressable, SafeAreaView, ActivityIndicator, Modal } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { db, auth } from '../../../firebase'; 
+import { collection, getDocs, addDoc, onSnapshot, query, orderBy, where, doc, getDoc } from 'firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon2 from "react-native-vector-icons/Ionicons";
+import Icon3 from "react-native-vector-icons/Feather"
+import { GiftedChat } from "react-native-gifted-chat";
+import { Overlay } from "@rneui/themed";
 
 const Reporting = () => {
   const [reports, setReports] = useState([]);
+  const [error, setError] = useState(null);
+  const [overlayVisible, setOverlayVisible] = useState(false); // For error messages
+  const [confirmationVisible, setConfirmationVisible] = useState(false); // For confirmation alerts
+  const [chatVisible, setChatVisible] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [loadingReports, setLoadingReports] = useState(true);
+  const [loadingChat, setLoadingChat] = useState(false);
+  const [userNames, setUserNames] = useState({}); // Store user names by userId
 
   useEffect(() => {
     const fetchReports = async () => {
-      const reportsCollection = collection(db, 'reports');
-      const reportSnapshot = await getDocs(reportsCollection);
-      const reportList = reportSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setReports(reportList);
+      try {
+        setLoadingReports(true);
+        const reportsCollection = collection(db, 'reports');
+        const reportSnapshot = await getDocs(reportsCollection);
+        const reportList = reportSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        // Fetch the names of users who submitted the reports
+        const userIds = [...new Set(reportList.map(report => report.userId))]; // Get unique userIds
+
+        const userPromises = userIds.map(async userId => {
+          const userDoc = await getDoc(doc(db, 'user', userId)); // Ensure collection name is correct
+          if (userDoc.exists()) {
+            return { userId, name: userDoc.data().username }; // Fetch the user name
+          } else {
+            console.log(`User not found for userId: ${userId}`);
+            return { userId, name: 'Unknown User' };
+          }
+        });
+
+        const userData = await Promise.all(userPromises);
+
+        // Create an object that maps userIds to user names
+        const userMap = {};
+        userData.forEach(user => {
+          userMap[user.userId] = user.name;
+        });
+
+        setUserNames(userMap); // Store this mapping in state
+        setReports(reportList);
+      } catch (error) {
+        console.error("Error fetching reports: ", error);
+        setError("Could not load reports. Please try again later.");
+        setOverlayVisible(true); // Show error overlay
+      } finally {
+        setLoadingReports(false);
+      }
     };
+
     fetchReports();
   }, []);
 
-  const renderItem = ({ item }) => (
-    <View key={item.id} style={styles.card}>
-      <View style={styles.profileContainer}>
-        <Image source={{ uri: item.userProfilePhoto || 'https://via.placeholder.com/60' }} style={styles.profileImage} />
-        <Text style={styles.initials}>{item.name || 'Unknown User'}</Text>
-      </View>
-      <View style={styles.reportContainer}>
-        <Image source={{ uri: item.image[0] || 'https://via.placeholder.com/100' }} style={styles.reportImage} />
-        <Text style={styles.description}>{item.description}</Text>
-        <View style={styles.iconContainer}>
-          <Icon name="map-marker" size={24} color="#202A44" />
-          <Icon name="eye" size={24} color="#202A44" />
-        </View>
-      </View>
-    </View>
-  );
+  // Fetch chat messages for the selected report
+  const fetchChatMessages = (reportCreatorId) => {
+    const currentUserId = auth.currentUser.uid;
+    const chatId = [reportCreatorId, currentUserId].sort().join('_'); // Create a unique chat ID between the two users
 
-  const handleMenuPress = () => {
-    console.log("Hamburger menu pressed");
+    const collectionRef = collection(db, 'chats');
+    const q = query(collectionRef, where('chatId', '==', chatId), orderBy('createdAt', 'desc'));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setLoadingChat(true);
+      setMessages(snapshot.docs.map(doc => ({
+        _id: doc.id,
+        createdAt: doc.data().createdAt?.toDate(),
+        text: doc.data().text,
+        user: doc.data().user,
+      })));
+      setLoadingChat(false);
+    });
+
+    return () => unsubscribe();
   };
+
+  const onSend = useCallback((messages = []) => {
+    const currentUserId = auth.currentUser.uid;
+    const reportCreatorId = selectedReport.userId;
+    const chatId = [reportCreatorId, currentUserId].sort().join('_'); // Use the same chat ID
+
+    setMessages(previousMessages => GiftedChat.append(previousMessages, messages));
+
+    const { _id, createdAt, text, user } = messages[0];
+    addDoc(collection(db, 'chats'), {
+      _id,
+      createdAt,
+      text,
+      user,
+      chatId, // Store the chat ID so we can filter messages for this chat
+    });
+  }, [selectedReport]);
+
+  const renderItem = ({ item }) => {
+    const userName = userNames[item.userId] || 'Unknown User';
+    
+    return (
+        <View key={item.id} style={styles.card}>
+            <View style={styles.profileContainer}>
+                <Image 
+                    source={{ uri: item.userProfilePhoto || 'https://via.placeholder.com/60' }} 
+                    style={styles.profileImage} 
+                />
+                <Text style={styles.initials}>{userName}</Text>
+            </View>
+            <View style={styles.reportContainer}>
+                <Image 
+                    source={{ uri: item.image || 'https://via.placeholder.com/100' }} 
+                    style={styles.reportImage} 
+                    onError={(e) => console.log("Image load error:", e.nativeEvent.error)}
+                />
+                <Text style={styles.description}>{item.description || 'No description available.'}</Text>
+                <View style={styles.iconContainer}>
+                    <Icon name="map-marker" size={24} color="#202A44" />
+                    <Icon name="eye" size={24} color="#202A44" />
+                    <TouchableOpacity 
+                        onPress={() => {
+                            setSelectedReport(item);
+                            setChatVisible(true); 
+                            fetchChatMessages(item.userId);
+                        }}
+                    >
+                        <Icon2 name="chatbox-outline" size={24} color="#202A44" />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>
+    );
+};
+
+  const filters = ['Submitted', 'In-Progress', 'Completed', 'Rejected'];
+
+  const renderFilterItem = ({ item }) => (
+    <TouchableOpacity style={styles.btn}>
+      <Text style={styles.btnText}>{item}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
@@ -48,48 +157,98 @@ const Reporting = () => {
         <Text style={styles.appName}>InfraSmart</Text>
       </View>
       
-      {/* filters, put them in a scrollview, that scrolls horizontally */}
-      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.horScrollView}>
-        <TouchableOpacity style={styles.btn}>
-          <Text style={styles.btnText}>Submitted</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btn}>
-          <Text 
-          style={styles.btnText}>In-Progress</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btn}>
-          <Text style={styles.btnText}>Completed</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btn}>
-          <Text style={styles.btnText}>Rejected</Text>
-        </TouchableOpacity>
-      </ScrollView>
-        
-        {/* <TouchableOpacity style={{
-          marginTop: 34,
-        }}
-        >
-            <Text style={styles.optionText}>Reported Issues</Text>
-        </TouchableOpacity> */}
+      {/* Filters using FlatList */}
+      <FlatList
+        data={filters}
+        renderItem={renderFilterItem}
+        keyExtractor={(item, index) => index.toString()}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.horScrollView}
+      />
 
-       <ScrollView 
-        style={{marginTop: 34}}
-       >
-        { reports.length > 0 ? (
-          <FlatList
-            data={reports}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-            contentContainerStyle={styles.list}
+      {/* Reports List */}
+      {loadingReports ? (
+        <ActivityIndicator size="large" color="#202A44" />
+      ) : reports.length > 0 ? (
+        <FlatList
+          data={reports}
+          renderItem={renderItem}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.list}
+        />
+      ) : (
+        <Text style={styles.emptyRep}>No reports available.</Text>
+      )}
+
+     {/* Error Overlay */}
+<Overlay isVisible={overlayVisible} onBackdropPress={() => setOverlayVisible(false)} overlayStyle={styles.overlay} // Apply overlay style
+>
+<View style={styles.overlayContent}>
+                    <Icon3 name="info" size={50} color="#000" style={styles.overlayIcon} />
+                    <Text style={styles.overlayText}>{error}</Text>
+                </View>
+</Overlay>
+
+{/* Confirmation Overlay (for Yes/No alerts) */}
+<Overlay 
+  isVisible={confirmationVisible} 
+  onBackdropPress={() => setConfirmationVisible(false)} 
+  overlayStyle={styles.overlay} // Apply overlay style
+>
+  <View style={styles.overlayContent}>
+    <Text style={styles.overlayText}>Are you sure?</Text>
+    <Pressable
+      style={styles.button}
+      onPress={() => {
+        // Handle Yes action
+        setConfirmationVisible(false);
+      }}
+    >
+      <Text style={styles.buttonText}>Yes</Text>
+    </Pressable>
+    <Pressable
+      style={styles.button}
+      onPress={() => setConfirmationVisible(false)}
+    >
+      <Text style={styles.buttonText}>No</Text>
+    </Pressable>
+  </View>
+</Overlay>
+
+      {/* Chat Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={chatVisible}
+        onRequestClose={() => {
+          setChatVisible(false);
+        }}
+      >
+        <SafeAreaView style={styles.chatContainer}>
+          <GiftedChat
+            messages={messages}
+            onSend={messages => onSend(messages)}
+            user={{
+              _id: auth?.currentUser?.email,
+              avatar: 'https://i.pravtart.cc/300',
+            }}
+            messagesContainerStyle={{ backgroundColor: "#fff" }}
           />
-        ) : (
-          <Text>No reports available.</Text>
-        ) 
-        }
-      </ScrollView>
+          <Pressable
+            style={styles.closeChatButton}
+            onPress={() => setChatVisible(false)}
+          >
+            <Text style={styles.buttonText}>Close Chat</Text>
+          </Pressable>
+        </SafeAreaView>
+      </Modal>
     </View>
   );
 };
+
+
+
 
 export default Reporting;
 
@@ -202,4 +361,67 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  overlayContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  overlayText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: '#202A44',
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#fff',
+  },
+  chatContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  closeChatButton: {
+    padding: 15,
+    backgroundColor: '#202A44',
+    alignItems: 'center',
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  emptyRep:{
+    fontSize:20,
+    justifyContent:"center",
+    textAlign:"center",
+    marginBottom:"70%",
+    color: "#202A44"
+  },
+  overlay: {
+    width: '80%',
+    height: 320,
+    borderRadius: 10,
+    padding: 20,
+    backgroundColor: "#EAF1FF",
+    alignItems: 'center',
+    justifyContent: 'center',
+},
+overlayContent: {
+    alignItems: 'center',
+},
+overlayIcon: {
+    marginBottom: 15,
+},
+overlayText: {
+    fontSize: 16,
+    textAlign: 'center',
+},
 });

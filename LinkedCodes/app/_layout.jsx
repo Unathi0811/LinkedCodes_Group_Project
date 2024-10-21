@@ -8,6 +8,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Alert } from "react-native";
 
+
 const _layout = () => {
   const [inactivityTimeoutCount, setInactivityTimeoutCount] = useState(0);
   const [isActive, setIsActive] = useState(true); // to manage activity state
@@ -45,8 +46,10 @@ const _layout = () => {
     >
       <ReportProvider>
         <UserProvider>
+          
           <StatusBar style="light" />
           <Slot />
+          
         </UserProvider>
       </ReportProvider>
     </ReactNativeInactivity>

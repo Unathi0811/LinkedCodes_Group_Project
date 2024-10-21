@@ -1,42 +1,32 @@
-import { 
-  View, 
-  Image, 
-  TouchableWithoutFeedback, 
-  Keyboard, 
-  TouchableOpacity, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  FlatList, 
-  Modal 
-} from "react-native";
+import {View,Image,TouchableWithoutFeedback,Keyboard,TouchableOpacity,Text,StyleSheet,TextInput,FlatList,Modal,ActivityIndicator} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/Feather";
 import React, { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid"; 
+import { v4 as uuidv4 } from "uuid"; // For generating unique filenames
 import useLocation from "../components/useLocation";
-import NetInfo from "@react-native-community/netinfo";
+import NetInfo from "@react-native-community/netinfo"; // To detect online status
 import { Overlay } from "@rneui/themed";
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
-import { db, storage } from "../../firebase"; 
-import { collection, onSnapshot, doc, setDoc, deleteDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { useUser } from '../../src/cxt/user'; 
+import AsyncStorage from '@react-native-async-storage/async-storage'; // For offline storage
+import { db, storage } from "../../firebase"; // Import Firebase
+import {collection,onSnapshot,doc,setDoc,deleteDoc, getDoc} from "firebase/firestore";
+import {ref,uploadBytes,getDownloadURL,deleteObject} from "firebase/storage";
+import { getAuth } from "firebase/auth"; // Import Firebase Auth
 
 export default function Reporting() {
   const { latitude, longitude } = useLocation();
   const [image, setImage] = useState(null);
   const [input, setInput] = useState("");
-  const [reports, setReports] = useState([]); 
+  const [reports, setReports] = useState([]); // Array to store reports
   const [modalVisible, setModalVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const [overlayMessage, setOverlayMessage] = useState("");
   const [modalVisible2, setModalVisible2] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
-  const { user } = useUser(); 
+  const auth = getAuth(); // Get the current authenticated user
+  const [loading, setLoading] = useState(false); 
 
-  // Get the current user ID from the user context
-  const userId = user ? user.uid : null;
+  // Get the current user ID
+  const userId = auth.currentUser ? auth.currentUser.uid : null;
 
   // Toggle overlay for error messages
   const toggleOverlay = () => {
@@ -133,55 +123,82 @@ export default function Reporting() {
   const submitReport = async () => {
     if (image && input && userId) {
       try {
+        setLoading(true);
         const newReportId = uuidv4();
         const newReport = {
           id: newReportId,
           image, // Save the local image URI for now
           description: input,
           timestamp: new Date(),
-          latitude,
-          longitude,
+          latitude, // Store location as is
+          longitude, // Store location as is
           userId, // Include the authenticated user's ID
+          status: "Not Started", // Default status
         };
-
-        // Check network status
+  
         const isOnline = await checkIfOnline();
-
+  
         if (isOnline) {
-          // If online, upload image and report to Firebase
-          const imageRef = ref(storage, `images/${newReportId}.jpg`);
-          const response = await fetch(image);
-          const blob = await response.blob();
-          await uploadBytes(imageRef, blob);
-
-          const imageUrl = await getDownloadURL(imageRef);
-          newReport.image = imageUrl; // Update image URL after upload
-
-          // Add the new report to Firestore
-          await setDoc(doc(db, "reports", newReportId), newReport);
+          // Try block specifically for image upload
+          try {
+            const imageRef = ref(storage, `images/${newReportId}.jpg`);
+            const response = await fetch(image); // Fetch image URI
+            const blob = await response.blob(); // Convert image to blob
+            await uploadBytes(imageRef, blob); // Upload image to Firebase Storage
+  
+            // Get the image download URL after upload
+            const imageUrl = await getDownloadURL(imageRef);
+            newReport.image = imageUrl; // Update image URL in report object
+          } catch (imageUploadError) {
+            // Handle image upload errors
+            console.error("Image upload error:", imageUploadError);
+            throw new Error("Failed to upload the image. Please try again.");
+          }
+  
+          // Try block specifically for Firestore document creation
+          try {
+            await setDoc(doc(db, "reports", newReportId), newReport);
+          } catch (firestoreError) {
+            // Handle Firestore write errors
+            console.error("Firestore error:", firestoreError);
+            throw new Error("Failed to save the report to the database. Please try again.");
+          }
         } else {
-          // If offline, save the report locally using AsyncStorage
-          const storedReports = await AsyncStorage.getItem("offlineReports");
-          const reportsArray = storedReports ? JSON.parse(storedReports) : [];
-          reportsArray.push(newReport);
-
-          await AsyncStorage.setItem("offlineReports", JSON.stringify(reportsArray));
-          console.log("Report saved offline");
+          // Handle offline report saving in AsyncStorage
+          try {
+            const storedReports = await AsyncStorage.getItem("offlineReports");
+            const reportsArray = storedReports ? JSON.parse(storedReports) : [];
+            reportsArray.push(newReport);
+  
+            await AsyncStorage.setItem("offlineReports", JSON.stringify(reportsArray));
+            console.log("Report saved offline");
+          } catch (offlineError) {
+            // Handle AsyncStorage errors
+            console.error("AsyncStorage error:", offlineError);
+            throw new Error("Failed to save the report offline. Please try again.");
+          }
         }
-
-        // Clear input and close modal
+  
+        // Clear inputs and close modal
         setImage(null);
         setInput("");
         setModalVisible(false);
       } catch (error) {
+        console.error("Submit report error:", error);
         setOverlayMessage("Error submitting report: " + error.message);
-        setVisible(true);
+        setVisible(true); // Show error message in the UI
+      } finally {
+        setLoading(false); // Stop loading animation
       }
     } else {
+      // Handle missing inputs (image/description)
       setOverlayMessage("Please add both an image and a description.");
-      setVisible(true);
+      setVisible(true); // Show warning in the UI
     }
   };
+  
+
+  
 
   // Delete a report from Firebase (if online)
   const deleteReport = async (reportId, imageUri) => {
@@ -250,275 +267,332 @@ export default function Reporting() {
     setImage(imageUri);
   };
 
-  // Confirm before deleting a report
-  const confirmDelete = (report) => {
+  // Show report details modal when a report is clicked
+  const openReportDetails = async (report) => {
+    try {
+      const reportRef = doc(db, "reports", report.id);
+      const reportSnapshot = await getDoc(reportRef);
+      
+      if (reportSnapshot.exists()) {
+        setSelectedReport({ ...reportSnapshot.data(), id: reportSnapshot.id });
+      } else {
+        console.log("No such document!");
+      }
+    } catch (error) {
+      console.error("Error fetching report details: ", error);
+    }
+  
     setModalVisible2(true);
-    setSelectedReport(report);
   };
 
-  return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setModalVisible(true)}
-        >
-          <Icon name="plus" size={30} color="#fff" />
-        </TouchableOpacity>
+  // Close report details modal
+  const closeReportDetails = () => {
+    setSelectedReport(null);
+    setModalVisible2(false);
+  };
 
-        {/* FlatList to display reports */}
-        <FlatList
-          data={reports}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.reportItem}
-              onPress={() => console.log("Report selected:", item)}
-            >
-              <Image source={{ uri: item.image }} style={styles.reportImage} />
-              <View style={styles.reportInfo}>
-                <Text style={styles.reportDescription}>
-                  {item.description}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => confirmDelete(item)}
-                  style={styles.deleteButton}
-                >
-                  <Icon name="trash-2" size={20} color="red" />
-                </TouchableOpacity>
+  // Render individual report item in the list
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+    onPress={() => openReportDetails(item)}
+    style={styles.cardContainer}
+  >
+    <View style={styles.card}>
+      {loading ? ( // Show Activity Indicator when loading
+        <ActivityIndicator size="large" color="#ffffff" />
+      ) : (
+        <>
+          <Text>{item.description}</Text>
+          <Text>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</Text>
+        </>
+      )}
+    </View>
+  </TouchableOpacity>
+);
+  
+
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <Text style={styles.Heading}>Reporting</Text>
+
+        {/* Modal for upload options */}
+        <Modal transparent={true} visible={modalVisible} animationType="slide">
+          <TouchableOpacity style={styles.modalBackground} onPress={() => setModalVisible(false)}>
+            <TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
+              <Text style={styles.modalHeader}>Upload Options</Text>
+              <View style={styles.modalButtons}>
+                <View style={styles.modalButtonsin}>
+                  <TouchableOpacity onPress={() => uploadImage("camera")}>
+                    <Icon name="camera" size={40} color={"#000"} />
+                    <Text style={styles.icontext}>Camera</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.modalButtonsin}>
+                  <TouchableOpacity onPress={() => uploadImage("gallery")}>
+                    <Icon name="image" size={40} color={"#000"} />
+                    <Text style={styles.icontext}>Gallery</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.modalButtonsin}>
+                  <TouchableOpacity onPress={removeImage}>
+                    <Icon name="trash-2" size={40} color={"#000"} />
+                    <Text style={styles.icontext}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
+              <TouchableOpacity style={styles.button} onPress={() => setModalVisible(false)}>
+                <Text style={styles.buttonText}>Close</Text>
+              </TouchableOpacity>
             </TouchableOpacity>
-          )}
+          </TouchableOpacity>
+        </Modal>
+
+        {/* Report Submission UI */}
+        <Text style={styles.imageheader}>Upload Image</Text>
+        {image ? (
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <Image source={{ uri: image }} style={styles.image} />
+          </TouchableOpacity>
+        ) : (
+          <Icon onPress={() => setModalVisible(true)} name="camera" size={70} color={"#000"} />
+        )}
+
+        <TextInput
+          multiline
+          keyboardType="default"
+          value={input}
+          onChangeText={setInput}
+          style={styles.input}
+          placeholder="Description"
         />
 
-        {/* Add Report Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(false);
-          }}
-        >
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Create a Report</Text>
-            {image ? (
-              <Image source={{ uri: image }} style={styles.imagePreview} />
-            ) : (
+<TouchableOpacity style={styles.button} onPress={submitReport} disabled={loading}>
+        {loading ? ( // Show Activity Indicator when loading
+          <ActivityIndicator size="small" color="#ffffff" />
+        ) : (
+          <Text style={styles.buttonText}>Submit Report</Text>
+        )}
+      </TouchableOpacity>
+
+        {/* Historical Reports */}
+        <View style={styles.container2}>
+          <Text style={styles.Heading2}>Historical Reports</Text>
+          <FlatList
+            data={reports}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
               <TouchableOpacity
-                onPress={() => uploadImage("gallery")}
-                style={styles.imagePicker}
+                style={styles.reportItem}
+                onPress={() => console.log("Report selected:", item)}
               >
-                <Text style={styles.imagePickerText}>Pick an image</Text>
+                <Image source={{ uri: item.image }} style={styles.reportImage} />
+                <View style={styles.reportInfo}>
+                  <Text style={styles.reportDescription}>{item.description}</Text>
+                  <TouchableOpacity
+                    onPress={() => confirmDelete(item)}
+                    style={styles.deleteButton}
+                  >
+                    <Icon name="trash-2" size={20} color="red" />
+                  </TouchableOpacity>
+                </View>
               </TouchableOpacity>
             )}
-            <TextInput
-              style={styles.textInput}
-              placeholder="Description"
-              value={input}
-              onChangeText={setInput}
-            />
-            <TouchableOpacity onPress={submitReport} style={styles.submitButton}>
-              <Text style={styles.submitButtonText}>Submit</Text>
+          />
+  
+          {/* Add Report Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(false);
+            }}
+          >
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>Create a Report</Text>
+              {image ? (
+                <Image source={{ uri: image }} style={styles.imagePreview} />
+              ) : (
+                <TouchableOpacity
+                  onPress={() => uploadImage("gallery")}
+                  style={styles.imagePicker}
+                >
+                  <Text style={styles.imagePickerText}>Pick an image</Text>
+                </TouchableOpacity>
+              )}
+              <TextInput
+                style={styles.textInput}
+                placeholder="Description"
+                value={input}
+                onChangeText={setInput}
+              />
+              <TouchableOpacity
+                onPress={submitReport}
+                style={styles.submitButton}
+              >
+                <Text style={styles.submitButtonText}>Submit</Text>
+              </TouchableOpacity>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         </Modal>
-
-        {/* Delete Confirmation Modal */}
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible2}
-          onRequestClose={() => {
-            setModalVisible2(false);
-          }}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.confirmationModal}>
-              <Text style={styles.confirmationText}>
-                Are you sure you want to delete this report?
-              </Text>
-              <View style={styles.modalButtonContainer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    deleteReport(selectedReport.id, selectedReport.image);
-                    setModalVisible2(false);
-                  }}
-                  style={styles.modalDeleteButton}
-                >
-                  <Text style={styles.modalDeleteButtonText}>Delete</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => setModalVisible2(false)}
-                  style={styles.modalCancelButton}
-                >
-                  <Text style={styles.modalCancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Overlay for error messages */}
-        <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
-          <Text>{overlayMessage}</Text>
-        </Overlay>
       </View>
     </TouchableWithoutFeedback>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     padding: 10,
     backgroundColor: "#EAF1FF",
   },
-  addButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    width: 60,
-    height: 60,
-    backgroundColor: "#202A44",
+  image: {
+    width: 200,
+    height: 200,
+    marginTop: 20,
+    borderRadius: 50,
+  },
+  input: {
+    borderColor: "#000",
+    borderWidth: 2,
+    height: 100,
     borderRadius: 30,
-    justifyContent: "center",
-    alignItems: "center",
+    width: "90%",
+    marginTop: 10,
+    padding: 5,
+  },
+  container2: {
+    flex: 2,
+    width: "100%",
+    backgroundColor: "#EAF1FF",
   },
   reportItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 10,
     borderColor: "#202A44",
+    marginBottom: 50,
     padding: 10,
-    marginBottom: 20,
-    backgroundColor: "#fff",
   },
-  reportImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
+  imageThumbnail: {
+    width: 100,
+    height: 100,
+    borderRadius: 30,
   },
-  reportInfo: {
-    flex: 1,
-    marginLeft: 10,
-    justifyContent: "center",
+  text: {
+    fontSize: 15,
+    paddingRight: 15,
+    paddingLeft: 20,
   },
-  reportDescription: {
-    fontSize: 16,
+  Heading: {
     color: "#202A44",
+    marginTop: 79,
+    textAlign: "center",
+    fontSize: 40,
+    fontWeight: "bold",
+    marginBottom: 50,
+  },
+  Heading2: {
+    color: "#202A44",
+    marginTop: 79,
+    textAlign: "center",
+    fontSize: 40,
     fontWeight: "bold",
   },
-  deleteButton: {
-    padding: 10,
+  button: {
+    width: "90%",
+    height: 52,
+    backgroundColor: "#202A44",
+    borderRadius: 10,
+    marginTop: 20,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  modalView: {
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  modalBackground: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", 
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
   },
   modalContainer: {
-    width: "80%",
-    backgroundColor: "#fff",
+    width: '80%',
+    height: 320,
     borderRadius: 10,
     padding: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#202A44",
-    marginBottom: 20,
-  },
-  imagePreview: {
-    width: 150,
-    height: 150,
-    marginBottom: 20,
-    borderRadius: 10,
-  },
-  imagePicker: {
-    width: "80%",
-    padding: 15,
     backgroundColor: "#EAF1FF",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    marginBottom: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  imagePickerText: {
-    fontSize: 16,
-    color: "#202A44",
+  closeIcon: {
+    position: "absolute",
+    top: 10,
+    right: 10,
   },
-  textInput: {
-    width: "100%",
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#202A44",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 20,
-    backgroundColor: "#fff",
-  },
-  submitButton: {
-    width: "80%",
-    height: 50,
-    backgroundColor: "#202A44",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-  },
-  submitButtonText: {
-    fontSize: 16,
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  confirmationModal: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  confirmationText: {
-    fontSize: 18,
-    color: "#202A44",
-    marginBottom: 20,
-  },
-  modalButtonContainer: {
+  modalButtons: {
+    justifyContent: "space-around",
     flexDirection: "row",
-    justifyContent: "space-between",
     width: "100%",
   },
-  modalDeleteButton: {
-    backgroundColor: "red",
-    padding: 15,
+  modalButtonsin: {
+    backgroundColor: "#EAF1FF",
     borderRadius: 10,
-    justifyContent: "center",
+    width: 70,
     alignItems: "center",
-    flex: 1,
-    marginRight: 10,
+    padding: 10,
   },
-  modalDeleteButtonText: {
-    color: "#fff",
+  modalHeader: {
+    textAlign: "center",
+    fontSize: 30,
+    color: "#202A44",
     fontWeight: "bold",
-    fontSize: 16,
+    marginBottom: 20,
   },
-  modalCancelButton: {
-    backgroundColor: "#202A44",
-    padding: 15,
+  textContainer: {
+    flex: 1, // Make the text container flexible to allow wrapping
+    paddingLeft: 20,
+    paddingRight: 10,
+  },
+  imageheader: {
+    fontWeight: "bold",
+    fontSize: 20
+  },
+  overlay: {
+    width: '80%',
+    height: 320,
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-  },
-  modalCancelButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    padding: 20,
+    backgroundColor: "#EAF1FF",
+    alignItems: 'center',
+    justifyContent: 'center',
+},
+overlayContent: {
+    alignItems: 'center',
+},
+overlayIcon: {
+    marginBottom: 15,
+},
+overlayText: {
     fontSize: 16,
+    textAlign: 'center',
+},
+  icontext: {
+    textAlign: "justify",
+    fontSize: 11
+  },
+  status: {
+    marginTop: 10,
+    fontWeight: "bold",
   },
 });
+

@@ -1,3 +1,4 @@
+import { View, Text, Image, FlatList, ActivityIndicator, Linking, TouchableOpacity } from 'react-native';
 import { View, Text, Image, FlatList, ActivityIndicator, Linking } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { signOut } from "firebase/auth";
@@ -6,8 +7,11 @@ import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CurrentDay from "../components/weather-API/CurrentDay";
 import { News } from '../components/News-API/News';
+import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
+import { router } from 'expo-router';
 
-const Home = () => {
+// have your drawer code here!
+const Home = ({ navigation }) => { // Accept navigation as a prop
 
   const [news, setNews] = useState([]);
   const [error, setErrors] = useState(null);
@@ -43,7 +47,7 @@ const Home = () => {
   }
 
   const renderItem = ({ item }) => (
-    <SafeAreaView style={{padding:1, backgroundColor:'#EAF1FF'}}>
+    <SafeAreaView style={{padding:1, backgroundColor:'#EAF1FF', }}>
  
         <View style={{padding:10,borderBottomWidth: 1,borderBottomColor:'black',backgroundColor:'#fff',
           borderRadius:5, marginVertical:-8, }}>
@@ -72,24 +76,18 @@ const Home = () => {
     </SafeAreaView>
   );
 
+  const handleHamburger = () =>{
+    console.log("hamburger pressed")
+    // this where to hamburger to make a move
+    router.push("../hamburger/")
+  }
+
   return (
     <View style={{marginHorizontal:4,padding:2}}>
-      {/* <Pressable
-        style={{
-          padding: 10,
-          borderRadius: 10,
-        }}
-        onPress={() => signOut(auth)}
-      >
-        <Text
-          style={{
-            color: "blue",
-            fontSize: 16,
-          }}
-        >
-          Logou
-        </Text>
-      </Pressable> */}
+      {/* Hamburger Menu Button */}
+      <TouchableOpacity onPress={handleHamburger} style={{ marginTop: 10, marginLeft: 10 }}>
+        <Icon name="bars" size={30} color="#000" />
+      </TouchableOpacity>
 
       <View style={{}}>
         <CurrentDay/>
@@ -106,3 +104,13 @@ const Home = () => {
 };
 
 export default Home;
+
+import { View, Text, Image, FlatList, ActivityIndicator, Linking } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase";
+import axios from 'axios';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import CurrentDay from "../components/weather-API/CurrentDay";
+import { News } from '../components/News-API/News';
+

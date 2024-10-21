@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
-import { collection, addDoc } from 'firebase/firestore'; // Import Firestore functions
-import { db } from '../../firebase'; // Ensure you have your Firestore instance
+
 
 export default function useLocation() {
   const [errorMsg, setErrorMsg] = useState('');
@@ -30,16 +29,7 @@ export default function useLocation() {
       console.log('User Location:', response);
 
       // Add the user's location to Firestore
-      try {
-        await addDoc(collection(db, 'reports'), {
-          latitude: latitude,
-          longitude: longitude,
-          timestamp: new Date(), // You can store the timestamp as well
-        });
-        console.log('Location successfully added to Firestore');
-      } catch (error) {
-        console.error('Error adding location to Firestore: ', error);
-      }
+   
     }
   };
 

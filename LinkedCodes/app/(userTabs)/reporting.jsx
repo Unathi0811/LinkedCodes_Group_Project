@@ -379,54 +379,59 @@ export default function Reporting() {
         <View style={styles.container2}>
           <Text style={styles.Heading2}>Historical Reports</Text>
           <FlatList
-  data={reports}
-  keyExtractor={(item) => item.id}
-  renderItem={({ item }) => (
-    <TouchableOpacity onPress={() => openReportDetails(item)}>
-      <View style={styles.reportItem}>
-        <Image source={{ uri: item.image }} style={styles.imageThumbnail} />
-        <View style={styles.textContainer}>
-          <Text style={styles.description}>{item.description}</Text>
-          <Text style={styles.timestamp}>{item.timestamp.toDate().toLocaleString()}</Text>
-          
-        </View>
-        <TouchableOpacity onPress={() => deleteReport(item.id, item.image)}>
-          <Icon name="trash" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  )}
-/>
-        </View>
-
-        {/* Overlay for error messages */}
-       
-        <Overlay isVisible={visible} onBackdropPress={toggleOverlay} overlayStyle={styles.overlay}>
-                <View style={styles.overlayContent}>
-                    <Icon name="info" size={50} color="#000" style={styles.overlayIcon} />
-                    <Text style={styles.overlayText}>{overlayMessage}</Text>
+            data={reports}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.reportItem}
+                onPress={() => console.log("Report selected:", item)}
+              >
+                <Image source={{ uri: item.image }} style={styles.reportImage} />
+                <View style={styles.reportInfo}>
+                  <Text style={styles.reportDescription}>{item.description}</Text>
+                  <TouchableOpacity
+                    onPress={() => confirmDelete(item)}
+                    style={styles.deleteButton}
+                  >
+                    <Icon name="trash-2" size={20} color="red" />
+                  </TouchableOpacity>
                 </View>
-            </Overlay>
-        
-
-        {/* Modal for report details */}
-        <Modal transparent={true} visible={modalVisible2} animationType="slide">
-          <TouchableOpacity style={styles.modalBackground} onPress={() => setModalVisible2(false)}>
-            <TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
-              {selectedReport && (
-                <>
-                  <Text style={styles.modalHeader}>Report Details</Text>
-                  <Text style={styles.description}>Description: {selectedReport.description}</Text>
-                  <Text style={styles.timestamp}>
-                    Date: {selectedReport.timestamp.toDate().toLocaleString()}
-                  </Text>
-                  <Text style={styles.status}>
-                    Status: {selectedReport.status || 'No Status'}
-                  </Text>
-                </>
+              </TouchableOpacity>
+            )}
+          />
+  
+          {/* Add Report Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(false);
+            }}
+          >
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>Create a Report</Text>
+              {image ? (
+                <Image source={{ uri: image }} style={styles.imagePreview} />
+              ) : (
+                <TouchableOpacity
+                  onPress={() => uploadImage("gallery")}
+                  style={styles.imagePicker}
+                >
+                  <Text style={styles.imagePickerText}>Pick an image</Text>
+                </TouchableOpacity>
               )}
-              <TouchableOpacity style={styles.button} onPress={() => setModalVisible2(false)}>
-                <Text style={styles.buttonText}>Close</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Description"
+                value={input}
+                onChangeText={setInput}
+              />
+              <TouchableOpacity
+                onPress={submitReport}
+                style={styles.submitButton}
+              >
+                <Text style={styles.submitButtonText}>Submit</Text>
               </TouchableOpacity>
             </TouchableOpacity>
           </TouchableOpacity>
@@ -454,12 +459,10 @@ const styles = StyleSheet.create({
     borderColor: "#000",
     borderWidth: 2,
     height: 100,
-    borderRadius: 10,
+    borderRadius: 30,
     width: "90%",
     marginTop: 10,
     padding: 5,
-    
-    
   },
   container2: {
     flex: 2,
@@ -467,19 +470,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#EAF1FF",
   },
   reportItem: {
-    flexDirection: 'row',
-    backgroundColor: "#fff",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 2,
     borderRadius: 10,
-    padding: 15,
-    width: "95%",
-    marginBottom: 15,
-    marginLeft: 10,
-    shadowColor: '#202A44',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.6,
-    shadowRadius: 7,
-    elevation: 3,}
-  ,
+    borderColor: "#202A44",
+    marginBottom: 50,
+    padding: 10,
+  },
   imageThumbnail: {
     width: 100,
     height: 100,
@@ -495,7 +494,7 @@ const styles = StyleSheet.create({
     marginTop: 79,
     textAlign: "center",
     fontSize: 40,
-  
+    fontWeight: "bold",
     marginBottom: 50,
   },
   Heading2: {
@@ -503,7 +502,7 @@ const styles = StyleSheet.create({
     marginTop: 79,
     textAlign: "center",
     fontSize: 40,
-    
+    fontWeight: "bold",
   },
   button: {
     width: "90%",
@@ -565,7 +564,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   imageheader: {
-   
+    fontWeight: "bold",
     fontSize: 20
   },
   overlay: {

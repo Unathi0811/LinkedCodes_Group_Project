@@ -28,9 +28,9 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.helloContainer}>
-        <Text style={styles.hello}>Hello</Text>
+    < View style={styles.container} >
+      <View style={styles.helloContainer} >
+        <Text style={styles.hello} >Hello </Text>
       </View>
 
       <View>

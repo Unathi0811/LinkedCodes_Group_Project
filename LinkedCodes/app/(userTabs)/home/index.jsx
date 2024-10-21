@@ -13,7 +13,7 @@ import {
 import * as React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Link, router } from "expo-router";
-import { useUser } from "../../src/cxt/user";
+import { useUser } from "../../../src/cxt/user";
 import "react-native-gesture-handler";
 import { Drawer } from "react-native-drawer-layout";
 import Icon2 from "react-native-vector-icons/MaterialIcons";
@@ -41,7 +41,7 @@ const Home = () => {
             {/* I want four links here one for notifications, account, settings, device permissins, logout button, */}
             <TouchableOpacity
               style={styles.drawerItem}
-              onPress={() => router.push("/(tabs)/Settings/notifications")}
+              onPress={() => router.push("/(userTabs)/home/notifications")}
             >
               <Text  style={styles.drawerItemText}>Notification</Text>
               <Icon name="bell" size={20} color="#fff" style={styles.drawerIcon} />
@@ -49,7 +49,7 @@ const Home = () => {
 
             <TouchableOpacity
               style={styles.drawerItem}
-              onPress={() => router.push("/(tabs)/Profile")}
+              onPress={() => router.push("/(userTabs)/home/profile")}
             >
               <Text style={styles.drawerItemText}>Profile</Text>
               <Icon name="user" size={22} color="#fff" style={styles.drawerIcon} />
@@ -57,7 +57,7 @@ const Home = () => {
 
             <TouchableOpacity
               style={styles.drawerItem}
-              onPress={() => router.push("/(tabs)/Settings")}
+              onPress={() => router.push("/(userTabs)/home/settings")}
             >
               <Text style={styles.drawerItemText}>Settings</Text>
               <Icon name="cog" size={20} color="#fff" style={styles.drawerIcon} />
@@ -65,10 +65,10 @@ const Home = () => {
 
             <TouchableOpacity
               style={styles.drawerItem}
-              onPress={() => router.push("/(tabs)/Settings/permissions")}
+              onPress={() => router.push("/(userTabs)/home/rate")}
             >
-              <Text style={styles.drawerItemText}>Permissions</Text>
-              <Icon2 name="fingerprint" size={20} color="#fff" style={styles.drawerIcon} />
+              <Text style={styles.drawerItemText}>Rate Us</Text>
+              <Icon2 name="star" size={24} color="#fff" style={styles.drawerIcon} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -118,10 +118,10 @@ const Home = () => {
           <Link
             style={styles.manageButton}
             asChild
-            href="/(tabs)/Maintainance/reporting"
+            href="/(userTabs)/reporting"
           >
             <TouchableOpacity style={styles.manageButton}>
-              <Text style={styles.manageButtonText}>Manage Reports</Text>
+              <Text style={styles.manageButtonText}>My Reports</Text>
               <Icon
                 name="file-text"
                 size={24}
@@ -129,62 +129,18 @@ const Home = () => {
                 style={styles.buttonIcon}
               />
             </TouchableOpacity>
-          </Link>
-          {/* Upcoming Maintenance Button */}
-          <Link
-            style={styles.upcomingButton}
-            asChild
-            href="/(tabs)/Maintainance/maintain"
-          >
-            <TouchableOpacity style={styles.upcomingButton}>
-              <Text style={styles.upcomingButtonText}>Maintenance</Text>
-              <Icon
-                name="wrench"
-                size={24}
-                color="#FFF"
-                style={styles.buttonIcon}
-              />
-            </TouchableOpacity>
-          </Link>
+          </Link> 
 
-          {/* analytics graphs down here, also they should scroll horizontally, still coming up with an idea*/}
-          <Text style={styles.overviewText}>Analytics</Text>
+          {/* news down here*/}
+          <Text style={styles.overviewText}>NEWS</Text>
           <Link
             style={styles.upcomingButton}
             asChild
-            href="/(tabs)/Maintainance/analytics"
+            href="/(userTabs)/Maintainance/analytics"
           >
             <TouchableOpacity style={styles.card}>
               <Image
-                source={require("../../assets/graph1.jpeg")}
-                style={styles.image}
-              />
-              <Text style={styles.headline}>Predictive Analysis</Text>
-            </TouchableOpacity>
-          </Link>
-
-          <Link
-            style={styles.upcomingButton}
-            asChild
-            href="/(tabs)/Maintainance/analytics"
-          >
-            <TouchableOpacity style={styles.card}>
-              <Image
-                source={require("../../assets/graph1.jpeg")}
-                style={styles.image}
-              />
-              <Text style={styles.headline}>Maintainance History</Text>
-            </TouchableOpacity>
-          </Link>
-
-          <Link
-            style={styles.upcomingButton}
-            asChild
-            href="/(tabs)/Maintainance/analytics"
-          >
-            <TouchableOpacity style={styles.card}>
-              <Image
-                source={require("../../assets/graph2.jpeg")}
+                source={require("../../../assets/graph2.jpeg")}
                 style={styles.image}
               />
               <Text style={styles.headline}>User Satisfaction</Text>
@@ -193,15 +149,14 @@ const Home = () => {
 
           {/* Recent Updates Section */}
           <Text style={styles.recentUpdatesTitle}>Recent Updates</Text>
-
           <Link
             style={styles.upcomingButton}
             asChild
-            href="/(tabs)/Maintainance/reporting"
+            href="/(userTabs)/Maintainance/reporting"
           >
             <TouchableOpacity style={styles.card}>
               <Image
-                source={require("../../assets/road.png")}
+                source={require("../../../assets/road.png")}
                 style={styles.image}
               />
               <Text style={styles.headline}>Pothole Repair Completed</Text>
@@ -211,11 +166,11 @@ const Home = () => {
           <Link
             style={styles.upcomingButton}
             asChild
-            href="/(tabs)/Maintainance/maintain"
+            href="/(userTabs)/Maintainance/maintain"
           >
             <TouchableOpacity style={styles.card}>
               <Image
-                source={require("../../assets/bridge.png")}
+                source={require("../../../assets/bridge.png")}
                 style={styles.image}
               />
               <Text style={styles.headline}>Bridge Inspection Scheduled</Text>

@@ -1,50 +1,130 @@
-import { StyleSheet, Text, TouchableOpacity, View, Pressable, ScrollView, Image } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Pressable, ScrollView, Image, Alert } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Link } from "expo-router";
+import { useRouter } from 'expo-router';
+import "react-native-gesture-handler";
+import { Drawer } from "react-native-drawer-layout";
+import { signOut } from "firebase/auth";
+import Icon2 from "react-native-vector-icons/MaterialIcons";
 
 const Maintenance = () => {
+  const [open, setOpen] = React.useState(false);
+
   const handleMenuPress = () => {
-    console.log("Hamburger menu pressed");
+    setOpen(!open);
   };
 
+  const router = useRouter();
+
   return (
+    <Drawer
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+      renderDrawerContent={() => {
+        // console.log("Drawer Content working!");
+        return (
+        <View style={styles.drawer}>
+          <View style={styles.drawerContent}>
+            <Text style={styles.drawerHeader}>Menu</Text>
+            {/* I want four links here one for notifications, account, settings, device permissins, logout button, */}
+            <TouchableOpacity
+              style={styles.drawerItem}
+              onPress={() => router.push("/(tabs)/Settings/notifications")}
+            >
+              <Text  style={styles.drawerItemText}>Notification</Text>
+              <Icon name="bell" size={20} color="#fff" style={styles.drawerIcon} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.drawerItem}
+              onPress={() => router.push("/(tabs)/Profile")}
+            >
+              <Text style={styles.drawerItemText}>Profile</Text>
+              <Icon name="user" size={22} color="#fff" style={styles.drawerIcon} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.drawerItem}
+              onPress={() => router.push("/(tabs)/Settings")}
+            >
+              <Text style={styles.drawerItemText}>Settings</Text>
+              <Icon name="cog" size={20} color="#fff" style={styles.drawerIcon} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.drawerItem}
+              onPress={() => router.push("/(tabs)/Settings/permissions")}
+            >
+              <Text style={styles.drawerItemText}>Permissions</Text>
+              <Icon2 name="fingerprint" size={20} color="#fff" style={styles.drawerIcon} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.drawerItem}
+              onPress={() => {
+                Alert.alert(
+                  "Logout",
+                  "Are you sure you want to logout?",
+                  [
+                    {
+                      text: "Cancel",
+                      onPress: () => console.log("Logout canceled"),
+                      style: "cancel",
+                    },
+                    {
+                      text: "Logout",
+                      onPress: () => signOut(auth),
+                      style: "destructive",
+                    },
+                  ],
+                  { cancelable: true }
+                );
+              }}
+            >
+              <Text style={styles.drawerItemText}>Logout</Text>
+              <Icon name="sign-out" size={20} color="#fff" style={styles.drawerIcon} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        )
+      }}
+    >
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.appName}>InfraSmart</Text>
         <TouchableOpacity onPress={handleMenuPress} style={styles.hamburgerButton}>
           <Icon name="bars" size={24} color="#202A44" />
         </TouchableOpacity>
+        <Text style={styles.appName}>InfraSmart</Text>
       </View>
       <ScrollView  style={styles.contentContainer}>
         {/* Buttons for Reporting and Maintenance */ }
-        <View style={styles.linkContainer} asChild>
-          <Link href="/(tabs)/Maintenance/reporting" asChild>
-            <TouchableOpacity style={styles.linkButton}>
+        <View style={styles.linkContainer} >
+            <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/(tabs)/Maintainance/reporting")} >
               <Text style={styles.linkText}>REPORTING</Text>
               <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
             </TouchableOpacity>
-          </Link>
 
-          <Link href="/(tabs)/Maintenance/maintain" asChild>
-            <TouchableOpacity style={styles.linkButton}>
+       
+            <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/(tabs)/Maintainance/maintain")}>
               <Text style={styles.linkText}>MAINTAIN</Text>
               <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
             </TouchableOpacity>
-          </Link> 
-          <Link href="/(tabs)/Maintenance/analytics" asChild>
-            <TouchableOpacity style={styles.linkButton}>
+
+
+            <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/(tabs)/Maintainance/analytics")}>
               <Text style={styles.linkText}>ANALYTICS</Text>
               <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
             </TouchableOpacity>
-          </Link>
+       
 
-          <Link href="/(tabs)/Maintenance/statistics" asChild>
-            <TouchableOpacity style={styles.linkButton}>
+         
+            <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/(tabs)/Maintainance/statistics")}>
               <Text style={styles.linkText}>STATISTICS</Text>
-              <Icon name="chevron-down" size={20} color="#fff" style={styles.icon} />
+              <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
             </TouchableOpacity>
-          </Link>
+      
         </View>
         <View
         style={styles.card}
@@ -56,6 +136,7 @@ const Maintenance = () => {
         </View>
       </ScrollView>
     </View>
+    </Drawer>
   );
 };
 
@@ -129,4 +210,40 @@ appName: {
     borderRadius: 10,
     marginBottom: 10,
   },
+  drawer: {
+    flex: 1,
+    backgroundColor: "#F2f9FB",
+  },
+  drawerContent: {
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    alignItems: "flex-start",
+    flex: 1,
+  },
+  drawerHeader: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#202A44",
+  },
+  drawerItem: {
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    width: "100%",
+    backgroundColor: "#202A44",
+    marginBottom: 10,
+    borderRadius: 10,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    flexDirection: "row",         
+    justifyContent: "space-between", 
+    alignItems: "center",     
+  },
+  drawerItemText: {
+    fontSize: 15,
+    color: "#fff",
+  },
+  drawerIcon: {
+      marginLeft: 23,
+  }
 });

@@ -11,6 +11,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@google/generative-ai": "^0.21.0",
     "@material-tailwind/react": "^2.1.10",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/netinfo": "^11.3.1",
@@ -21,13 +22,14 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@types/react": "~18.2.79",
     "axios": "^1.7.7",
-    "events": "^3.3.0",
-    "expo": "~51.0.38",
+    "expo": "^51.0.32",
     "expo-constants": "~16.0.2",
+    "expo-contacts": "~13.0.5",
     "expo-device": "~6.0.2",
     "expo-image-picker": "~15.0.7",
     "expo-linear-gradient": "~13.0.2",
     "expo-linking": "~6.3.1",
+    "expo-local-authentication": "~14.0.1",
     "expo-location": "~17.0.1",
     "expo-modules-core": "^1.12.26",
     "expo-notifications": "~0.28.18",
@@ -41,7 +43,6 @@
     "react": "18.2.0",
     "react-native": "0.74.5",
     "react-native-calendars": "^1.1306.0",
-    "react-native-geocoding": "^0.5.0",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-gifted-chat": "^2.6.4",
     "react-native-image-picker": "^7.1.2",
@@ -58,7 +59,7 @@
     "react-step-builder": "^3.0.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
+    "@babel/core": "^7.24.0",
     "tailwindcss": "^3.3.2",
     "typescript": "~5.3.3"
   },

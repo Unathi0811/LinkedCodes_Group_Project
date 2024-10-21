@@ -50,7 +50,22 @@ const Settings = () => {
           color="#fff" 
           size={22} 
         />
+        </TouchableOpacity>
 
+        <TouchableOpacity style={styles.option}
+        onPress={() => {
+          router.push('/(tabs)/Settings/permissions' );
+          }}
+        >
+          <Text style={styles.optionText}>Permissions</Text>
+          <Icon 
+          style={{
+            marginLeft: 104,
+          }}
+          name='lock' 
+          color="#fff" 
+          size={22} 
+        />
         </TouchableOpacity>
         
         {/* when this touchable opacity is pressed it should pop up an alert that has fingerprint and face recognition, both with an enable and disable button of some sort, so when pressed it can enabe the biometrics
@@ -109,7 +124,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1,
     flexDirection: "row",
-    gap: 50,
+    gap: 70,
+    alignContent: "space-between"
   },
   optionText: {
     fontSize: 18,

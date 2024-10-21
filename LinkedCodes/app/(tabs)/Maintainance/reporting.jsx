@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, Pressable, SafeAreaView, ActivityIndicator, Modal } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, Pressable, SafeAreaView, ActivityIndicator, Modal, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState, useCallback } from 'react';
 import { db, auth,} from '../../../firebase'; 
-import { collection, getDocs, addDoc, onSnapshot, query, orderBy, where, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, onSnapshot, query, orderBy, where, doc, getDoc, query, where } from 'firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from "react-native-vector-icons/Ionicons";
 import Icon3 from "react-native-vector-icons/Feather";
@@ -14,8 +14,10 @@ import { updateDoc } from 'firebase/firestore';
 
 // Initialize the Geocoding API with your API key
 Geocoder.init('AIzaSyAQ6VsdSIFTQYmic060gIGuGQQd2TW4jsw');
+import { useUser } from '../../../src/cxt/user'; 
 
-const Reporting = () => {
+export default function Reporting() {
+  const { user } = useUser();
   const [reports, setReports] = useState([]);
   const [error, setError] = useState(null);
   const [overlayVisible, setOverlayVisible] = useState(false);
@@ -90,7 +92,9 @@ const Reporting = () => {
     };
 
     fetchReports();
-  }, []);
+  }, [user]);
+
+  const filteredReports = reports.filter(report => report.status === filter); 
 
   const fetchLocationDescription = async (lat, long) => {
     try {
@@ -275,7 +279,6 @@ const Reporting = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.headerContainer}>
         <Text style={styles.appName}>InfraSmart</Text>
       </View>
@@ -370,8 +373,8 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    flexDirection: "row",
     padding: 20,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     zIndex: 10,
@@ -438,18 +441,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: "flex-end",
     marginTop: 50,
-  },
-  iconButton: {
-    marginRight: 15,
-  },
-  moreButton: {
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  moreButtonText: {
-    fontSize: 16,
-    color: '#202A44',
-    fontWeight: 'bold',
   },
   horScrollView: {
     marginTop: 100,

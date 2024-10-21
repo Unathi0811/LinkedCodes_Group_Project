@@ -1,4 +1,5 @@
 import { View, Text, Image, FlatList, ActivityIndicator, Linking, TouchableOpacity } from 'react-native';
+import { View, Text, Image, FlatList, ActivityIndicator, Linking } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase";
@@ -10,7 +11,6 @@ import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon lib
 import { router } from 'expo-router';
 
 // have your drawer code here!
-
 const Home = ({ navigation }) => { // Accept navigation as a prop
 
   const [news, setNews] = useState([]);
@@ -47,8 +47,8 @@ const Home = ({ navigation }) => { // Accept navigation as a prop
   }
 
   const renderItem = ({ item }) => (
-    <SafeAreaView style={{padding:1, backgroundColor:'#EAF1FF'}}>
-
+    <SafeAreaView style={{padding:1, backgroundColor:'#EAF1FF', }}>
+ 
         <View style={{padding:10,borderBottomWidth: 1,borderBottomColor:'black',backgroundColor:'#fff',
           borderRadius:5, marginVertical:-8, }}>
 

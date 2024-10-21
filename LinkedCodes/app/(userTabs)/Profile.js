@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import {View,Text,TextInput,Button,Image,StyleSheet,TouchableOpacity,ScrollView,} from "react-native";
-import { useUser } from "../../../src/cxt/user";
-import { auth, db } from "../../../firebase";
-import {doc,updateDoc,deleteDoc,addDoc,collection,} from "firebase/firestore";
+import {View,Text,TextInput,Image,StyleSheet,TouchableOpacity,ScrollView,
+} from "react-native";
+import { useUser } from "../../src/cxt/user";
+import { db } from "../../firebase";
+import { doc, updateDoc } from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
-import {getStorage,ref,uploadBytesResumable,getDownloadURL,} from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Removed getStorage
 import Icon from "react-native-vector-icons/FontAwesome";
-import {deleteUser,reauthenticateWithCredential,EmailAuthProvider,} from "firebase/auth";
+import { storage } from "../../firebase"; // Use initialized storage
 
 const EditProfile = () => {
   const { user, setUser } = useUser();
@@ -15,7 +16,6 @@ const EditProfile = () => {
   const [mobile, setMobile] = useState(user?.mobile || "");
   const [image, setImage] = useState(user.profileImage);
   const [password, setPassword] = useState("");
-  const [overlayMessage, setOverlayMessage] = useState("");
 
   const handleSave = async () => {
     try {
@@ -27,7 +27,7 @@ const EditProfile = () => {
         mobile,
       });
 
-      // update the user context
+      // Update the user context
       setUser({
         ...user,
         username,
@@ -40,10 +40,6 @@ const EditProfile = () => {
       console.error("Error updating profile:", error);
     }
   };
-   // Toggle overlay for error messages
- const toggleOverlay = () => {
-    setVisible(!visible);
-   };
 
   const pickImage = async () => {
     try {
@@ -56,7 +52,10 @@ const EditProfile = () => {
 
       if (!result.canceled) {
         setImage(result.assets[0].uri);
-        const fileName = result.assets[0].uri.split("/").pop();
+
+        // Use the user's uid to uniquely identify their profile image
+        const fileName = `${user.uid}_profile_${result.assets[0].uri.split("/").pop()}`;
+
         const uploadResp = await uploadToFirebase(
           result.assets[0].uri,
           fileName,
@@ -64,7 +63,11 @@ const EditProfile = () => {
             console.log(progress); // Show upload progress
           }
         );
+
+        // Save the profile image URL to Firestore
         await saveProfileImage(user.uid, uploadResp.downloadUrl);
+
+        // Update user context with the new profile image URL
         setUser({
           ...user,
           profileImage: uploadResp.downloadUrl,
@@ -75,48 +78,17 @@ const EditProfile = () => {
     }
   };
 
-  const handleDeleteAccount = async () => {
+  // Function to save the profile image URL to Firestore
+  const saveProfileImage = async (uid, downloadUrl) => {
     try {
-      const currentUser = auth.currentUser;
-
-      if (currentUser) {
-        // Delete user from Firebase Auth
-        await deleteUser(currentUser);
-
-        // Remove user data from Firestore
-        const userDoc = doc(db, "users", currentUser.uid);
-        await deleteDoc(userDoc);
-
-        // Sign out the user after deletion
-        await signOut(auth);
-        console.log("User account deleted and logged out");
-        alert("Your account has been deleted.");
-        // You can navigate to a login screen or homepage here
-      }
+      const userDoc = doc(db, "user", uid); // Reference to user document
+      await updateDoc(userDoc, {
+        profileImage: downloadUrl, // Update profileImage field with URL
+      });
+      console.log("Profile image URL updated successfully in Firestore");
     } catch (error) {
-      console.error("Error deleting account:", error);
-      Alert.alert("Error", "Unable to delete account. Please try again.");
+      console.error("Error updating profile image URL in Firestore:", error);
     }
-  };
-
-  const confirmDeleteAccount = () => {
-    Alert.alert(
-      "Delete Account",
-      "Are you sure you want to delete your account? This action is irreversible.",
-      [
-        {
-          text: "Cancel",
-          onPress: () => console.log("Account deletion canceled"),
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          onPress: handleDeleteAccount,
-          style: "destructive",
-        },
-      ],
-      { cancelable: true }
-    );
   };
 
   return (
@@ -177,14 +149,12 @@ const EditProfile = () => {
           <TouchableOpacity style={styles.deleteButton} onPress={handleSave}>
             <Text style={styles.deleteButtonText}>Save Changes</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.button}
-            onPress={confirmDeleteAccount}
+            // onPress={handleDeleteRequest}
           >
-            <Text style={styles.buttonText}>Delete Account</Text>
+            <Text style={styles.buttonText}>Delete Account </Text>
           </TouchableOpacity>
-
         </View>
       </ScrollView>
     </View>
@@ -195,7 +165,7 @@ const EditProfile = () => {
 const uploadToFirebase = async (uri, name, onProgress) => {
   const fetchResponse = await fetch(uri);
   const blob = await fetchResponse.blob();
-  const imageRef = ref(getStorage(), `profiles/${name}`);
+  const imageRef = ref(storage, `profiles/${name}`); // Using initialized storage directly
   const uploadTask = uploadBytesResumable(imageRef, blob);
 
   return new Promise((resolve, reject) => {
@@ -215,10 +185,6 @@ const uploadToFirebase = async (uri, name, onProgress) => {
   });
 };
 
-const saveProfileImage = async (userId, downloadUrl) => {
-  const userDoc = doc(db, "user", userId);
-  await updateDoc(userDoc, { profileImage: downloadUrl });
-};
 
 const styles = StyleSheet.create({
   container: {

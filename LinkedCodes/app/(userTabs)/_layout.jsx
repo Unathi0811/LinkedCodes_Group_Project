@@ -5,7 +5,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 const Layout = () => {
     return (
-        <Tabs initialRouteName="home" 
+       <Tabs initialRouteName="home" 
               screenOptions={{
                   headerShown: false,
                   tabBarActiveTintColor: '#202A44', 
@@ -34,16 +34,6 @@ const Layout = () => {
             />
             <Tabs.Screen 
                 name="traffic"
-                options={{
-                    tabBarIcon: ({ color, size }) => (
-                      <FontAwesome6
-                        name="map"
-                        color={color}
-                        size={size}
-                        stroke={0.9}
-                      />
-                    ),
-                  }}
             />
         </Tabs>
     );

@@ -20,7 +20,7 @@ const Square = ({ isLight, selected }) => {
 };
 
 const buttonStyle = {
-  borderRadius: 25,
+  borderRadius: 10,
   alignItems: "center",
   justifyContent: "center",
   width: "80%",

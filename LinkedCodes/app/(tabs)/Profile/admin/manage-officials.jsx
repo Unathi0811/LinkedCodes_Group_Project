@@ -17,7 +17,6 @@ import { useUser } from "../../../../src/cxt/user";
 const ManageOfficials = () => {
   const [users, setUsers] = useState([]);
   const { user } = useUser();
-  const [deleteRequests, setDeleteRequests] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
@@ -54,47 +53,9 @@ const ManageOfficials = () => {
     });
   };
 
-  // const fetchDeleteRequests = async () => {
-  //   try {
-  //     const querySnapshot = await getDocs(collection(db, "delete_requests"));
-  //     const requests = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  //     setDeleteRequests(requests);
-  //   } catch (error) {
-  //     console.error("Error fetching deletion requests:", error);
-  //   }
-  // };
+  
+  const placeholderImage = "https://via.placeholder.com/60"
 
-  // useEffect(() => {
-  //   fetchDeleteRequests();
-  // }, []);
-
-  // const fetchNotifications = async (requestId) => {
-  //   const notificationsRef = collection(db, `delete_requests/${requestId}/notifications`);
-  //   const querySnapshot = await getDocs(notificationsRef);
-  //   const notifications_ = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  
-  //   return notifications_;
-  // };
-  
-  // const fetchAllNotifications = async () => {
-  //   const querySnapshot = await getDocs(collection(db, "delete_requests"));
-  //   const allNotifications = [];
-  
-  //   const requests = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  
-  //   for (const requestDoc of requests) {
-  //     const notifications = await fetchNotifications(requestDoc.id);
-  //     allNotifications.push(...notifications);
-  //   }
-  
-  //   setNotifications(allNotifications); // Set all notifications to state
-  // };
-  
-  // useEffect(() => {
-  //   fetchDeleteRequests();
-  //   fetchAllNotifications(); // Fetch notifications when the component mounts
-  // }, []);
-  
   return (
     <>
       <Stack.Screen
@@ -139,7 +100,7 @@ const ManageOfficials = () => {
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.profileContainer}>
-              <Image source={{ uri: item.profileImage }} style={styles.profileImage} />
+              <Image source={{ uri: item.profileImage || placeholderImage}} style={styles.profileImage} />
               <View style={styles.textContainer}>
                 <Text style={styles.title}>{item.username}</Text>
                 <Text style={styles.description}>{item.email}</Text>
@@ -167,18 +128,6 @@ const ManageOfficials = () => {
         )}
         keyExtractor={(item) => item.id}
       />
-
-      {/* <Text>Deletion Requests</Text>
-      <FlatList
-        data={deleteRequests}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.title}>{item.department}</Text>
-            <Text style={styles.description}>{item.email}</Text>
-          </View>
-        )}
-        keyExtractor={(item) => item.id}
-      /> */}
     </>
   );
 };

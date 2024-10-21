@@ -17,23 +17,14 @@ const Mantain = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={handleMenuPress}
           style={styles.hamburgerButton}
         >
           <Icon name="bars" size={24} color="#202A44" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Text style={styles.appName}>InfraSmart</Text>
       </View>
-
-      <ScrollView>
-        {/* Card for upcoming events or tasks */}
-        <View style={styles.cardContainer}>
-          <Text style={styles.cardTitle}>Upcoming Events</Text>
-          <Text style={styles.cardContent}>Event 1: Due Soon</Text>
-          <Text style={styles.cardContent}>Event 2: In Progress</Text>
-        </View>
-      </ScrollView>
 
       <View style={styles.calendarCard}>
         <Calendar />
@@ -66,6 +57,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#202A44",
+    marginTop: 18,
   },
   hamburgerButton: {
     padding: 10,

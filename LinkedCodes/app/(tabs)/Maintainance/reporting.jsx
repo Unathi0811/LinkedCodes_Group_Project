@@ -1,137 +1,106 @@
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import { StyleSheet, Text, View, Image, FlatList, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { db } from '../../../firebase'; 
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useUser } from '../../../src/cxt/user'; 
 
-const Reporting = () => {
-  const reports = [
-    {
-      id: 1,
-      userProfilePhoto: 'https://via.placeholder.com/60',
-      reportImage: 'https://via.placeholder.com/100',
-      description: 'Report 1 description',
-      userName: 'Uathi Suru',
-    },
-    {
-      id: 2,
-      userProfilePhoto: 'https://via.placeholder.com/60',
-      reportImage: 'https://via.placeholder.com/100',
-      description: 'Report 2 description',
-      userName: 'Lina Zulu',
-    },
-    {
-      id: 3,
-      userProfilePhoto: 'https://via.placeholder.com/60',
-      reportImage: 'https://via.placeholder.com/100',
-      description: 'Report 3 description',
-      userName: 'Chris Noah',
-    },
-  ];
+export default function Reporting() {
+  const { user } = useUser();
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('Submitted'); 
 
-  const [trackedReports, setTrackedReports] = useState([]);
-  const [showAll, setShowAll] = useState(false);
+  useEffect(() => {
+    const fetchReports = async () => {
+      if (!user) return; 
 
-  const toggleTrackReport = (id) => {
-    if (trackedReports.includes(id)) {
-      setTrackedReports(trackedReports.filter((reportId) => reportId !== id));
-    } else {
-      setTrackedReports([...trackedReports, id]);
-    }
-  };
+      try {
+        const reportsRef = collection(db, 'reports');
+        const q = query(reportsRef, where('uid', '==', user.uid));
+        const reportSnapshot = await getDocs(q);
+        const reportList = reportSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setReports(reportList);
+      } catch (error) {
+        console.error("Error fetching reports: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReports();
+  }, [user]);
 
-  const getInitials = (name) => {
-    const [firstName, lastName] = name.split(' ');
-    return firstName[0] + (lastName ? lastName[0] : '');
-  };
+  const filteredReports = reports.filter(report => report.status === filter); 
 
   const renderItem = ({ item }) => (
     <View key={item.id} style={styles.card}>
       <View style={styles.profileContainer}>
-        <Image source={{ uri: item.userProfilePhoto }} style={styles.profileImage} />
-        <Text style={styles.initials}>{getInitials(item.userName)}</Text>
+        <Image source={{ uri: item.userProfilePhoto || 'https://via.placeholder.com/60' }} style={styles.profileImage} />
+        <Text style={styles.initials}>{item.name || 'Unknown User'}</Text>
       </View>
       <View style={styles.reportContainer}>
-        <Image source={{ uri: item.reportImage }} style={styles.reportImage} />
+        <Image source={{ uri: item.image[0] || 'https://via.placeholder.com/100' }} style={styles.reportImage} />
         <Text style={styles.description}>{item.description}</Text>
         <View style={styles.iconContainer}>
-          {/* Map icon */}
-          <TouchableOpacity style={styles.iconButton}>
-            <Icon name="map-marker" size={24} color="#fff" />
-          </TouchableOpacity>
-
-          {/* Eye icon for tracking */}
-          <TouchableOpacity onPress={() => toggleTrackReport(item.id)} style={styles.iconButton}>
-            <Icon
-              name={trackedReports.includes(item.id) ? 'eye' : 'eye-slash'}
-              size={24}
-              color="#fff"
-            />
-          </TouchableOpacity>
+          <Icon name="map-marker" size={24} color="#202A44" />
+          <Icon name="eye" size={24} color="#202A44" />
         </View>
       </View>
     </View>
   );
 
-  const handleMenuPress = () => {
-    console.log("Hamburger menu pressed");
+  const handleFilterPress = (status) => {
+    setFilter(status); 
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={handleMenuPress} style={styles.hamburgerButton}>
-          <Icon name="bars" size={24} color="#202A44" />
-        </TouchableOpacity>
         <Text style={styles.appName}>InfraSmart</Text>
       </View>
       
-      <View style={styles.buttonContainer}>
-      <TouchableOpacity style={styles.btn}>
-        <Text style={styles.btnText}>Submitted</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.btn}>
-        <Text 
-        style={styles.btnText}>In-Progress</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.btn}>
-        <Text style={styles.btnText}>Completed</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.btn}>
-        <Text style={styles.btnText}>Rejected</Text>
-      </TouchableOpacity>
-      </View>
-      {/* Report List */}
-      <FlatList
-        style={styles.list}
-        data={showAll ? reports : reports.slice(0, 3)}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        ListFooterComponent={
-          !showAll && reports.length > 3 && (
-            <TouchableOpacity style={styles.moreButton} onPress={() => setShowAll(true)}>
-              <Text style={styles.moreButtonText}>Show More</Text>
-            </TouchableOpacity>
-          )
-        }
-      />
+      {/* Filters */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horScrollView}>
+        {['Submitted', 'In-Progress', 'Completed', 'Rejected'].map(status => (
+          <TouchableOpacity key={status} style={styles.btn} onPress={() => handleFilterPress(status)}>
+            <Text style={styles.btnText}>{status}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      
+      {/* Loading Indicator */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#202A44" style={{ marginTop: 50 }} />
+      ) : (
+        <ScrollView style={{ marginTop: 34 }}>
+          {filteredReports.length > 0 ? (
+            <FlatList
+              data={filteredReports}
+              renderItem={renderItem}
+              keyExtractor={item => item.id}
+              contentContainerStyle={styles.list}
+            />
+          ) : (
+            <Text>No reports available for this status.</Text>
+          )}
+        </ScrollView>
+      )}
     </View>
   );
-};
-
-export default Reporting;
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F2f9FB',
   },
   headerContainer: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    flexDirection: "row",
     padding: 20,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     zIndex: 10,
@@ -142,9 +111,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#202A44",
-  },
-  hamburgerButton: {
-    padding: 10,
+    marginTop: 20,
   },
   list: {
     marginTop: 80, 
@@ -152,13 +119,15 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: "#202A44",
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
+    width: "95%",
     marginBottom: 15,
+    marginLeft: 10,
     shadowColor: '#202A44',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.6,
     shadowRadius: 7,
     elevation: 3,
   },
@@ -191,43 +160,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginTop: 10,
-    color: "#fff"
+    color: "#202A44"
   },
   iconContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     marginTop: 10,
   },
-  iconButton: {
-    marginRight: 15,
-  },
-  moreButton: {
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  moreButtonText: {
-    fontSize: 16,
-    color: '#202A44',
-    fontWeight: 'bold',
+  horScrollView: {
+    marginTop: 100,
   },
   btn: {
-    borderRadius: 25,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    width: "80%",
-    padding: 15,
-    marginTop: 10,
-    backgroundColor: "#202A44"
+    width: 184,
+    height: 50,
+    marginTop: 15,
+    marginBottom: 15,
+    backgroundColor: "#202A44",
+    marginLeft: 13,
   },
   btnText: {
     fontSize: 16,
     color: "#fff",
     fontWeight: "bold",
   },
-  buttonContainer: {
-    marginTop: 157,
-    flexDirection: "column",
-    alignContent: "center",
-    alignItems: "center",
-  }
 });

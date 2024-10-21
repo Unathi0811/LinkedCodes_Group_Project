@@ -85,7 +85,7 @@ const Profile = () => {
 
         <View style={styles.linksContainer}>
           {/* Personal Information link */}
-          <Link href="/(tabs)/Profile/edit-profile" asChild>
+          <Link href="/(userTabs)/home/edit-profile" asChild>
             <Pressable style={styles.card}>
               <Text style={styles.cardText}>Personal Information</Text>
               <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
@@ -94,7 +94,7 @@ const Profile = () => {
 
           {/* Admin link (only if the user is an admin) */}
           {user?.admin && (
-            <Link href="/(tabs)/Profile/admin" asChild>
+            <Link href="/(userTabs)/Profile/admin" asChild>
               <Pressable style={styles.card}>
                 <Text style={styles.cardText}>Admin</Text>
                 <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />

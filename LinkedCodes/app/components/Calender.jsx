@@ -75,7 +75,7 @@ const Calendar = () => {
             backgroundColor: '#202A44', // background
             calendarBackground: '#202A44', // calendar background
             textSectionTitleColor: '#FFFFFF', // section titles (weekdays)
-            selectedDayBackgroundColor: '#FFFFFF', // selected day
+            selectedDayBackgroundColor: '#202A44', // selected day
             selectedDayTextColor: '#202A44', // text on selected day
             todayTextColor: '#FFD700', // text for today's date
             dayTextColor: '#FFFFFF', // dates text
@@ -99,6 +99,8 @@ const Calendar = () => {
             placeholderTextColor={"#D3D3D3"}
             value={newActivity}
             onChangeText={setNewActivity}
+            multiline
+            numberOfLines={5}
           />
 
         <View style={styles.buttons}>
@@ -151,13 +153,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     backgroundColor: '#fff',
+    marginBottom: 123,
   },
   input: {
     borderColor: '#202A44',
     borderWidth: 2,
-    borderRadius: 20,
     padding: 10,
     width: '80%',
+    maxHeight: "44%",
     marginBottom: 10,
   },
   buttons: {

@@ -26,7 +26,6 @@ const ManageUsers = () => {
       });
       setUsers(users_);
     });
-
     return () => {
       unsubscribe();
     };
@@ -53,6 +52,8 @@ const ManageUsers = () => {
       console.error("Error deleting user:", error);
     }
   };
+
+  const placeholderImage = "https://via.placeholder.com/60"
 
   return (
     <>
@@ -97,7 +98,7 @@ const ManageUsers = () => {
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.profileContainer}>
-              <Image source={{ uri: item.profileImage }} style={styles.profileImage} />
+              <Image source={{ uri: item.profileImage || placeholderImage}} style={styles.profileImage} />
               <View style={styles.textContainer}>
                 <Text style={styles.title}>{item.username}</Text>
                 <Text style={styles.description}>{item.email}</Text>
@@ -106,7 +107,7 @@ const ManageUsers = () => {
             <View style={styles.buttonContainer}>
               {/* Block/Unblock Button */}
               <TouchableOpacity style={styles.button} onPress={() => handleBlock(item.id, item.blocked)}>
-                {item.blocked ? (
+                { item.blocked ? (
                   <Octicons name="unlock" size={24} color="#202A44" />
                 ) : (
                   <Octicons name="lock" size={24} color="#202A44" />

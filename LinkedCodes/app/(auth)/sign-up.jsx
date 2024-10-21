@@ -53,64 +53,69 @@ const SignupScreen = () => {
   return (
     //a useContext that will take evrything heare and store them in the users profile
     <Pressable onPress={Keyboard.dismiss} style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image source={require("../../assets/top.png")} style={styles.topImage} />
-      </View>
       <View>
         <Text style={styles.createAccountText}>Create Account</Text>
       </View>
 
+      <Text style={styles.title}>Username: </Text>
       <View style={styles.inputContainer}>
-        <Icon name={"user"} size={20} color={"#ccc"} style={styles.inputIcon} />
+        <Icon name={"user"} size={24} color={"#ccc"} style={styles.inputIcon} />
         <TextInput
           style={styles.textInput}
-          placeholder="Username"
+          placeholder="username"
           keyboardType="default"
+          placeholderTextColor={"#ccc"}
           autoComplete="nickname"
           onChangeText={(text) => setUserData({ ...userData, username: text })}
           value={userData.username}
         />
       </View>
 
+      <Text style={styles.title}>Mobile: </Text>
       <View style={styles.inputContainer}>
         <Icon
           name={"mobile"}
-          size={24}
+          size={35}
           color={"#ccc"}
           style={styles.inputIcon}
         />
         <TextInput
           style={styles.textInput}
-          placeholder="Mobile"
+          placeholder="mobile"
           onChangeText={(text) => setUserData({ ...userData, mobile: text })}
           value={userData.mobile}
           keyboardType="phone-pad"
+          placeholderTextColor={"#ccc"}
           autoComplete="tel"
         />
       </View>
 
+      <Text style={styles.title}>Email: </Text>
       <View style={styles.inputContainer}>
         <Icon
           name={"envelope"}
-          size={24}
+          size={20}
           color={"#ccc"}
           style={styles.inputIcon}
         />
         <TextInput
           style={styles.textInput}
-          placeholder="Email"
+          placeholder="email"
           onChangeText={(text) => setUserData({ ...userData, email: text })}
           value={userData.email}
+          placeholderTextColor={"#ccc"}
           keyboardType="email-address"
           autoComplete="email"
         />
       </View>
 
+      <Text style={styles.title}>Password: </Text>
       <View style={styles.inputContainer}>
-        <Icon name={"lock"} size={24} color={"#ccc"} style={styles.inputIcon} />
+        <Icon name={"lock"} size={25} color={"#ccc"} style={styles.inputIcon} />
         <TextInput
           style={styles.textInput}
-          placeholder="Password"
+          placeholder="password"
+          placeholderTextColor={"#ccc"}
           keyboardType="default"
           autoComplete="new-password"
           secureTextEntry={true}
@@ -157,9 +162,6 @@ const SignupScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.imageContainer}>
-        <Image source={require("../../assets/bottom.png")} style={styles.bottomImage} />
-      </View>
     </Pressable>
   );
 };
@@ -177,24 +179,31 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: "#202A44",
     textAlign: "center",
-    marginBottom: 0,
+    marginBottom: 22,
     fontWeight: "bold",
-    marginTop: 20,
+    marginTop: 100,
   },
   inputContainer: {
     backgroundColor: "#ffffff",
     flexDirection: "row",
-    borderRadius: 20,
+    borderRadius: 10,
     marginHorizontal: 40,
     elevation: 10,
     marginVertical: 10,
     height: 50,
+    borderWidth: 1,
+    borderColor: "#ccc",
     alignItems: "center",
-    shadowOffset: { width: 3, height: 10 },
-    shadowOpacity: 0.2,
+    shadowOffset: { width: 4, height: 10 },
+    shadowOpacity: 0.1,
     shadowColor: "#202A44",
     gap: 10,  
     paddingHorizontal: 10,
+  },
+  title: {
+    fontSize: 15,
+    color: "#202A44",
+    marginLeft: 56,
   },
   textInput: {
     flex: 1,
@@ -217,7 +226,7 @@ const styles = StyleSheet.create({
   pressedSocial: {
     margin: 10,
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.8,
     shadowColor: "#202A44",
     shadowRadius: 10,
     elevation: 5,
@@ -230,7 +239,7 @@ const styles = StyleSheet.create({
   signUpButtonContainer: {
     backgroundColor: "#202A44",
     flexDirection: "row",
-    borderRadius: 20,
+    borderRadius: 10,
     marginHorizontal: 40,
     elevation: 10,
     marginVertical: 20,
@@ -254,20 +263,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: 10,
-  },
-  topImage: {
-    width: '100%',
-    height: 120,
-    resizeMode: 'cover',
-    marginBottom: 0,
-    marginLeft: -29,
-    marginTop: 0,
-  },
-  bottomImage: {
-    width: '100%',
-    height: 140,
-    resizeMode: 'cover',
-    marginLeft: -44,
-    marginTop: 30,
   },
 });

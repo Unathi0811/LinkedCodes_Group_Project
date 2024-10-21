@@ -26,7 +26,6 @@ const ManageUsers = () => {
       });
       setUsers(users_);
     });
-
     return () => {
       unsubscribe();
     };
@@ -108,7 +107,7 @@ const ManageUsers = () => {
             <View style={styles.buttonContainer}>
               {/* Block/Unblock Button */}
               <TouchableOpacity style={styles.button} onPress={() => handleBlock(item.id, item.blocked)}>
-                {item.blocked ? (
+                { item.blocked ? (
                   <Octicons name="unlock" size={24} color="#202A44" />
                 ) : (
                   <Octicons name="lock" size={24} color="#202A44" />

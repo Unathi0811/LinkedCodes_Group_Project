@@ -94,36 +94,49 @@ const EditProfile = () => {
     }
   };
 
-  // const handleDeleteRequest = async () => {
-  //   try {
-  //     // Create a new deletion request document
-  //     const deleteRequestDoc = {
-  //       userId: user.uid,
-  //       email: user.email,
-  //       department: user.department,
-  //       timestamp: new Date(),
-  //       status: "pending",
-  //     };
+  const handleDeleteAccount = async () => {
+    try {
+      const currentUser = auth.currentUser;
 
-  //     // Save the deletion request in the 'delete_requests' collection
-  //     const requestRef = await addDoc(collection(db, "delete_requests"), deleteRequestDoc);
+      if (currentUser) {
+        // Delete user from Firebase Auth
+        await deleteUser(currentUser);
 
-  //     // Add a notification related to this deletion request
-  //     const notificationDoc = {
-  //       message: `${user.email} has requested account deletion.`,
-  //       timestamp: new Date(),
-  //       isRead: false, // Flag for unread notification
-  //     };
+        // Remove user data from Firestore
+        const userDoc = doc(db, "users", currentUser.uid);
+        await deleteDoc(userDoc);
 
-  //     // Add notification as a subcollection to the deletion request
-  //     await addDoc(collection(db, `delete_requests/${requestRef.id}/notifications`), notificationDoc);
+        // Sign out the user after deletion
+        await signOut(auth);
+        console.log("User account deleted and logged out");
+        alert("Your account has been deleted.");
+        // You can navigate to a login screen or homepage here
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      Alert.alert("Error", "Unable to delete account. Please try again.");
+    }
+  };
 
-  //     console.log("Account deletion request submitted successfully");
-  //     alert("Your account deletion request has been submitted.");
-  //   } catch (error) {
-  //     console.error("Error submitting deletion request:", error);
-  //   }
-  // };
+  const confirmDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete your account? This action is irreversible.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Account deletion canceled"),
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: handleDeleteAccount,
+          style: "destructive",
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -183,12 +196,14 @@ const EditProfile = () => {
           <TouchableOpacity style={styles.deleteButton} onPress={handleSave}>
             <Text style={styles.deleteButtonText}>Save Changes</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.button}
-            // onPress={handleDeleteRequest}
+            onPress={confirmDeleteAccount}
           >
-            <Text style={styles.buttonText} >Delete Account </Text>
+            <Text style={styles.buttonText}>Delete Account</Text>
           </TouchableOpacity>
+
         </View>
       </ScrollView>
     </View>

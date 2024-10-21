@@ -10,6 +10,7 @@ import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Link } from "expo-router";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import ReactNativeBiometrics from 'react-native-biometrics';
 
 const LoginScreen = () => {
   const [email, setEmail] = React.useState("");
@@ -20,36 +21,56 @@ const LoginScreen = () => {
       alert("Please fill in all fields");
       return;
     }
-
     signInWithEmailAndPassword(getAuth(), email, password)
-      .then(() => {})
+      .then(() => {
+        // Redirect to the home screen
+      })
       .catch((err) => {
         alert(err?.message);
       });
   };
 
+  const handleBiometricLogin = async () => {
+    const rnBiometrics = new ReactNativeBiometrics();
+
+    const { available, biometryType } = await rnBiometrics.isBiometricAvailable();
+    if (available) {
+      const { success, error } = await rnBiometrics.simplePrompt({
+        promptMessage: 'Confirm fingerprint',
+      });
+
+      if (success) {
+        // Here, you can log the user in automatically
+        alert('Biometric authentication successful!');
+        // Redirect to the home screen
+      } else {
+        alert('Biometric authentication failed');
+      }
+    } else {
+      alert('Biometric authentication not available');
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image source={require("../../assets/top.png")} style={styles.topImage} />
-      </View>
-      <View style={styles.helloContainer}>
-        <Text style={styles.hello}>Hello</Text>
+    < View style={styles.container} >
+      <View style={styles.helloContainer} >
+        <Text style={styles.hello} >Hello </Text>
       </View>
 
       <View>
         <Text style={styles.loginText}>Sign in to your account</Text>
       </View>
 
-      <Text  style={styles.labelText}>Email</Text>
+      <Text style={styles.labelText}>Email</Text>
       <View style={styles.inputContainer}>
         <Icon name={"user"} size={24} color={"#ccc"} style={styles.inputIcon} />
         <TextInput
           style={styles.textInput}
-          placeholder="Email"
+          placeholder="email"
           onChangeText={(text) => setEmail(text)}
           value={email}
           autoComplete="email"
+          placeholderTextColor={"#ccc"}
           keyboardType="email-address"
         />
       </View>
@@ -62,17 +83,25 @@ const LoginScreen = () => {
           value={password}
           autoComplete="password"
           style={styles.textInput}
-          placeholder="Password"
+          placeholderTextColor={"#ccc"}
+          placeholder="password"
           secureTextEntry={true}
         />
       </View>
 
-       {/* The sign in button needs to go home */}
       <TouchableOpacity
         style={styles.signInButtonContainer}
         onPress={handleLogin}
       >
         <Text style={styles.signIn}>Sign In</Text>
+      </TouchableOpacity>
+
+      {/* Biometric Login Button */}
+      <TouchableOpacity
+        style={styles.biometricButton}
+        onPress={handleBiometricLogin}
+      >
+        <Text style={styles.biometricText}>Use Biometrics</Text>
       </TouchableOpacity>
 
       <Link href="/forgot-password" asChild>
@@ -90,10 +119,6 @@ const LoginScreen = () => {
           </Text>
         </TouchableOpacity>
       </Link>
-
-      <View style={styles.imageContainer}>
-        <Image source={require("../../assets/bottom.png")} style={styles.bottomImage} />
-      </View>
     </View>
   );
 };
@@ -107,12 +132,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     position: "relative",
   },
-  labelText:{
+  labelText: {
     marginLeft: 50,
     color: "#202A44",
   },
   helloContainer: {
-    marginTop: 0,
+    marginTop: 120,
+    marginBottom: 0,
   },
   hello: {
     textAlign: "center",
@@ -125,20 +151,24 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#202A44",
     fontWeight: "200",
-    marginBottom: 20,
+    marginBottom: 70,
   },
   inputContainer: {
     backgroundColor: "#ffffff",
     flexDirection: "row",
-    borderRadius: 20,
+    borderRadius: 10,
     marginHorizontal: 40,
     elevation: 10,
-    marginVertical: 20,
+    marginVertical: 10,
+    borderColor: "#ccc",
     height: 50,
+    borderWidth: 1,
     alignItems: "center",
-    shadowOffset: { width: 3, height: 10 },
-    shadowOpacity: 0.2,
+    shadowOffset: { width: 4, height: 10 },
+    shadowOpacity: 0.1,
     shadowColor: "#202A44",
+    gap: 10,  
+    paddingHorizontal: 10,
   },
   textInput: {
     flex: 1,
@@ -146,6 +176,25 @@ const styles = StyleSheet.create({
   inputIcon: {
     marginLeft: 10,
     marginRight: 5,
+  },
+  biometricButton: {
+    backgroundColor: "#202A44",
+    borderRadius: 20,
+    marginHorizontal: 40,
+    elevation: 10,
+    marginVertical: 20,
+    height: 50,
+    justifyContent: "center", 
+    alignItems: "center",
+    shadowOffset: { width: 3, height: 10 },
+    shadowOpacity: 0.2,
+    shadowColor: "#202A44",
+  },
+  biometricText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
   },
   forgotPasswordText: {
     color: "#BEBEBE",
@@ -157,7 +206,7 @@ const styles = StyleSheet.create({
   signInButtonContainer: {
     backgroundColor: "#202A44",
     flexDirection: "row",
-    borderRadius: 20,
+    borderRadius: 10,
     marginHorizontal: 40,
     elevation: 10,
     marginVertical: 20,
@@ -173,14 +222,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
-  },
-  gradient: {
-    height: 34,
-    width: 66,
-    borderRadius: 70,
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 10,
   },
   signUp: {
     color: "#BEBEBE",

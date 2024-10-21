@@ -1,3 +1,4 @@
+import { signOut } from "firebase/auth";
 import {
   StyleSheet,
   Text,
@@ -7,155 +8,232 @@ import {
   ScrollView,
   Button,
   PixelRatio,
+  Alert,
 } from "react-native";
-import React from "react";
+import * as React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Link, router } from "expo-router";
 import { useUser } from "../../src/cxt/user";
-import { useVideoPlayer, VideoView } from "expo-video";
-import { useEffect, useRef, useState } from "react";
-
-const videoSource =
-  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+import "react-native-gesture-handler";
+import { Drawer } from "react-native-drawer-layout";
+import Icon2 from "react-native-vector-icons/MaterialIcons";
 
 const Home = () => {
+  const [open, setOpen] = React.useState(false);
+
   const handleMenuPress = () => {
-    console.log("Hamburger menu pressed");
+    setOpen(!open);
   };
 
   const { setUser, user } = useUser();
 
-  const ref = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const player = useVideoPlayer(videoSource, (player) => {
-    player.loop = true;
-    player.play();
-  });
-
-  useEffect(() => {
-    const subscription = player.addListener("playingChange", (isPlaying) => {
-      setIsPlaying(isPlaying);
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [player]);
-
   return (
-    <View style={styles.container}>
-      {/* Fixed header with hamburger button */}
-      <View style={styles.headerContainer}>
-        <Text style={styles.appName}>InfraSmart</Text>
-        <TouchableOpacity
-          onPress={handleMenuPress}
-          style={styles.hamburgerButton}
-        >
-          <Icon name="bars" size={24} color="#202A44" />
-        </TouchableOpacity>
-      </View>
+    <Drawer
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+      renderDrawerContent={() => {
+        // console.log("Drawer Content working!");
+        return (
+        <View style={styles.drawer}>
+          <View style={styles.drawerContent}>
+            <Text style={styles.drawerHeader}>Menu</Text>
+            {/* I want four links here one for notifications, account, settings, device permissins, logout button, */}
+            <TouchableOpacity
+              style={styles.drawerItem}
+              onPress={() => router.push("/(tabs)/Settings/notifications")}
+            >
+              <Text  style={styles.drawerItemText}>Notification</Text>
+              <Icon name="bell" size={20} color="#fff" style={styles.drawerIcon} />
+            </TouchableOpacity>
 
-      {/* Scrollable content */}
-      <ScrollView style={styles.content}>
-        {/* <Text style={styles.username}>Hi {user.username ?? "Unknown Name"}!</Text> */}
+            <TouchableOpacity
+              style={styles.drawerItem}
+              onPress={() => router.push("/(tabs)/Profile")}
+            >
+              <Text style={styles.drawerItemText}>Profile</Text>
+              <Icon name="user" size={22} color="#fff" style={styles.drawerIcon} />
+            </TouchableOpacity>
 
-        <Link
-          style={styles.manageButton}
-          asChild
-          href="/(tabs)/Maintainance/reporting"
-        >
-          <TouchableOpacity style={styles.manageButton}>
-            <Text style={styles.manageButtonText}>Manage Reports</Text>
+            <TouchableOpacity
+              style={styles.drawerItem}
+              onPress={() => router.push("/(tabs)/Settings")}
+            >
+              <Text style={styles.drawerItemText}>Settings</Text>
+              <Icon name="cog" size={20} color="#fff" style={styles.drawerIcon} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.drawerItem}
+              onPress={() => router.push("/(tabs)/Settings/permissions")}
+            >
+              <Text style={styles.drawerItemText}>Permissions</Text>
+              <Icon2 name="fingerprint" size={20} color="#fff" style={styles.drawerIcon} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.drawerItem}
+              onPress={() => {
+                Alert.alert(
+                  "Logout",
+                  "Are you sure you want to logout?",
+                  [
+                    {
+                      text: "Cancel",
+                      onPress: () => console.log("Logout canceled"),
+                      style: "cancel",
+                    },
+                    {
+                      text: "Logout",
+                      onPress: () => signOut(auth),
+                      style: "destructive",
+                    },
+                  ],
+                  { cancelable: true }
+                );
+              }}
+            >
+              <Text style={styles.drawerItemText}>Logout</Text>
+              <Icon name="sign-out" size={20} color="#fff" style={styles.drawerIcon} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        )
+      }}
+    >
+      <View style={styles.container}>
+        {/* Fixed header with hamburger button */}
+        <View style={styles.headerContainer}>
+          <TouchableOpacity
+            onPress={handleMenuPress}
+            style={styles.hamburgerButton}
+          >
+            <Icon name="bars" size={24} color="#202A44" />
           </TouchableOpacity>
-        </Link>
-
-        {/* Upcoming Maintenance Button */}
-        <Link
-          style={styles.upcomingButton}
-          asChild
-          href="/(tabs)/Maintainance/maintain"
-        >
-          <TouchableOpacity style={styles.upcomingButton}>
-            <Text style={styles.upcomingButtonText}>Upcoming Maintenance</Text>
-          </TouchableOpacity>
-        </Link>
-
-        {/* analytics graphs down here, also they should scroll horizontally, still coming up with an idea*/}
-        <Text style={styles.overviewText}>Analytics</Text>
-        <View style={styles.card}>
-          <Image
-            source={require("../../assets/graph1.jpeg")}
-            style={styles.image}
-          />
-          <Text style={styles.headline}>Predictive Analysis</Text>
-        </View>
-        <View style={styles.card}>
-          <Image
-            source={require("../../assets/graph1.jpeg")}
-            style={styles.image}
-          />
-          <Text style={styles.headline}>Maintainance History</Text>
+          <Text style={styles.appName}>InfraSmart</Text>
         </View>
 
-        <View style={styles.card}>
-          <Image
-            source={require("../../assets/graph2.jpeg")}
-            style={styles.image}
-          />
-          <Text style={styles.headline}>User Satisfaction</Text>
-        </View>
-
-        {/* Recent Updates Section */}
-        <Text style={styles.recentUpdatesTitle}>Recent Updates</Text>
-        <View style={styles.card}>
-          <Image
-            source={require("../../assets/road.png")}
-            style={styles.image}
-          />
-          <Text style={styles.headline}>Pothole Repair Completed</Text>
-        </View>
-        <View style={styles.card}>
-          <Image
-            source={require("../../assets/bridge.png")}
-            style={styles.image}
-          />
-          <Text style={styles.headline}>Bridge Inspection Scheduled</Text>
-        </View>
-
-        <TouchableOpacity style={styles.viewAllButton}>
-          <Text style={styles.viewAllText}>View All Updates</Text>
-        </TouchableOpacity>
-
-        <View style={styles.educationalSection}>
-          <Text style={styles.educationalText}>
-            Learn about the latest maintenance practices and reporting tools.
-          </Text>
-          {/* infraSmart Video */}
-          {/* <View style={styles.contentContainer}>
-            <VideoView
-              ref={ref}
-              style={styles.video}
-              player={player}
-              allowsFullscreen
-              allowsPictureInPicture
-            />
-            <View style={styles.controlsContainer}>
-              <Button
-                title={isPlaying ? "Pause" : "Play"}
-                onPress={() => {
-                  if (isPlaying) {
-                    player.pause();
-                  } else {
-                    player.play();
-                  }
-                  setIsPlaying(!isPlaying);
-                }}
+        {/* Scrollable content */}
+        <ScrollView style={styles.content}>
+          <Link
+            style={styles.manageButton}
+            asChild
+            href="/(tabs)/Maintainance/reporting"
+          >
+            <TouchableOpacity style={styles.manageButton}>
+              <Text style={styles.manageButtonText}>Manage Reports</Text>
+              <Icon
+                name="file-text"
+                size={24}
+                color="#FFF"
+                style={styles.buttonIcon}
               />
-            </View>
-          </View> */}
-        </View>
-      </ScrollView>
-    </View>
+            </TouchableOpacity>
+          </Link>
+          {/* Upcoming Maintenance Button */}
+          <Link
+            style={styles.upcomingButton}
+            asChild
+            href="/(tabs)/Maintainance/maintain"
+          >
+            <TouchableOpacity style={styles.upcomingButton}>
+              <Text style={styles.upcomingButtonText}>Maintenance</Text>
+              <Icon
+                name="wrench"
+                size={24}
+                color="#FFF"
+                style={styles.buttonIcon}
+              />
+            </TouchableOpacity>
+          </Link>
+
+          {/* analytics graphs down here, also they should scroll horizontally, still coming up with an idea*/}
+          <Text style={styles.overviewText}>Analytics</Text>
+          <Link
+            style={styles.upcomingButton}
+            asChild
+            href="/(tabs)/Maintainance/analytics"
+          >
+            <TouchableOpacity style={styles.card}>
+              <Image
+                source={require("../../assets/graph1.jpeg")}
+                style={styles.image}
+              />
+              <Text style={styles.headline}>Predictive Analysis</Text>
+            </TouchableOpacity>
+          </Link>
+
+          <Link
+            style={styles.upcomingButton}
+            asChild
+            href="/(tabs)/Maintainance/analytics"
+          >
+            <TouchableOpacity style={styles.card}>
+              <Image
+                source={require("../../assets/graph1.jpeg")}
+                style={styles.image}
+              />
+              <Text style={styles.headline}>Maintainance History</Text>
+            </TouchableOpacity>
+          </Link>
+
+          <Link
+            style={styles.upcomingButton}
+            asChild
+            href="/(tabs)/Maintainance/analytics"
+          >
+            <TouchableOpacity style={styles.card}>
+              <Image
+                source={require("../../assets/graph2.jpeg")}
+                style={styles.image}
+              />
+              <Text style={styles.headline}>User Satisfaction</Text>
+            </TouchableOpacity>
+          </Link>
+
+          {/* Recent Updates Section */}
+          <Text style={styles.recentUpdatesTitle}>Recent Updates</Text>
+
+          <Link
+            style={styles.upcomingButton}
+            asChild
+            href="/(tabs)/Maintainance/reporting"
+          >
+            <TouchableOpacity style={styles.card}>
+              <Image
+                source={require("../../assets/road.png")}
+                style={styles.image}
+              />
+              <Text style={styles.headline}>Pothole Repair Completed</Text>
+            </TouchableOpacity>
+          </Link>
+
+          <Link
+            style={styles.upcomingButton}
+            asChild
+            href="/(tabs)/Maintainance/maintain"
+          >
+            <TouchableOpacity style={styles.card}>
+              <Image
+                source={require("../../assets/bridge.png")}
+                style={styles.image}
+              />
+              <Text style={styles.headline}>Bridge Inspection Scheduled</Text>
+            </TouchableOpacity>
+          </Link>
+
+          <TouchableOpacity style={styles.viewAllButton}>
+            <Text style={styles.viewAllText}>View All Updates</Text>
+          </TouchableOpacity>
+
+          <View style={styles.educationalSection}>
+            <Text style={styles.educationalText}>
+              Learn about the latest maintenance practices and reporting tools.
+            </Text>
+          </View>
+        </ScrollView>
+      </View>
+    </Drawer>
   );
 };
 
@@ -208,13 +286,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#202A44",
     borderRadius: 10,
     paddingVertical: 15,
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   manageButtonText: {
     color: "#FFF",
     fontSize: 16,
     fontWeight: "bold",
+    marginLeft: 10,
   },
   upcomingButton: {
     backgroundColor: "#202A44",
@@ -222,11 +303,14 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     alignItems: "center",
     marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   upcomingButtonText: {
     color: "#FFF",
     fontSize: 16,
     fontWeight: "bold",
+    marginLeft: 10,
   },
   recentUpdatesTitle: {
     fontSize: 18,
@@ -244,7 +328,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     padding: 15,
     marginVertical: 10,
-    alignItems: "center",
+    flexDirection: "column",
   },
   image: {
     width: "100%",
@@ -255,7 +339,7 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "center",
+    textAlign: "left",
     color: "#202A44",
   },
   viewAllButton: {
@@ -267,24 +351,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  educationalSection: {
-    backgroundColor: "#E8F4F8",
-    borderRadius: 10,
-    padding: 15,
-    marginVertical: 20,
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  educationalText: {
-    fontSize: 16,
-    color: "#202A44",
-    flex: 1,
-  },
-  educationalIcon: {
-    width: 30,
-    height: 30,
-    marginLeft: 10,
-  },
   contentContainer: {
     flex: 1,
     padding: 10,
@@ -293,21 +359,68 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     width: "100%",
     height: 275,
-    backgroundColor: "#fff",
+    backgroundColor: "#202A44",
     borderRadius: 15,
     shadowColor: "#202A44",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.6,
+    shadowOpacity: 0.8,
     shadowRadius: 5,
     elevation: 5,
     marginVertical: 10,
     alignItems: "center",
-  },
-  video: {
-    width: 350,
-    height: 275,
+    marginBottom: 34,
   },
   controlsContainer: {
     padding: 10,
   },
+  customButton: {
+    backgroundColor: "#202A44",
+    padding: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  buttonIcon: {
+    marginRight: 15,
+  },
+  drawer: {
+    flex: 1,
+    backgroundColor: "#F2f9FB",
+  },
+  drawerContent: {
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    alignItems: "flex-start",
+    flex: 1,
+  },
+  drawerHeader: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#202A44",
+  },
+  drawerItem: {
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    width: "100%",
+    backgroundColor: "#202A44",
+    marginBottom: 10,
+    borderRadius: 10,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    flexDirection: "row",         
+    justifyContent: "space-between", 
+    alignItems: "center",     
+  },
+  drawerItemText: {
+    fontSize: 15,
+    color: "#fff",
+  },
+  drawerIcon: {
+      marginLeft: 23,
+  }
 });

@@ -3,18 +3,18 @@ import { Slot,Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
-const _layout = () => {
+const Layout = () => {
     return (
         <Tabs initialRouteName="home" 
-        screenOptions={{
-            headerShown: false,
-            tabBarActiveTintColor: '#202A44', 
-            tabBarInactiveTintColor: 'gray',
-            tabBarStyle: {
-              display: 'flex', 
-              backgroundColor: 'white',
-            },
-          }}
+              screenOptions={{
+                  headerShown: false,
+                  tabBarActiveTintColor: '#202A44', 
+                  tabBarInactiveTintColor: 'gray',
+                  tabBarStyle: {
+                    display: 'flex', 
+                    backgroundColor: 'white',
+                  },
+                }}
           >
             <Tabs.Screen 
                 name="home"
@@ -28,7 +28,7 @@ const _layout = () => {
                 name="reporting"
                 options={{
                     tabBarIcon: ({ color  }) => (
-                      <Ionicons name="clipboard-outline" color={color} size={34} />
+                      <Ionicons name="clipboard-outline" color={color} size={30} />
                     ),
                   }}
             />
@@ -49,4 +49,4 @@ const _layout = () => {
     );
 };
 
-export default _layout;
+export default Layout;

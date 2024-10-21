@@ -68,7 +68,7 @@ const Home = () => {
               onPress={() => router.push("/(userTabs)/home/rate")}
             >
               <Text style={styles.drawerItemText}>Rate Us</Text>
-              <Icon2 name="fingerprint" size={20} color="#fff" style={styles.drawerIcon} />
+              <Icon2 name="star" size={24} color="#fff" style={styles.drawerIcon} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -118,10 +118,10 @@ const Home = () => {
           <Link
             style={styles.manageButton}
             asChild
-            href="/(userTabs)/Maintainance/reporting"
+            href="/(userTabs)/reporting"
           >
             <TouchableOpacity style={styles.manageButton}>
-              <Text style={styles.manageButtonText}>Manage Reports</Text>
+              <Text style={styles.manageButtonText}>My Reports</Text>
               <Icon
                 name="file-text"
                 size={24}
@@ -129,27 +129,10 @@ const Home = () => {
                 style={styles.buttonIcon}
               />
             </TouchableOpacity>
-          </Link>
-          {/* Upcoming Maintenance Button */}
-          <Link
-            style={styles.upcomingButton}
-            asChild
-            href="/(userTabs)/Maintainance/maintain"
-          >
-            <TouchableOpacity style={styles.upcomingButton}>
-              <Text style={styles.upcomingButtonText}>Maintenance</Text>
-              <Icon
-                name="wrench"
-                size={24}
-                color="#FFF"
-                style={styles.buttonIcon}
-              />
-            </TouchableOpacity>
-          </Link>
+          </Link> 
 
-          {/* analytics graphs down here, also they should scroll horizontally, still coming up with an idea*/}
+          {/* news down here*/}
           <Text style={styles.overviewText}>NEWS</Text>
-
           <Link
             style={styles.upcomingButton}
             asChild

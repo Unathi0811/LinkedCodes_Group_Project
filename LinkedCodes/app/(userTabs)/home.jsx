@@ -104,3 +104,13 @@ const Home = ({ navigation }) => { // Accept navigation as a prop
 };
 
 export default Home;
+
+import { View, Text, Image, FlatList, ActivityIndicator, Linking } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase";
+import axios from 'axios';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import CurrentDay from "../components/weather-API/CurrentDay";
+import { News } from '../components/News-API/News';
+

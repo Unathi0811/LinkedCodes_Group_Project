@@ -14,7 +14,7 @@
     "@material-tailwind/react": "^2.1.10",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-community/masked-view": "^0.1.11",
-    "@react-native-community/netinfo": "11.3.1",
+    "@react-native-community/netinfo": "^11.3.1",
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/drawer": "^6.7.2",
     "@react-navigation/native": "^6.1.18",

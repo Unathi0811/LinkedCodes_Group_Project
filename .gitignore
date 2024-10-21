@@ -1,2 +1,9 @@
 LinkedCodes/package-lock.json
 ter..Sanele
+node_modules
+.DS_Store
+.expo
+package-lock.json
+tsconfig.json
+cSpell.json
+package.json

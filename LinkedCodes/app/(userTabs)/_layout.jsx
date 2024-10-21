@@ -14,6 +14,12 @@ const _layout = () => {
             <Tabs.Screen 
                 name="traffic"
             />
+             <Tabs.Screen 
+                name="userChat"
+            />
+             <Tabs.Screen 
+                name="Profile"
+            />
         </Tabs>
     );
 };

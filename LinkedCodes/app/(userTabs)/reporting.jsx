@@ -8,7 +8,7 @@ import NetInfo from "@react-native-community/netinfo"; // To detect online statu
 import { Overlay } from "@rneui/themed";
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For offline storage
 import { db, storage } from "../../firebase"; // Import Firebase
-import {collection,onSnapshot,doc,setDoc,deleteDoc,} from "firebase/firestore";
+import {collection,onSnapshot,doc,setDoc,deleteDoc, getDoc} from "firebase/firestore";
 import {ref,uploadBytes,getDownloadURL,deleteObject} from "firebase/storage";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
 
@@ -123,58 +123,82 @@ export default function Reporting() {
   const submitReport = async () => {
     if (image && input && userId) {
       try {
-        setLoading(true)
+        setLoading(true);
         const newReportId = uuidv4();
         const newReport = {
           id: newReportId,
           image, // Save the local image URI for now
           description: input,
           timestamp: new Date(),
-          latitude,
-          longitude,
+          latitude, // Store location as is
+          longitude, // Store location as is
           userId, // Include the authenticated user's ID
+          status: "Not Started", // Default status
         };
-
-        // Check network status
+  
         const isOnline = await checkIfOnline();
-
+  
         if (isOnline) {
-          // If online, upload image and report to Firebase
-          const imageRef = ref(storage, `images/${newReportId}.jpg`);
-          const response = await fetch(image);
-          const blob = await response.blob();
-          await uploadBytes(imageRef, blob);
-
-          const imageUrl = await getDownloadURL(imageRef);
-          newReport.image = imageUrl; // Update image URL after upload
-
-          // Add the new report to Firestore
-          await setDoc(doc(db, "reports", newReportId), newReport);
+          // Try block specifically for image upload
+          try {
+            const imageRef = ref(storage, `images/${newReportId}.jpg`);
+            const response = await fetch(image); // Fetch image URI
+            const blob = await response.blob(); // Convert image to blob
+            await uploadBytes(imageRef, blob); // Upload image to Firebase Storage
+  
+            // Get the image download URL after upload
+            const imageUrl = await getDownloadURL(imageRef);
+            newReport.image = imageUrl; // Update image URL in report object
+          } catch (imageUploadError) {
+            // Handle image upload errors
+            console.error("Image upload error:", imageUploadError);
+            throw new Error("Failed to upload the image. Please try again.");
+          }
+  
+          // Try block specifically for Firestore document creation
+          try {
+            await setDoc(doc(db, "reports", newReportId), newReport);
+          } catch (firestoreError) {
+            // Handle Firestore write errors
+            console.error("Firestore error:", firestoreError);
+            throw new Error("Failed to save the report to the database. Please try again.");
+          }
         } else {
-          // If offline, save the report locally using AsyncStorage
-          const storedReports = await AsyncStorage.getItem("offlineReports");
-          const reportsArray = storedReports ? JSON.parse(storedReports) : [];
-          reportsArray.push(newReport);
-
-          await AsyncStorage.setItem("offlineReports", JSON.stringify(reportsArray));
-          console.log("Report saved offline");
+          // Handle offline report saving in AsyncStorage
+          try {
+            const storedReports = await AsyncStorage.getItem("offlineReports");
+            const reportsArray = storedReports ? JSON.parse(storedReports) : [];
+            reportsArray.push(newReport);
+  
+            await AsyncStorage.setItem("offlineReports", JSON.stringify(reportsArray));
+            console.log("Report saved offline");
+          } catch (offlineError) {
+            // Handle AsyncStorage errors
+            console.error("AsyncStorage error:", offlineError);
+            throw new Error("Failed to save the report offline. Please try again.");
+          }
         }
-
-        // Clear input and close modal
+  
+        // Clear inputs and close modal
         setImage(null);
         setInput("");
         setModalVisible(false);
       } catch (error) {
+        console.error("Submit report error:", error);
         setOverlayMessage("Error submitting report: " + error.message);
-        setVisible(true);
+        setVisible(true); // Show error message in the UI
       } finally {
-        setLoading(false); // Set loading to false when done
+        setLoading(false); // Stop loading animation
       }
     } else {
+      // Handle missing inputs (image/description)
       setOverlayMessage("Please add both an image and a description.");
-      setVisible(true);
+      setVisible(true); // Show warning in the UI
     }
   };
+  
+
+  
 
   // Delete a report from Firebase (if online)
   const deleteReport = async (reportId, imageUri) => {
@@ -244,8 +268,20 @@ export default function Reporting() {
   };
 
   // Show report details modal when a report is clicked
-  const openReportDetails = (report) => {
-    setSelectedReport(report);
+  const openReportDetails = async (report) => {
+    try {
+      const reportRef = doc(db, "reports", report.id);
+      const reportSnapshot = await getDoc(reportRef);
+      
+      if (reportSnapshot.exists()) {
+        setSelectedReport({ ...reportSnapshot.data(), id: reportSnapshot.id });
+      } else {
+        console.log("No such document!");
+      }
+    } catch (error) {
+      console.error("Error fetching report details: ", error);
+    }
+  
     setModalVisible2(true);
   };
 

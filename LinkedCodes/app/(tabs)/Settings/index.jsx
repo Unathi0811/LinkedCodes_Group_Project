@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1,
     flexDirection: "row",
-    gap: 50,
+    gap: 70,
     alignContent: "space-between"
   },
   optionText: {

@@ -15,23 +15,58 @@ import { Link, useRouter } from 'expo-router'
 //  -  cancel anytime
 // a button to proceed to checkout
 //a button to cancel
+
 const Index = () => {
-  const router = useRouter()
-  return (
-    <View className="flex-1 justify-center items-center align-middle">
-      <Text>SupportUs</Text>
+   // Get current date and to add 1 year
+    const currentDate = new Date();
+    const nextYearDate = new Date(currentDate);
+    nextYearDate.setFullYear(currentDate.getFullYear() + 1); // Adds 1 year to the curent year
+    const formattedDate = nextYearDate.toLocaleDateString();
+    const router = useRouter()
+    return (
+      <View className="flex-1 bg-[#F2f9FB] p-6 ">
+      {/* Premium Header */}
+      <Text className="text-2xl font-bold text-[#202A44] mb-6 mt-20 ml-10" >Premium InfraSmart</Text>
+
+      {/* Plan Renewal Card */}
+      <View className="bg-white p-4 rounded-xl shadow-md mb-6 ">
+        <Text className="text-lg font-semibold text-[#202A44]">
+          Your plan will automatically renew on {formattedDate}. 
+        </Text>
+        <Text className="text-lg text-gray-600">
+          You will be charged R99/year.
+        </Text>
+      </View>
+
+      {/* Benefits Card */}
+      <View className="bg-white p-4 rounded-xl shadow-md mb-6">
+        <Text className="text-lg font-bold text-[#202A44] mb-4">
+          You will get access to premium features, including:
+        </Text>
+        <Text className="text-gray-600 mb-2">- 24/7 support </Text>
+        <Text className="text-gray-600 mb-2">- Priority access to the app without ads</Text>
+        <Text className="text-gray-600 mb-2">- 1 verified premium account</Text>
+        <Text className="text-gray-600">- Cancel anytime</Text>
+      </View>
+
+      {/* Proceed to Checkout Button */}
       <Link href="/(payment)/" asChild>
         <TouchableOpacity
-            className="bg-[#202A44] hover:bg-[#ccc] text-white font-bold py-2 px-4 rounded-[10px] h-12 w-60 align-middle justify-center items-center"
-          >
-          <Text
-          className="text-[#fff] font-bold text-[16px]"
-          >Proceed To Payment</Text>
+          className="bg-[#202A44] text-white font-bold py-3 px-6 rounded-lg mb-4"
+        >
+          <Text className="text-white text-lg text-center">Proceed To Checkout</Text>
         </TouchableOpacity>
       </Link>
+
+      {/* Cancel Button */}
+      <TouchableOpacity
+        onPress={() => router.back()}
+        className="bg-gray-200 text-[#202A44] py-3 px-6 rounded-lg"
+      >
+        <Text className="text-[#202A44] text-lg text-center">Cancel</Text>
+      </TouchableOpacity>
     </View>
-    )
+      )
 }
 
 export default Index
-

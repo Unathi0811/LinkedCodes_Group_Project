@@ -73,12 +73,6 @@ const Profile = () => {
 
       {/* Links and buttons */}
       <ScrollView style={styles.content}>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>First Name: {user.firstName}</Text>
-          <Text style={styles.label}>Email: {user.email}</Text>
-          <Text style={styles.label}>User ID: {user.uid}</Text>
-        </View>
-
         <View style={styles.linksContainer}>
           {/* Personal Information link */}
           <Link href="/(userTabs)/home/edit-profile" asChild>
@@ -137,11 +131,10 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     position: "absolute",
-    top: -35,
+    top: -25,
     left: 0,
     right: 0,
-    marginBottom: 0,
-    borderRadius: 50,
+    marginBottom: 20,
     paddingHorizontal: 20,
     paddingVertical: 50,
     backgroundColor: "#202A44",

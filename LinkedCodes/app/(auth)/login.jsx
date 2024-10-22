@@ -30,6 +30,8 @@ const LoginScreen = () => {
       });
   };
 
+
+  //thif function is throwing a rejection!
   const handleBiometricLogin = async () => {
     const rnBiometrics = new ReactNativeBiometrics();
 
@@ -179,7 +181,7 @@ const styles = StyleSheet.create({
   },
   biometricButton: {
     backgroundColor: "#202A44",
-    borderRadius: 20,
+    borderRadius: 10,
     marginHorizontal: 40,
     elevation: 10,
     marginVertical: 20,
@@ -225,10 +227,10 @@ const styles = StyleSheet.create({
   },
   signUp: {
     color: "#BEBEBE",
-    textAlign: "center",
+    textAlign: "right",
     fontSize: 15,
-    marginTop: 22,
-    marginLeft: 33,
+    width: "87%",
+    marginTop: 23,
   },
   createText: {
     textDecorationLine: "underline",

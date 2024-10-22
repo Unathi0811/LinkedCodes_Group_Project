@@ -1,28 +1,25 @@
 import {
   Alert,
   ScrollView,
-  ScrollViewBase,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Button, Image, Pressable } from "react-native";
+import {Image, Pressable } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { getApp, getApps } from "firebase/app";
 import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
-  listAll,
+
 } from "firebase/storage";
-import { Link, Stack } from "expo-router";
-import { doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { Link} from "expo-router";
+import { doc, updateDoc } from "firebase/firestore";
 import { useUser } from "../../../src/cxt/user";
 import { db, auth } from "../../../firebase";
-import { signOut, deleteUser } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const Profile = () => {
@@ -65,9 +62,6 @@ const Profile = () => {
 
   return (
     <View style={styles.container} >
-      <Stack.Screen options={{
-        headerShown: false
-      }} />
       {/* Fixed header with profile details */}
       <View style={styles.headerContainer}>
         <View style={styles.header}>
@@ -80,12 +74,6 @@ const Profile = () => {
 
       {/* Links and buttons */}
       <ScrollView style={styles.content}>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>First Name: {user.firstName}</Text>
-          <Text style={styles.label}>Email: {user.email}</Text>
-          <Text style={styles.label}>User ID: {user.uid}</Text>
-        </View>
-
         <View style={styles.linksContainer}>
           {/* Personal Information link */}
           <Link href="/(tabs)/Profile/edit-profile" asChild>
@@ -148,8 +136,7 @@ const styles = StyleSheet.create({
     top: -35,
     left: 0,
     right: 0,
-    marginBottom: 0,
-    borderRadius: 50,
+    marginBottom: 20,
     paddingHorizontal: 20,
     paddingVertical: 50,
     backgroundColor: "#202A44",
@@ -165,13 +152,13 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     marginBottom: 20,
-    marginTop: 20,
+    marginTop: 30,
   },
   username: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#fff",
-    marginBottom: 20,
+    marginBottom: -10,
   },
   email: {
     fontSize: 12,

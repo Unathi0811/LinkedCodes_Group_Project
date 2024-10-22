@@ -44,7 +44,7 @@ const Layout = () => {
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <ActivityIndicator size="large" color="#202A44" />
       <Text>Loading...</Text>
-      <Link href="/(userTabs)/traffic">user</Link>
+      {/* <Link href="/(userTabs)/traffic">user</Link> */}
     </View>
   );
 };

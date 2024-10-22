@@ -7,9 +7,9 @@ import { useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Alert } from "react-native";
+import { ThemeProvider } from "../src/cxt/theme";
 
-
-const _layout = () => {
+const Layout = () => {
   const [inactivityTimeoutCount, setInactivityTimeoutCount] = useState(0);
   const [isActive, setIsActive] = useState(true); // to manage activity state
   const [loop] = useState(true);
@@ -44,16 +44,17 @@ const _layout = () => {
       restartTimerOnActivityAfterExpiration={false}
       loop={loop}
     >
+      {/* theme provider here, for the theme */}
+    <ThemeProvider>
       <ReportProvider>
         <UserProvider>
-
-          <StatusBar style="light" />
+          <StatusBar style="dark" />
           <Slot />
-
         </UserProvider>
       </ReportProvider>
+    </ThemeProvider>
     </ReactNativeInactivity>
   );
 };
 
-export default _layout;
+export default Layout;

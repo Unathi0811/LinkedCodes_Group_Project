@@ -6,18 +6,17 @@ import {
   View,
   Image,
   ScrollView,
-  Button,
-  PixelRatio,
   Alert,
 } from "react-native";
 import * as React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Link, router } from "expo-router";
-import { useUser } from "../../src/cxt/user";
+import { useUser } from "../../../src/cxt/user";
 import "react-native-gesture-handler";
 import { Drawer } from "react-native-drawer-layout";
 import Icon2 from "react-native-vector-icons/MaterialIcons";
-import { auth } from "../../firebase";
+import { auth } from "../../../firebase";
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 const Home = () => {
   const [open, setOpen] = React.useState(false);
@@ -72,6 +71,14 @@ const Home = () => {
                 <Icon2 name="fingerprint" size={20} color="#fff" style={styles.drawerIcon} />
               </TouchableOpacity>
 
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => router.push("/(tabs)/Home/support-us")}
+              >
+                <Text style={styles.drawerItemText}>Support Us</Text>
+                <FontAwesome5 name="hand-holding-usd" size={18} color="#fff" />
+              </TouchableOpacity>
+              
               <TouchableOpacity
                 style={styles.drawerItem}
                 onPress={() => {
@@ -157,7 +164,7 @@ const Home = () => {
           >
             <TouchableOpacity style={styles.card}>
               <Image
-                source={require("../../assets/graph1.jpeg")}
+                source={require("../../../assets/graph1.jpeg")}
                 style={styles.image}
               />
               <Text style={styles.headline}>Predictive Analysis</Text>
@@ -171,7 +178,7 @@ const Home = () => {
           >
             <TouchableOpacity style={styles.card}>
               <Image
-                source={require("../../assets/graph1.jpeg")}
+                source={require("../../../assets/graph1.jpeg")}
                 style={styles.image}
               />
               <Text style={styles.headline}>Maintainance History</Text>
@@ -185,7 +192,7 @@ const Home = () => {
           >
             <TouchableOpacity style={styles.card}>
               <Image
-                source={require("../../assets/graph2.jpeg")}
+                source={require("../../../assets/graph2.jpeg")}
                 style={styles.image}
               />
               <Text style={styles.headline}>User Satisfaction</Text>
@@ -202,7 +209,7 @@ const Home = () => {
           >
             <TouchableOpacity style={styles.card}>
               <Image
-                source={require("../../assets/road.png")}
+                source={require("../../../assets/road.png")}
                 style={styles.image}
               />
               <Text style={styles.headline}>Pothole Repair Completed</Text>
@@ -216,7 +223,7 @@ const Home = () => {
           >
             <TouchableOpacity style={styles.card}>
               <Image
-                source={require("../../assets/bridge.png")}
+                source={require("../../../assets/bridge.png")}
                 style={styles.image}
               />
               <Text style={styles.headline}>Bridge Inspection Scheduled</Text>

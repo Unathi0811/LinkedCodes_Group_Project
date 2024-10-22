@@ -1,4 +1,5 @@
 import { signOut } from "firebase/auth";
+import {auth} from "../../../firebase"
 import {
   StyleSheet,
   Text,
@@ -13,7 +14,7 @@ import { useUser } from "../../../src/cxt/user";
 import "react-native-gesture-handler";
 import { Drawer } from "react-native-drawer-layout";
 import Icon2 from "react-native-vector-icons/MaterialIcons";
-
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 const Home = () => {
   const [open, setOpen] = React.useState(false);
 
@@ -67,6 +68,13 @@ const Home = () => {
                 <Icon2 name="star" size={24} color="#fff" style={styles.drawerIcon} />
               </TouchableOpacity>
 
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => router.push("/(userTabs)/home/premium")}
+              >
+                <Text style={styles.drawerItemText}>Premium</Text>
+                <MaterialIcons name="workspace-premium" size={24} color="#fff" />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.drawerItem}
                 onPress={() => {

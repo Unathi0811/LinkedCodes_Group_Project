@@ -45,10 +45,9 @@ const HomeScreen = () => {
     <>
       <Stack.Screen 
         options={{
-          headerShown: false,
+          headerShown: false
         }}
       />
-      
       {/* Fixed Header */}
       <View style={styles.header}>
         <Text style={styles.dashboardText}>Dashboard</Text>

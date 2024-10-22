@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, Switch, StyleSheet, Alert } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';

@@ -4,10 +4,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image,
-  ScrollView,
-  Button,
-  PixelRatio,
   Alert,
 } from "react-native";
 import * as React from "react";
@@ -35,69 +31,69 @@ const Home = () => {
       renderDrawerContent={() => {
         // console.log("Drawer Content working!");
         return (
-        <View style={styles.drawer}>
-          <View style={styles.drawerContent}>
-            <Text style={styles.drawerHeader}>Menu</Text>
-            {/* I want four links here one for notifications, account, settings, device permissins, logout button, */}
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => router.push("/(userTabs)/home/notifications")}
-            >
-              <Text  style={styles.drawerItemText}>Notification</Text>
-              <Icon name="bell" size={20} color="#fff" style={styles.drawerIcon} />
-            </TouchableOpacity>
+          <View style={styles.drawer}>
+            <View style={styles.drawerContent}>
+              <Text style={styles.drawerHeader}>Menu</Text>
+              {/* I want four links here one for notifications, account, settings, device permissins, logout button, */}
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => router.push("/(userTabs)/home/notifications")}
+              >
+                <Text style={styles.drawerItemText}>Notification</Text>
+                <Icon name="bell" size={20} color="#fff" style={styles.drawerIcon} />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => router.push("/(userTabs)/home/profile")}
-            >
-              <Text style={styles.drawerItemText}>Profile</Text>
-              <Icon name="user" size={22} color="#fff" style={styles.drawerIcon} />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => router.push("/(userTabs)/home/profile")}
+              >
+                <Text style={styles.drawerItemText}>Profile</Text>
+                <Icon name="user" size={22} color="#fff" style={styles.drawerIcon} />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => router.push("/(userTabs)/home/settings")}
-            >
-              <Text style={styles.drawerItemText}>Settings</Text>
-              <Icon name="cog" size={20} color="#fff" style={styles.drawerIcon} />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => router.push("/(userTabs)/home/settings")}
+              >
+                <Text style={styles.drawerItemText}>Settings</Text>
+                <Icon name="cog" size={20} color="#fff" style={styles.drawerIcon} />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => router.push("/(userTabs)/home/rate")}
-            >
-              <Text style={styles.drawerItemText}>Rate Us</Text>
-              <Icon2 name="star" size={24} color="#fff" style={styles.drawerIcon} />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => router.push("/(userTabs)/home/rate")}
+              >
+                <Text style={styles.drawerItemText}>Rate Us</Text>
+                <Icon2 name="star" size={24} color="#fff" style={styles.drawerIcon} />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => {
-                Alert.alert(
-                  "Logout",
-                  "Are you sure you want to logout?",
-                  [
-                    {
-                      text: "Cancel",
-                      onPress: () => console.log("Logout canceled"),
-                      style: "cancel",
-                    },
-                    {
-                      text: "Logout",
-                      onPress: () => signOut(auth),
-                      style: "destructive",
-                    },
-                  ],
-                  { cancelable: true }
-                );
-              }}
-            >
-              <Text style={styles.drawerItemText}>Logout</Text>
-              <Icon name="sign-out" size={20} color="#fff" style={styles.drawerIcon} />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => {
+                  Alert.alert(
+                    "Logout",
+                    "Are you sure you want to logout?",
+                    [
+                      {
+                        text: "Cancel",
+                        onPress: () => console.log("Logout canceled"),
+                        style: "cancel",
+                      },
+                      {
+                        text: "Logout",
+                        onPress: () => signOut(auth),
+                        style: "destructive",
+                      },
+                    ],
+                    { cancelable: true }
+                  );
+                }}
+              >
+                <Text style={styles.drawerItemText}>Logout</Text>
+                <Icon name="sign-out" size={20} color="#fff" style={styles.drawerIcon} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
         )
       }}
     >
@@ -113,80 +109,6 @@ const Home = () => {
           <Text style={styles.appName}>InfraSmart</Text>
         </View>
 
-        {/* Scrollable content */}
-        <ScrollView style={styles.content}>
-          <Link
-            style={styles.manageButton}
-            asChild
-            href="/(userTabs)/reporting"
-          >
-            <TouchableOpacity style={styles.manageButton}>
-              <Text style={styles.manageButtonText}>My Reports</Text>
-              <Icon
-                name="file-text"
-                size={24}
-                color="#FFF"
-                style={styles.buttonIcon}
-              />
-            </TouchableOpacity>
-          </Link> 
-
-          {/* news down here*/}
-          <Text style={styles.overviewText}>NEWS</Text>
-          <Link
-            style={styles.upcomingButton}
-            asChild
-            href="/(userTabs)/Maintainance/analytics"
-          >
-            <TouchableOpacity style={styles.card}>
-              <Image
-                source={require("../../../assets/graph2.jpeg")}
-                style={styles.image}
-              />
-              <Text style={styles.headline}>User Satisfaction</Text>
-            </TouchableOpacity>
-          </Link>
-
-          {/* Recent Updates Section */}
-          <Text style={styles.recentUpdatesTitle}>Recent Updates</Text>
-          <Link
-            style={styles.upcomingButton}
-            asChild
-            href="/(userTabs)/Maintainance/reporting"
-          >
-            <TouchableOpacity style={styles.card}>
-              <Image
-                source={require("../../../assets/road.png")}
-                style={styles.image}
-              />
-              <Text style={styles.headline}>Pothole Repair Completed</Text>
-            </TouchableOpacity>
-          </Link>
-
-          <Link
-            style={styles.upcomingButton}
-            asChild
-            href="/(userTabs)/Maintainance/maintain"
-          >
-            <TouchableOpacity style={styles.card}>
-              <Image
-                source={require("../../../assets/bridge.png")}
-                style={styles.image}
-              />
-              <Text style={styles.headline}>Bridge Inspection Scheduled</Text>
-            </TouchableOpacity>
-          </Link>
-
-          <TouchableOpacity style={styles.viewAllButton}>
-            <Text style={styles.viewAllText}>View All Updates</Text>
-          </TouchableOpacity>
-
-          <View style={styles.educationalSection}>
-            <Text style={styles.educationalText}>
-              Learn about the latest maintenance practices and reporting tools.
-            </Text>
-          </View>
-        </ScrollView>
       </View>
     </Drawer>
   );
@@ -367,15 +289,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "#ccc",
     borderWidth: 1,
-    flexDirection: "row",         
-    justifyContent: "space-between", 
-    alignItems: "center",     
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   drawerItemText: {
     fontSize: 15,
     color: "#fff",
   },
   drawerIcon: {
-      marginLeft: 23,
+    marginLeft: 23,
   }
 });

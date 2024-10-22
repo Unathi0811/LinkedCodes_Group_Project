@@ -32,7 +32,7 @@ const _layout = () => {
       },
     ]);
   };
-  
+
   return (
     <ReactNativeInactivity
       isActive={isActive}
@@ -46,10 +46,10 @@ const _layout = () => {
     >
       <ReportProvider>
         <UserProvider>
-          
+
           <StatusBar style="light" />
           <Slot />
-          
+
         </UserProvider>
       </ReportProvider>
     </ReactNativeInactivity>

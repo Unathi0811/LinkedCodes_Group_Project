@@ -6,8 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import React from "react";
-import Calendar from "../../components/Calender";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Calendar from "../../../src/components/Calender";
 
 const Mantain = () => {
   const handleMenuPress = () => {

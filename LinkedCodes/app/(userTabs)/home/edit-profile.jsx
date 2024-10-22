@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   Image,
   StyleSheet,
   TouchableOpacity,
@@ -15,8 +14,6 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  addDoc,
-  collection,
 } from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -27,9 +24,7 @@ import {
 } from "firebase/storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 import {
-  deleteUser,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
+  deleteUser
 } from "firebase/auth";
 
 const EditProfile = () => {

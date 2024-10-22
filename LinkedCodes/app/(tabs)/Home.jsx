@@ -17,6 +17,7 @@ import { useUser } from "../../src/cxt/user";
 import "react-native-gesture-handler";
 import { Drawer } from "react-native-drawer-layout";
 import Icon2 from "react-native-vector-icons/MaterialIcons";
+import { auth } from "../../firebase";
 
 const Home = () => {
   const [open, setOpen] = React.useState(false);
@@ -35,69 +36,69 @@ const Home = () => {
       renderDrawerContent={() => {
         // console.log("Drawer Content working!");
         return (
-        <View style={styles.drawer}>
-          <View style={styles.drawerContent}>
-            <Text style={styles.drawerHeader}>Menu</Text>
-            {/* I want four links here one for notifications, account, settings, device permissins, logout button, */}
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => router.push("/(tabs)/Settings/notifications")}
-            >
-              <Text  style={styles.drawerItemText}>Notification</Text>
-              <Icon name="bell" size={20} color="#fff" style={styles.drawerIcon} />
-            </TouchableOpacity>
+          <View style={styles.drawer}>
+            <View style={styles.drawerContent}>
+              <Text style={styles.drawerHeader}>Menu</Text>
+              {/* I want four links here one for notifications, account, settings, device permissins, logout button, */}
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => router.push("/(tabs)/Settings/notifications")}
+              >
+                <Text style={styles.drawerItemText}>Notification</Text>
+                <Icon name="bell" size={20} color="#fff" style={styles.drawerIcon} />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => router.push("/(tabs)/Profile")}
-            >
-              <Text style={styles.drawerItemText}>Profile</Text>
-              <Icon name="user" size={22} color="#fff" style={styles.drawerIcon} />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => router.push("/(tabs)/Profile")}
+              >
+                <Text style={styles.drawerItemText}>Profile</Text>
+                <Icon name="user" size={22} color="#fff" style={styles.drawerIcon} />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => router.push("/(tabs)/Settings")}
-            >
-              <Text style={styles.drawerItemText}>Settings</Text>
-              <Icon name="cog" size={20} color="#fff" style={styles.drawerIcon} />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => router.push("/(tabs)/Settings")}
+              >
+                <Text style={styles.drawerItemText}>Settings</Text>
+                <Icon name="cog" size={20} color="#fff" style={styles.drawerIcon} />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => router.push("/(tabs)/Settings/permissions")}
-            >
-              <Text style={styles.drawerItemText}>Permissions</Text>
-              <Icon2 name="fingerprint" size={20} color="#fff" style={styles.drawerIcon} />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => router.push("/(tabs)/Settings/permissions")}
+              >
+                <Text style={styles.drawerItemText}>Permissions</Text>
+                <Icon2 name="fingerprint" size={20} color="#fff" style={styles.drawerIcon} />
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => {
-                Alert.alert(
-                  "Logout",
-                  "Are you sure you want to logout?",
-                  [
-                    {
-                      text: "Cancel",
-                      onPress: () => console.log("Logout canceled"),
-                      style: "cancel",
-                    },
-                    {
-                      text: "Logout",
-                      onPress: () => signOut(auth),
-                      style: "destructive",
-                    },
-                  ],
-                  { cancelable: true }
-                );
-              }}
-            >
-              <Text style={styles.drawerItemText}>Logout</Text>
-              <Icon name="sign-out" size={20} color="#fff" style={styles.drawerIcon} />
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => {
+                  Alert.alert(
+                    "Logout",
+                    "Are you sure you want to logout?",
+                    [
+                      {
+                        text: "Cancel",
+                        onPress: () => console.log("Logout canceled"),
+                        style: "cancel",
+                      },
+                      {
+                        text: "Logout",
+                        onPress: () => signOut(auth),
+                        style: "destructive",
+                      },
+                    ],
+                    { cancelable: true }
+                  );
+                }}
+              >
+                <Text style={styles.drawerItemText}>Logout</Text>
+                <Icon name="sign-out" size={20} color="#fff" style={styles.drawerIcon} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
         )
       }}
     >
@@ -412,15 +413,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "#ccc",
     borderWidth: 1,
-    flexDirection: "row",         
-    justifyContent: "space-between", 
-    alignItems: "center",     
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   drawerItemText: {
     fontSize: 15,
     color: "#fff",
   },
   drawerIcon: {
-      marginLeft: 23,
+    marginLeft: 23,
   }
 });

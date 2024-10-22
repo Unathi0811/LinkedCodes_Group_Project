@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { GiftedChat } from "react-native-gifted-chat";
 import { SafeAreaView, ActivityIndicator } from 'react-native';
-import { auth, db } from "../../firebase";
+import { auth, db } from "../../../firebase";
 import { addDoc, collection, onSnapshot, query, orderBy, where } from "firebase/firestore";
 
 export default function Chat({ chatUserId }) {  // Using chatUserId to identify the user you're chatting with
@@ -35,7 +35,7 @@ export default function Chat({ chatUserId }) {  // Using chatUserId to identify 
   // Send message to Firestore
   const onSend = useCallback((messages = []) => {
     const { _id, createdAt, text, user } = messages[0]; // Destructure message properties
-    
+
     // Add the new message to Firestore
     addDoc(collection(db, 'chats'), {
       _id, // Message ID
@@ -67,7 +67,3 @@ export default function Chat({ chatUserId }) {  // Using chatUserId to identify 
     </SafeAreaView>
   );
 }
-
-
-
-

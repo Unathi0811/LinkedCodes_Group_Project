@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {View,Text,TextInput,Image,StyleSheet,TouchableOpacity,ScrollView,
 } from "react-native";
-import { useUser } from "../../src/cxt/user";
-import { db } from "../../firebase";
+import { useUser } from "./cxt/user";
+import { db } from "../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Removed getStorage
 import Icon from "react-native-vector-icons/FontAwesome";
-import { storage } from "../../firebase"; // Use initialized storage
+import { storage } from "../firebase"; // Use initialized storage
 
 const EditProfile = () => {
   const { user, setUser } = useUser();

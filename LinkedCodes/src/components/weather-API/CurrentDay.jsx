@@ -12,6 +12,7 @@ const CurrentDay = () => {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter()
 
   useEffect(() => {
     const fetchWeather = async (latitude, longitude) => {
@@ -27,7 +28,7 @@ const CurrentDay = () => {
       }
     };
 
-
+    // asking for permission to access the location on the devide 
     const getLocation = async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -36,7 +37,7 @@ const CurrentDay = () => {
           setLoading(false);
           return;
         }
-
+        // getting access to the current location of the user
         const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
         const { latitude, longitude } = location.coords;
         fetchWeather(latitude, longitude);
@@ -49,7 +50,7 @@ const CurrentDay = () => {
     getLocation();
 
   }, []);
-
+  // to have access to the current weather of which is a todays weather
   const getTodayWeather = () => {
     const today = new Date().toLocaleDateString();
     const todayWeather = weather.list.filter(item => new Date(item.dt * 1000).toLocaleDateString() === today);
@@ -66,15 +67,16 @@ const CurrentDay = () => {
     return <Text>Error: {error}</Text>;
   }
 
-  // const handleRouter = () => {
-  //   router.push('/Forecast')
-  // }
+  const handleButton = () =>{
+    router.push('/components/weather-API/Forecast')
+  }
+
 
   return (
     <ScrollView >
 
       {weather && todayWeather && (
-        <View style={{flexDirection: 'row',paddingHorizontal: 6, borderRadius: 8, backgroundColor:'#EAF1FF',paddingVertical:'1%'}}>
+        <View style={{flexDirection: 'row',paddingHorizontal: 6, borderRadius: 8, backgroundColor:'#EAF1FF',paddingVertical:'1%',marginBottom:'2%',marginTop:'30%'}}>
     
         <View style={{ backgroundColor:'#202A44',borderRadius: 12,width:'38%',padding: 8,justifyContent:'center',marginRight:'3%' }}>
 
@@ -101,9 +103,7 @@ const CurrentDay = () => {
                     {new Date(todayWeather.dt * 1000).toLocaleDateString('en-US',{weekday:'long'})}, {new Date(todayWeather.dt * 1000).toLocaleDateString()}
                   </Text>
                   
-                  <TouchableOpacity  onPress={()=>{
-                    router.push("/components/weather-API/Forecast")
-                  }}> 
+                  <TouchableOpacity  onPress={handleButton}> 
                     <Text>
                       <MaterialIcons name="east" size={20}color={'#202A44'} />
                     </Text>

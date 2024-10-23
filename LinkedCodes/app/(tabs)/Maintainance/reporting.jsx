@@ -267,7 +267,9 @@ function Reporting() {
           <Text style={styles.description}>
             Descption: {item.description || "No description available."}
           </Text>
-
+          <Text style={styles.description}>
+            Urgency Level: {item.urgency}
+          </Text>
           {/* Display location directly under the description */}
           {item.latitude && item.longitude && (
             <Text style={styles.description}>
@@ -632,3 +634,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+

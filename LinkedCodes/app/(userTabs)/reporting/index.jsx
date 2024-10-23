@@ -1,8 +1,8 @@
-import { View, Image, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Text, StyleSheet, TextInput, FlatList, Modal, } from "react-native";
+import { View, Image, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Text, StyleSheet, TextInput, FlatList, Modal,ActivityIndicator } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/Feather";
 import React, { useState, useEffect } from "react";
-// import { v4 as uuidv4 } from "uuid"; // For generating unique filenames
+import { v4 as uuidv4 } from "uuid"; // For generating unique filenames
 import useLocation from "../../../src/components/useLocation";
 import NetInfo from "@react-native-community/netinfo"; // To detect online status
 import { Overlay } from "@rneui/themed";
@@ -22,6 +22,10 @@ export default function Reporting() {
   const [overlayMessage, setOverlayMessage] = useState("");
   const [modalVisible2, setModalVisible2] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
+  const [urgency, setUrgency] = useState("Low"); // Default urgency level
+const [loading, setLoading] = useState(false); // For submit button loading
+const [imageLoading, setImageLoading] = useState(true); // For image loading
+
   const auth = getAuth(); // Get the current authenticated user
 
   // Get the current user ID
@@ -124,9 +128,10 @@ export default function Reporting() {
 
   // Submit report to Firestore (or AsyncStorage if offline)
   const submitReport = async () => {
-    if (image && input && userId) {
+    if (image && input && userId && urgency) {
       try {
         // const newReportId = uuidv4();
+        setLoading(true);
         const newReport = {
           // id: newReportId,
           image, // Save the local image URI for now
@@ -135,6 +140,7 @@ export default function Reporting() {
           latitude,
           longitude,
           userId, // Include the authenticated user's ID
+          urgency
         };
 
         // Check network status
@@ -152,6 +158,7 @@ export default function Reporting() {
 
           // Add the new report to Firestore
           await addDoc(collection(db, "reports"), newReport);
+          setLoading(false)
         } else {
           // If offline, save the report locally using AsyncStorage
           const storedReports = await AsyncStorage.getItem("offlineReports");
@@ -171,7 +178,7 @@ export default function Reporting() {
         setVisible(true);
       }
     } else {
-      setOverlayMessage("Please add both an image and a description.");
+      setOverlayMessage("Please add both an image, description and select urgency level");
       setVisible(true);
     }
   };
@@ -183,7 +190,7 @@ export default function Reporting() {
       const isOnline = await checkIfOnline();
       if (isOnline) {
         console.log("Deleting report from Firebase...");
-        const reportRef = doc(firestore, "reports", reportId); // Access the specific document
+        const reportRef = doc(db, "reports", reportId); // Access the specific document
         await deleteDoc(reportRef); // Delete the document
 
         // Delete image from Firebase Storage if it exists
@@ -323,9 +330,27 @@ export default function Reporting() {
           style={styles.input}
           placeholder="Description"
         />
+          {/*this is the urgency dropdown*/}
 
+          <Text style={styles.urgencyLabel}>Select Urgency Level:</Text>
+  <View style={styles.urgencyDropdown}>
+    <TouchableOpacity onPress={() => setUrgency("Low")} style={styles.urgencyOption(urgency === "Low")}>
+      <Text>Low</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => setUrgency("Medium")} style={styles.urgencyOption(urgency === "Medium")}>
+      <Text>Medium</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => setUrgency("High")} style={styles.urgencyOption(urgency === "High")}>
+      <Text>High</Text>
+    </TouchableOpacity>
+  </View>
         <TouchableOpacity style={styles.button} onPress={submitReport}>
-          <Text style={styles.buttonText}>Submit Report</Text>
+        {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <Text><Text style={styles.buttonText}>Submit Report</Text></Text>
+      )}
+          
         </TouchableOpacity>
 
         {/* Historical Reports */}
@@ -337,11 +362,16 @@ export default function Reporting() {
             renderItem={({ item }) => (
               <TouchableOpacity onPress={() => openReportDetails(item)}>
                 <View style={styles.reportItem}>
-                  <Image source={{ uri: item.image }} style={styles.imageThumbnail} />
+                {loading ? (
+                  <ActivityIndicator size="large" color="#0000ff" />
+                   ) : (
+                  <Text><Image source={{ uri: item.image }} style={styles.imageThumbnail} /></Text>
+                   )}
+                  
                   <View style={styles.textContainer}>
                     <Text style={styles.description}>{item.description}</Text>
                     <Text style={styles.timestamp}>{item.timestamp.toDate().toLocaleString()}</Text>
-
+                    <Text style={styles.urgency}>Urgency: {item.urgency}</Text> 
                   </View>
                   <TouchableOpacity onPress={() => deleteReport(item.id, item.image)}>
                     <Icon name="trash" size={24} color="#000" />
@@ -373,9 +403,11 @@ export default function Reporting() {
                   <Text style={styles.timestamp}>
                     Date: {selectedReport.timestamp.toDate().toLocaleString()}
                   </Text>
+                  <Text style={styles.urgency}>Urgency: {selectedReport.urgency}</Text>
                   <Text style={styles.status}>
                     Status: {selectedReport.status || 'No Status'}
                   </Text>
+                  
                 </>
               )}
               <TouchableOpacity style={styles.button} onPress={() => setModalVisible2(false)}>
@@ -407,7 +439,7 @@ const styles = StyleSheet.create({
     borderColor: "#000",
     borderWidth: 2,
     height: 100,
-    borderRadius: 30,
+    borderRadius: 5,
     width: "90%",
     marginTop: 10,
     padding: 5,
@@ -439,24 +471,23 @@ const styles = StyleSheet.create({
   },
   Heading: {
     color: "#202A44",
-    marginTop: 79,
+    marginTop: 20,
     textAlign: "center",
-    fontSize: 40,
-    fontWeight: "bold",
+    fontSize: 35,
     marginBottom: 50,
   },
   Heading2: {
     color: "#202A44",
-    marginTop: 79,
+    marginTop: 40,
     textAlign: "center",
-    fontSize: 40,
-    fontWeight: "bold",
+    fontSize: 30,
+   
   },
   button: {
     width: "90%",
     height: 52,
     backgroundColor: "#202A44",
-    borderRadius: 10,
+    borderRadius: 5,
     marginTop: 20,
     display: "flex",
     justifyContent: "center",
@@ -464,7 +495,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 18,
-    fontWeight: "bold",
+    
     color: "#fff",
   },
   modalBackground: {
@@ -512,7 +543,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   imageheader: {
-    fontWeight: "bold",
+   
     fontSize: 20
   },
   overlay: {
@@ -542,4 +573,26 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: "bold",
   },
+  urgencyOption: (isSelected) => ({
+    padding: 10,
+    borderWidth: 1,
+    borderColor: isSelected ? "#202A44" : "grey", // Highlight selected option
+    backgroundColor: isSelected ? "#BFDBF7" : "#EAF1FF",
+    marginVertical: 5,
+    borderRadius: 5,
+  }),
+
+  urgencyLabel: {
+    marginTop: 10,
+    marginBottom: 5,
+    
+  },
+
+  urgencyDropdown: {
+    flexDirection:"row",
+    justifyContent:"space-evenly",
+    width:"100%"
+
+  },
 });
+

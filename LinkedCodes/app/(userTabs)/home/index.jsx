@@ -15,6 +15,9 @@ import "react-native-gesture-handler";
 import { Drawer } from "react-native-drawer-layout";
 import Icon2 from "react-native-vector-icons/MaterialIcons";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import CurrentDay from "../../../src/components/weather-API/CurrentDay";
+import NewsDisplay from "../../../src/components/News-API/NewsDisplay";
+
 const Home = () => {
   const [open, setOpen] = React.useState(false);
 
@@ -116,8 +119,17 @@ const Home = () => {
           </TouchableOpacity>
           <Text style={styles.appName}>InfraSmart</Text>
         </View>
-
+        {/* weather display  */}
+        <View> 
+          <CurrentDay/>
+        </View>
+        <Text style={styles.NewsTitle}>News</Text>
+        {/* news display  */}
+        <View>
+          <NewsDisplay/>
+         </View>
       </View>
+      
     </Drawer>
   );
 };
@@ -127,7 +139,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2f9FB",
+    backgroundColor: "#EAF1FF",
   },
   username: {
     fontSize: 20,
@@ -156,6 +168,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#202A44",
     marginTop: 20,
+  },
+  NewsTitle:{
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#202A44",
+    marginTop: 10,
+    marginBottom: 5,
+    marginLeft:12,
+    backgroundColor:'#EAF1FF'
   },
   content: {
     marginTop: 130,

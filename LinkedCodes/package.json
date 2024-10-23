@@ -54,6 +54,7 @@
     "react-native-image-picker": "^7.1.2",
     "react-native-inactivity": "^0.1.8",
     "react-native-linear-gradient": "^2.8.3",
+    "react-native-maps": "^1.18.2",
     "react-native-modal": "^13.0.1",
     "react-native-paper": "^5.12.5",
     "react-native-reanimated": "~3.10.1",

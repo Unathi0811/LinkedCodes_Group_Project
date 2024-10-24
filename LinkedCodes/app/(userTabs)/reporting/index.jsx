@@ -184,7 +184,7 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
   };
 
   // Delete a report from Firebase (if online)
-  const deleteReport = async (reportId, imageUri) => {
+  const deleteReport = async (reportId, imageUri, userId) => {
     try {
       // Check if online before deleting from Firebase
       const isOnline = await checkIfOnline();
@@ -192,16 +192,22 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
         console.log("Deleting report from Firebase...");
         const reportRef = doc(db, "reports", reportId); // Access the specific document
         await deleteDoc(reportRef); // Delete the document
-
+  
         // Delete image from Firebase Storage if it exists
-        if (imageUri) {
-          const imageRef = ref(storage, imageUri); // Use ref to get a reference to the image
+        if (imageUri && userId) {
+          console.log("Image URI before deletion:", imageUri);
+  
+          // Construct the path based on the userId and image file
+          const userImagePath = `users/${userId}/images/${imageUri}`;
+  
+          const imageRef = ref(storage, userImagePath); // Get reference to the user's image
           await deleteObject(imageRef); // Delete the image
+          console.log("Image deleted from Firebase Storage");
         }
-
-        console.log("Report deleted from Firebase");
+  
+        console.log("Report and associated image deleted from Firebase");
       }
-
+  
       setOverlayMessage("Report successfully deleted.");
       setVisible(true);
     } catch (error) {
@@ -210,6 +216,7 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
       setVisible(true);
     }
   };
+  
 
   // Upload image from camera or gallery
   const uploadImage = async (mode) => {
@@ -346,7 +353,7 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
   </View>
         <TouchableOpacity style={styles.button} onPress={submitReport}>
         {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="small" color="#EAF1FF" />
       ) : (
         <Text><Text style={styles.buttonText}>Submit Report</Text></Text>
       )}
@@ -362,12 +369,7 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
             renderItem={({ item }) => (
               <TouchableOpacity onPress={() => openReportDetails(item)}>
                 <View style={styles.reportItem}>
-                {loading ? (
-                  <ActivityIndicator size="large" color="#0000ff" />
-                   ) : (
-                  <Text><Image source={{ uri: item.image }} style={styles.imageThumbnail} /></Text>
-                   )}
-                  
+                <Image source={{ uri: item.image }} style={styles.imageThumbnail} />
                   <View style={styles.textContainer}>
                     <Text style={styles.description}>{item.description}</Text>
                     <Text style={styles.timestamp}>{item.timestamp.toDate().toLocaleString()}</Text>
@@ -595,4 +597,3 @@ const styles = StyleSheet.create({
 
   },
 });
-

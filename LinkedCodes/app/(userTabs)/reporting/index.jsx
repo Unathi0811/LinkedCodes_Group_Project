@@ -2,7 +2,7 @@ import { View, Image, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Text
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/Feather";
 import React, { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid"; // For generating unique filenames
+//import { v4 as uuidv4 } from "uuid"; // For generating unique filenames
 import useLocation from "../../../src/components/useLocation";
 import NetInfo from "@react-native-community/netinfo"; // To detect online status
 import { Overlay } from "@rneui/themed";

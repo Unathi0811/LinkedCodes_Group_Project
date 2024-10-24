@@ -1,26 +1,24 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import ReviewsAnalytics from "../../../src/components/graphs/Reviews";
 
-const analytics = () => {
+const Analytics = () => {
+
+
   return (
-    <View 
+    <View
       style={{
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF',
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#F5FCFF",
       }}
     >
-      <Text
-        style={{
-          fontSize: 20,
-          marginBottom: 20,
-        }}
-      >Where we will have our graphs</Text>
+     <ReviewsAnalytics />
     </View>
-  )
-}
+  );
+};
 
-export default analytics
+export default Analytics;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

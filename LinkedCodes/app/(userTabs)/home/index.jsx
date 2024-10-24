@@ -16,7 +16,7 @@ import { Drawer } from "react-native-drawer-layout";
 import Icon2 from "react-native-vector-icons/MaterialIcons";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import CurrentDay from "../../../src/components/weather-API/CurrentDay";
-import NewsDisplay from "../../../src/components/News-API/NewsDisplay";
+import NewsDisplay from "../../../src/components/news/NewsDisplay"
 
 const Home = () => {
   const [open, setOpen] = React.useState(false);
@@ -129,7 +129,6 @@ const Home = () => {
           <NewsDisplay/>
          </View>
       </View>
-      
     </Drawer>
   );
 };

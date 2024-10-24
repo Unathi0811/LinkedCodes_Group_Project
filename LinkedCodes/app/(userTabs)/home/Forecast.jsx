@@ -96,7 +96,8 @@ const Forecast = () => {
   }
 
   return (
-    <><Tabs.Screen
+    <> 
+    <Tabs.Screen
     options={{
       tabBarStyle: {
         height: 0,

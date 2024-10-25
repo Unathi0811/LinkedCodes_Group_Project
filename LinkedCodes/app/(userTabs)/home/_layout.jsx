@@ -1,15 +1,37 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { StatusBar } from 'expo-status-bar'
-import { Stack } from 'expo-router'
+import { StatusBar } from "expo-status-bar";
+import { Stack, Tabs } from "expo-router";
+import { View } from "react-native";
 
 const Layout = () => {
-    return (
-        <>
-            <StatusBar style="light" />
-            <Stack screenOptions={{ headerShown: false}} />
-        </>
-    )
-}
+  return (
+    <>
+      <Tabs.Screen
+        options={{
+          tabBarVisibilityAnimationConfig: {
+            hide: {
+              animation: "spring",
+            },
+          },
+          tabBarHideOnKeyboard: true,
+        }}
+      />
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        //   headerBackground: () => (
+        //     <View
+        //       style={{
+        //         backgroundColor: "red",
+        //         flexGrow: 1,
+        //       }}
+        //     />
+        //   ),
+    
+        }}
+      />
+    </>
+  );
+};
 
-export default Layout
+export default Layout;

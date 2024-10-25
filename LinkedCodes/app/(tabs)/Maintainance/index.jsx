@@ -106,25 +106,20 @@ const Maintenance = () => {
               <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
             </TouchableOpacity>
 
-       
             <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/(tabs)/Maintainance/maintain")}>
               <Text style={styles.linkText}>MAINTAIN</Text>
               <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
             </TouchableOpacity>
 
-
             <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/(tabs)/Maintainance/analytics")}>
               <Text style={styles.linkText}>ANALYTICS</Text>
               <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
             </TouchableOpacity>
-       
 
-         
             <TouchableOpacity style={styles.linkButton} onPress={() => router.push("/(tabs)/Maintainance/statistics")}>
               <Text style={styles.linkText}>STATISTICS</Text>
               <Icon name="chevron-right" size={20} color="#fff" style={styles.icon} />
             </TouchableOpacity>
-      
         </View>
         <View
         style={styles.card}

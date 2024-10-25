@@ -1,12 +1,13 @@
 import { ActivityIndicator, Alert, Text, View } from "react-native";
-import { Redirect, router } from "expo-router";
+import { Link, Redirect, router } from "expo-router";
 import { getAuth, signOut } from "firebase/auth";
 import { app, db } from "../firebase";
 import { useUser } from "../src/cxt/user";
 import { doc, getDoc } from "firebase/firestore";
 
-const _layout = () => {
+const Layout = () => {
   const { setUser } = useUser();
+
   getAuth(app).onAuthStateChanged(async (user) => {
     if (!user) return router.replace("/(auth)");
 
@@ -43,8 +44,9 @@ const _layout = () => {
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <ActivityIndicator size="large" color="#202A44" />
       <Text>Loading...</Text>
+      {/* <Link href="/(userTabs)/traffic">user</Link> */}
     </View>
   );
 };
 
-export default _layout;
+export default Layout;

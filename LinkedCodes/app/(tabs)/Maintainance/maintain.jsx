@@ -6,8 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import React from "react";
-import Calendar from "../../components/Calender";
-import Icon from "react-native-vector-icons/FontAwesome";
+import Calendar from "../../../src/components/Calender";
 
 const Mantain = () => {
   const handleMenuPress = () => {
@@ -17,15 +16,8 @@ const Mantain = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        {/* <TouchableOpacity
-          onPress={handleMenuPress}
-          style={styles.hamburgerButton}
-        >
-          <Icon name="bars" size={24} color="#202A44" />
-        </TouchableOpacity> */}
         <Text style={styles.appName}>InfraSmart</Text>
       </View>
-
       <View style={styles.calendarCard}>
         <Calendar />
       </View>
@@ -38,7 +30,7 @@ export default Mantain;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F2f9FB",
     paddingTop: 70,
   },
   headerContainer: {
@@ -51,16 +43,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     zIndex: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#F2f9FB",
   },
   appName: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#202A44",
     marginTop: 18,
-  },
-  hamburgerButton: {
-    padding: 10,
   },
   cardContainer: {
     flex: 1,
@@ -88,7 +77,8 @@ const styles = StyleSheet.create({
   },
   calendarCard: {
     flex: 4,
-    marginTop: 20,
+    marginTop: 22,
+    marginBottom: 6,
     marginHorizontal: 10,
     padding: 10,
     borderRadius: 10,

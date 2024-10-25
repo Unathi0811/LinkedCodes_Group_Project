@@ -1,28 +1,24 @@
 import {
   Alert,
   ScrollView,
-  ScrollViewBase,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Button, Image, Pressable } from "react-native";
+import { Image, Pressable } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { getApp, getApps } from "firebase/app";
 import {
   getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
-  listAll,
 } from "firebase/storage";
 import { Link } from "expo-router";
-import { doc, updateDoc, deleteDoc  } from "firebase/firestore";
+import { doc, updateDoc, } from "firebase/firestore";
 import { useUser } from "../../../src/cxt/user";
 import { db, auth } from "../../../firebase";
-import { signOut, deleteUser } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const Profile = () => {
@@ -69,7 +65,7 @@ const Profile = () => {
       <View style={styles.headerContainer}>
         <View style={styles.header}>
           <Pressable onPress={pickImage}>
-              <Image source={{ uri: user.profileImage ?? "https://via.placeholder.com/150" }} style={styles.image} />
+            <Image source={{ uri: user.profileImage ?? "https://via.placeholder.com/150" }} style={styles.image} />
           </Pressable>
           <Text style={styles.username}>{user.username ?? "Unknown Name"}</Text>
         </View>
@@ -77,12 +73,6 @@ const Profile = () => {
 
       {/* Links and buttons */}
       <ScrollView style={styles.content}>
-      <View style={styles.infoContainer}>
-          <Text style={styles.label}>First Name: {user.firstName}</Text>
-          <Text style={styles.label}>Email: {user.email}</Text>
-          <Text style={styles.label}>User ID: {user.uid}</Text>
-        </View>
-
         <View style={styles.linksContainer}>
           {/* Personal Information link */}
           <Link href="/(userTabs)/home/edit-profile" asChild>
@@ -104,24 +94,24 @@ const Profile = () => {
 
           {/* Logout button */}
           <Pressable style={styles.card} onPress={() => {
-              Alert.alert(
-                "Logout",
-                "Are you sure you want to logout?",
-                [
-                  {
-                    text: "Cancel",
-                    onPress: () => console.log("Logout canceled"),
-                    style: "cancel",
-                  },
-                  {
-                    text: "Logout",
-                    onPress: () => signOut(auth),
-                    style: "destructive",
-                  },
-                ],
-                { cancelable: true }
-              );
-            }}>
+            Alert.alert(
+              "Logout",
+              "Are you sure you want to logout?",
+              [
+                {
+                  text: "Cancel",
+                  onPress: () => console.log("Logout canceled"),
+                  style: "cancel",
+                },
+                {
+                  text: "Logout",
+                  onPress: () => signOut(auth),
+                  style: "destructive",
+                },
+              ],
+              { cancelable: true }
+            );
+          }}>
             <Text style={styles.cardText}>Logout</Text>
             <Icon name="sign-out" size={25} color="#fff" style={styles.icon} />
           </Pressable>
@@ -141,11 +131,10 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     position: "absolute",
-    top: -35,
+    top: -25,
     left: 0,
     right: 0,
-    marginBottom: 0,
-    borderRadius: 50,
+    marginBottom: 20,
     paddingHorizontal: 20,
     paddingVertical: 50,
     backgroundColor: "#202A44",
@@ -174,7 +163,7 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   content: {
-    marginTop: 280, 
+    marginTop: 280,
     paddingHorizontal: 30,
   },
   linksContainer: {
@@ -204,47 +193,47 @@ const styles = StyleSheet.create({
   },
 });
 
-  //The following code does the following:
-  // uploadToFirebase is a function that uploads an image to Firebase Storage
-  // it takes three arguments: the image URI, the file name, and a callback function
-  // the callback function is called with the upload progress (in bytes)
-  const uploadToFirebase = async (uri, name, onProgress) => {
-    const fetchResponse = await fetch(uri);
-    const theBlob = await fetchResponse.blob();
-    const imageRef = ref(getStorage(), `profiles/${name}`);
-    const uploadTask = uploadBytesResumable(imageRef, theBlob);
-  
-    return new Promise((resolve, reject) => {
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          onProgress && onProgress(progress);
-        },
-        (error) => {
-          // Handle unsuccessful uploads
-          console.log("Upload ERROR", error);
-          reject(error);
-        },
-        async () => {
-          const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
-          resolve({
-            downloadUrl,
-            metadata: uploadTask.snapshot.metadata,
-          });
-        }
-      );
-    });
-  };
-  
-  //explaination of the code
-  //The following code is a function that handles the upload of an image to Firebase Storage
-  //It takes three arguments: the image URI, the file name, and a callback function
-  //The callback function is called with the upload progress (in bytes)
-  const saveProfileImage = async (userId, downloadUrl) => {
-    const userDoc = doc(db, "user", userId);
-    await updateDoc(userDoc, {
-      profileImage: downloadUrl,
-    });
-  };
+//The following code does the following:
+// uploadToFirebase is a function that uploads an image to Firebase Storage
+// it takes three arguments: the image URI, the file name, and a callback function
+// the callback function is called with the upload progress (in bytes)
+const uploadToFirebase = async (uri, name, onProgress) => {
+  const fetchResponse = await fetch(uri);
+  const theBlob = await fetchResponse.blob();
+  const imageRef = ref(getStorage(), `profiles/${name}`);
+  const uploadTask = uploadBytesResumable(imageRef, theBlob);
+
+  return new Promise((resolve, reject) => {
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        onProgress && onProgress(progress);
+      },
+      (error) => {
+        // Handle unsuccessful uploads
+        console.log("Upload ERROR", error);
+        reject(error);
+      },
+      async () => {
+        const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+        resolve({
+          downloadUrl,
+          metadata: uploadTask.snapshot.metadata,
+        });
+      }
+    );
+  });
+};
+
+//explaination of the code
+//The following code is a function that handles the upload of an image to Firebase Storage
+//It takes three arguments: the image URI, the file name, and a callback function
+//The callback function is called with the upload progress (in bytes)
+const saveProfileImage = async (userId, downloadUrl) => {
+  const userDoc = doc(db, "user", userId);
+  await updateDoc(userDoc, {
+    profileImage: downloadUrl,
+  });
+};

@@ -2,14 +2,10 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-nati
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { router } from 'expo-router';
+// import { useTheme, themes } from '../../../src/cxt/theme';
 
 const Settings = () => {
-  const [isLightTheme, setIsLightTheme] = useState(true);
-
-  const toggleTheme = () => {
-    setIsLightTheme((prev) => !prev);
-    //  logic to actually apply the theme changes in the app
-  };
+  // const { theme, toggleTheme } = useTheme();
 
   return (
     <View style={styles.container}>
@@ -28,15 +24,16 @@ const Settings = () => {
             name='bell' color="#fff" size={22}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.option}>
-          <Text style={styles.optionText}>Theme</Text>
-          <Icon 
-            name={ isLightTheme ? 'moon' : 'sun'} 
-            color="#fff" 
+        {/* theme here */}
+        {/* <TouchableOpacity style={styles.option} onPress={toggleTheme}>
+          <Text style={[styles.optionText, { color: theme.text }]}>Theme</Text>
+          <Icon
+            name={theme === themes.light ? 'moon' : 'sun'}
+            color={theme.text}
             size={22}
-            style={styles.themeIcon} 
+            style={styles.themeIcon}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         
         <TouchableOpacity style={styles.option}
         onPress={() => {
@@ -124,7 +121,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1,
     flexDirection: "row",
-    gap: 50,
+    gap: 70,
     alignContent: "space-between"
   },
   optionText: {

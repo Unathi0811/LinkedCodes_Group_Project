@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, TextInput, Alert } from 'react-native';
-import { db } from '../../../firebase'; 
 import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { auth, db } from "../../../firebase";
 
 const RateUs = ({ isDarkMode }) => {
   const [reviews, setReviews] = useState([]);
@@ -51,7 +51,7 @@ const RateUs = ({ isDarkMode }) => {
   const renderReview = ({ item }) => (
     <View style={[styles.reviewContainer, { backgroundColor: isDarkMode ? '#2C2C2C' : '#FFFFFF' }]}>
       <View style={styles.reviewContent}>
-        <Text style={[styles.userName, { color: isDarkMode ? '#FFFFFF' : '#000000' }]} >{item.userName}</Text>
+        <Text style={[styles.userName, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>{item.userName}</Text>
         <View style={styles.ratingContainer}>{renderStars(item.rating)}</View>
         <Text style={[styles.comment, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>{item.comment}</Text>
       </View>

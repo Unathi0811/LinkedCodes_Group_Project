@@ -10,6 +10,7 @@ import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Link } from "expo-router";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import ReactNativeBiometrics from 'react-native-biometrics';
 
 const LoginScreen = () => {
   const [email, setEmail] = React.useState("");
@@ -21,10 +22,35 @@ const LoginScreen = () => {
       return;
     }
     signInWithEmailAndPassword(getAuth(), email, password)
-      .then(() => {})
+      .then(() => {
+        // Redirect to the home screen
+      })
       .catch((err) => {
         alert(err?.message);
       });
+  };
+
+
+  //thif function is throwing a rejection!
+  const handleBiometricLogin = async () => {
+    const rnBiometrics = new ReactNativeBiometrics();
+
+    const { available, biometryType } = await rnBiometrics.isBiometricAvailable();
+    if (available) {
+      const { success, error } = await rnBiometrics.simplePrompt({
+        promptMessage: 'Confirm fingerprint',
+      });
+
+      if (success) {
+        // Here, you can log the user in automatically
+        alert('Biometric authentication successful!');
+        // Redirect to the home screen
+      } else {
+        alert('Biometric authentication failed');
+      }
+    } else {
+      alert('Biometric authentication not available');
+    }
   };
 
   return (
@@ -37,7 +63,7 @@ const LoginScreen = () => {
         <Text style={styles.loginText}>Sign in to your account</Text>
       </View>
 
-      <Text  style={styles.labelText}>Email</Text>
+      <Text style={styles.labelText}>Email</Text>
       <View style={styles.inputContainer}>
         <Icon name={"user"} size={24} color={"#ccc"} style={styles.inputIcon} />
         <TextInput
@@ -65,12 +91,19 @@ const LoginScreen = () => {
         />
       </View>
 
-       {/* The sign in button needs to go home */}
       <TouchableOpacity
         style={styles.signInButtonContainer}
         onPress={handleLogin}
       >
         <Text style={styles.signIn}>Sign In</Text>
+      </TouchableOpacity>
+
+      {/* Biometric Login Button */}
+      <TouchableOpacity
+        style={styles.biometricButton}
+        onPress={handleBiometricLogin}
+      >
+        <Text style={styles.biometricText}>Use Biometrics</Text>
       </TouchableOpacity>
 
       <Link href="/forgot-password" asChild>
@@ -101,7 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     position: "relative",
   },
-  labelText:{
+  labelText: {
     marginLeft: 50,
     color: "#202A44",
   },
@@ -146,6 +179,25 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 5,
   },
+  biometricButton: {
+    backgroundColor: "#202A44",
+    borderRadius: 10,
+    marginHorizontal: 40,
+    elevation: 10,
+    marginVertical: 20,
+    height: 50,
+    justifyContent: "center", 
+    alignItems: "center",
+    shadowOffset: { width: 3, height: 10 },
+    shadowOpacity: 0.2,
+    shadowColor: "#202A44",
+  },
+  biometricText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
   forgotPasswordText: {
     color: "#BEBEBE",
     textAlign: "right",
@@ -173,20 +225,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
-  gradient: {
-    height: 34,
-    width: 66,
-    borderRadius: 70,
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 10,
-  },
   signUp: {
     color: "#BEBEBE",
-    textAlign: "center",
+    textAlign: "right",
     fontSize: 15,
-    marginTop: 22,
-    marginLeft: 33,
+    width: "87%",
+    marginTop: 23,
   },
   createText: {
     textDecorationLine: "underline",
@@ -204,5 +248,21 @@ const styles = StyleSheet.create({
     margin: 10,
     color: "#ffffff",
     backgroundColor: "transparent",
+  },
+  topImage: {
+    width: '100%',
+    height: 120,
+    resizeMode: 'cover',
+    marginBottom: 0,
+    marginLeft: -29,
+    marginTop: 0,
+  },
+  
+  bottomImage: {
+    width: '100%',
+    height: 140,
+    resizeMode: 'cover',
+    marginLeft: -23,
+    marginTop: 56,
   },
 });

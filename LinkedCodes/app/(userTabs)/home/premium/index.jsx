@@ -54,7 +54,7 @@ const Index = () => {
         <TouchableOpacity
           className="bg-[#202A44] text-white font-bold py-3 px-6 rounded-lg mb-4"
         >
-          <Text className="text-white text-lg text-center">Proceed To Checkout</Text>
+          <Text className="text-white text-lg text-center">Proceed To Payment</Text>
         </TouchableOpacity>
       </Link>
 

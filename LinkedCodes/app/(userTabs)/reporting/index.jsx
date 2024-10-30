@@ -11,6 +11,7 @@ import { db, storage } from "../../../firebase"; // Import Firebase
 import { collection, onSnapshot, doc, setDoc, deleteDoc, addDoc, query, where, } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import {Link } from 'expo-router'
 
 export default function Reporting() {
   const { latitude, longitude } = useLocation();
@@ -357,8 +358,12 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
       ) : (
         <Text><Text style={styles.buttonText}>Submit Report</Text></Text>
       )}
-          
         </TouchableOpacity>
+        <Link href="/(userTabs)/reporting/userChat" asChild>
+    <TouchableOpacity>
+      <Text>User Chat</Text>
+    </TouchableOpacity>
+  </Link>
 
         {/* Historical Reports */}
         <View style={styles.container2}>
@@ -439,12 +444,23 @@ const styles = StyleSheet.create({
   },
   input: {
     borderColor: "#000",
-    borderWidth: 2,
+    
     height: 100,
-    borderRadius: 5,
+    
     width: "90%",
     marginTop: 10,
-    padding: 5,
+    padding: 12,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 12,
+   
+    elevation: 5,
+    
+    fontSize: 16,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowColor: "#202A44",
   },
   container2: {
     flex: 2,
@@ -455,11 +471,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderWidth: 2,
-    borderRadius: 10,
-    borderColor: "#202A44",
     marginBottom: 50,
     padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    marginHorizontal: 20,
+    elevation: 5,
+    fontSize: 16,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowColor: "#202A44",
   },
   imageThumbnail: {
     width: 100,
@@ -483,17 +506,25 @@ const styles = StyleSheet.create({
     marginTop: 40,
     textAlign: "center",
     fontSize: 30,
-   
   },
   button: {
-    width: "90%",
-    height: 52,
+    padding:12,
     backgroundColor: "#202A44",
-    borderRadius: 5,
+    borderRadius: 12,
     marginTop: 20,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#202A44",
+    paddingVertical: 13,
+    marginHorizontal: 20,
+    width: "90%",
+    elevation: 5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowColor: "#202A44",
+    
   },
   buttonText: {
     fontSize: 18,

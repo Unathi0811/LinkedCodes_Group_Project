@@ -1,9 +1,11 @@
 import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
-import Icon from "react-native-vector-icons/FontAwesome5"; // Import the FontAwesome icon component
+import Icon from "react-native-vector-icons/FontAwesome5"; 
+import { useUser } from "../../src/cxt/user"
 
 const ConfirmationScreen = () => {
+    const { setUser, user } = useUser()
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Review and Confirm</Text>
@@ -21,8 +23,8 @@ const ConfirmationScreen = () => {
         </TouchableOpacity>
       </Link>
 
-      {/* Go Back Button */}
-      <Link href="/(userTabs)/home" asChild>
+      {/* Go Back Button, here the user should be routed back to userTabs where as the officla should be routed back to tabs*/}
+       <Link href={user.userType ? "/(tabs)/Home" : "/(userTabs)/home"} asChild>
         <TouchableOpacity style={styles.button}>
           <View style={styles.buttonContent}>
             <Text style={styles.buttonText}>Go Back</Text>

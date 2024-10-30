@@ -64,22 +64,65 @@ const ReviewsAnalytics = () => {
   
 
   return (
-    <View
-      style={{
-        backgroundColor: "#F5FCFF",
-      }}
-    >
-      <Text>
-        Ratings Analysis
-      </Text>
-      <Text>
-       Avarage: {avg}
-      </Text>
-      <BarChart data={data} />
-    </View>
+    <View style={styles.card}>
+    <Text style={styles.title}>USER SATISFACTION</Text>
+    <Text style={styles.subTitle}>Ratings Analysis</Text>
+    <Text style={styles.average}>Average: {avg.toFixed(2)}</Text>
+    <BarChart
+      data={data}
+      barWidth={40}
+      barBorderRadius={5}
+      frontColor="#202A44"
+      showFractionalValue
+      showXAxisIndices
+      initialSpacing={15}
+      spacing={20}
+      xAxisColor="#202A44"
+      yAxisColor="#202A44"
+      yAxisThickness={1}
+      xAxisThickness={1}
+      yAxisLabelTextStyle={styles.axisLabel}
+      xAxisLabelTextStyle={styles.axisLabel}
+    />
+  </View>
   );
 };
 
 export default ReviewsAnalytics;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    marginVertical: 10,
+    width: 370,
+    shadowColor: "#202A44",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
+    alignItems: "center",
+    marginTop: 34
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#202A44",
+    marginBottom: 5,
+  },
+  subTitle: {
+    fontSize: 18,
+    color: "#6C7A89",
+    marginBottom: 10,
+  },
+  average: {
+    fontSize: 16,
+    color: "#202A44",
+    marginBottom: 15,
+  },
+  axisLabel: {
+    color: "#202A44",
+    fontSize: 14,
+  },
+});

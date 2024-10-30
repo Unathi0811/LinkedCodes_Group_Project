@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {View,Text,TextInput,Button,Image,StyleSheet,TouchableOpacity,ScrollView,} from "react-native";
+import {View,Text,TextInput,Button,Image,StyleSheet,TouchableOpacity,ScrollView, Pressable,} from "react-native";
 import { useUser } from "../../../src/cxt/user";
 import { auth, db } from "../../../firebase";
 import {doc,updateDoc,deleteDoc,addDoc,collection,} from "firebase/firestore";
@@ -7,7 +7,7 @@ import * as ImagePicker from "expo-image-picker";
 import {getStorage,ref,uploadBytesResumable,getDownloadURL,} from "firebase/storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 import {deleteUser,reauthenticateWithCredential,EmailAuthProvider,} from "firebase/auth";
-
+import { useRouter } from "expo-router"; 
 const EditProfile = () => {
   const { user, setUser } = useUser();
   const [username, setUsername] = useState(user?.username || "");
@@ -16,7 +16,7 @@ const EditProfile = () => {
   const [image, setImage] = useState(user.profileImage);
   const [password, setPassword] = useState("");
   const [overlayMessage, setOverlayMessage] = useState("");
-
+  const router = useRouter();
   const handleSave = async () => {
     try {
       const userDoc = doc(db, "user", user.uid); // Update user doc in Firestore
@@ -122,6 +122,10 @@ const EditProfile = () => {
   return (
     <View style={styles.container}>
       <View style={styles.profileImageContainer}>
+        {/* Back Button */}
+        <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <Icon name="arrow-left" size={20} color="#fff" />
+          </Pressable>
         <Image
           style={styles.profileImage}
           source={{
@@ -244,6 +248,12 @@ const styles = StyleSheet.create({
     zIndex: 10,
     paddingBottom: 30,
     height: 150,
+  },
+  backButton: {
+    position: "absolute",
+    left: 20, 
+    top: 70, 
+    padding: 10,
   },
   profileImage: {
     width: 100,

@@ -142,7 +142,7 @@ const HomeScreen = () => {
           </View>
         )}
       />
-      <Link asChild href={"/(tabs)/Maintenance/reporting"}>
+      <Link asChild href={"/(tabs)/Maintainance/reporting"}>
         <TouchableOpacity style={styles.viewReportsButton}>
           <Text style={styles.viewReportsText}>View Reports</Text>
         </TouchableOpacity>
@@ -185,24 +185,7 @@ const HomeScreen = () => {
                 />
               </TouchableOpacity>
             </Link>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Manage Infrastructure</Text>
-              <FontAwesome5
-                name="road"
-                size={16}
-                color="#202A44"
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Schedule Maintenance</Text>
-              <FontAwesome5
-                name="calendar"
-                size={16}
-                color="#202A44"
-                style={styles.icon}
-              />
-            </TouchableOpacity>
+            <Link href="/(tabs)/Maintainance/analytics" asChild>
             <TouchableOpacity style={styles.actionButton}>
               <Text style={styles.actionButtonText}>View Analytics</Text>
               <FontAwesome
@@ -212,6 +195,7 @@ const HomeScreen = () => {
                 style={styles.icon}
               />
             </TouchableOpacity>
+            </Link>
           </ScrollView>
         </View>
       </ScrollView>
@@ -275,7 +259,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 5,
     elevation: 5,
-    height: 500,
+    height: 300,
   },
   adminActionsText: {
     fontSize: 15,
@@ -284,7 +268,7 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     flexDirection: "column",
-    height: 233,
+    height: 103,
   },
   actionButton: {
     backgroundColor: "#F1F1F1",
@@ -295,7 +279,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    height: "15%",
+    height: "23%",
     marginBottom: 9,
   },
   actionButtonText: {

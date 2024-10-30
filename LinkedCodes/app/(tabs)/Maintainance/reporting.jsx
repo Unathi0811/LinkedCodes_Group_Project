@@ -29,7 +29,8 @@ import Icon4 from "react-native-vector-icons/FontAwesome";
 import { GiftedChat } from "react-native-gifted-chat";
 import { Overlay } from "@rneui/themed";
 import Geocoder from "react-native-geocoding"; // Import geocoding library
-
+import { useRouter } from 'expo-router';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import { updateDoc } from "firebase/firestore";
 
 // Initialize the Geocoding API with your API key
@@ -53,7 +54,8 @@ function Reporting() {
   const [longitude, setLongitude] = useState(null);
   const [locationDescription, setLocationDescription] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("Submitted");
-
+  const [imageLoadingMap, setImageLoadingMap] = useState({});
+  const router = useRouter();
   useEffect(() => {
     const fetchReports = async () => {
       try {
@@ -246,73 +248,78 @@ function Reporting() {
       name: "Unknown User",
       profilePhoto: "https://via.placeholder.com/60",
     }; // Default values for unknown users
-
+    
     return (
       <View key={item.id} style={styles.card}>
-        <View style={styles.profileContainer}>
-          <Image
-            source={{ uri: user.profilePhoto }} // Display the user profile picture
-            style={styles.profileImage}
-          />
-          <Text style={styles.initials}>{user.name}</Text>
-        </View>
-        <View style={styles.reportContainer}>
+      <View style={styles.reportContainer}>
+         {/* Image with loading indicator */}
+         {imageLoadingMap[item.id] && (
+            <ActivityIndicator size="small" color="#202A44" style={styles.loadingIndicator} />
+          )}
           <Image
             source={{ uri: item.image || "https://via.placeholder.com/100" }}
             style={styles.reportImage}
-            onError={(e) =>
-              console.log("Image load error:", e.nativeEvent.error)
-            }
+            onLoadEnd={() => setImageLoadingMap(prev => ({ ...prev, [item.id]: false }))} // Set loading to false when image is loaded
+            onError={(e) => {
+              console.log("Image load error:", e.nativeEvent.error);
+              setImageLoadingMap(prev => ({ ...prev, [item.id]: false })); // Set loading to false even if there’s an error
+            }}
+            onLoadStart={() => setImageLoadingMap(prev => ({ ...prev, [item.id]: true }))} // Set loading to true when starting to load
           />
-          <Text style={styles.description}>
-            Descption: {item.description || "No description available."}
-          </Text>
-          <Text style={styles.description}>
-            Urgency Level: {item.urgency}
-          </Text>
-          {/* Display location directly under the description */}
-          {item.latitude && item.longitude && (
-            <Text style={styles.description}>
-              Location: {item.locationDescription || "No location available"}
-            </Text>
-          )}
-
-          <Text style={styles.description}>Status: </Text>
-          {/* Status Update Icons */}
-          <View style={styles.statusIcons}>
-            <TouchableOpacity
-              onPress={() => updateReportStatus(item.id, "In-Progress")}
-            >
-              <Icon4
-                name="spinner"
-                size={20}
-                color={item.status === "In-Progress" ? "#202A44" : "#ccc"}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => updateReportStatus(item.id, "Completed")}
-            >
-              <Icon4
-                name="check-circle"
-                size={20}
-                color={item.status === "Completed" ? "#202A44" : "#ccc"}
-              />
-            </TouchableOpacity>
+        <View style={styles.detailsContainer}>
+          <View style={styles.infoRow}>
+            <Text style={styles.description}>User:</Text>
+            <Text style={styles.descriptionText}>{user.name}</Text>
           </View>
-
-          <View style={styles.iconContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedReport(item);
-                setChatVisible(true);
-                fetchChatMessages(item.userId);
-              }}
-            >
-              <Icon2 name="chatbox-outline" size={24} color="#202A44" />
-            </TouchableOpacity>
+          <View style={styles.infoRow}>
+            <Text style={styles.description}>Description:</Text>
+            <Text style={styles.descriptionText}>{item.description || "No description available."}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.description}>Urgency Level:</Text>
+            <Text style={styles.descriptionText}>{item.urgency}</Text>
+          </View>
+          {item.latitude && item.longitude && (
+            <View style={styles.infoRow}>
+              <Text style={styles.description}>Location:</Text>
+              <Text style={styles.descriptionText}>{item.locationDescription || "No location available"}</Text>
+            </View>
+          )}
+         
+            <Text style={styles.description}>Status:</Text>
+            <View style={styles.iconContainer}>
+              <TouchableOpacity
+                onPress={() => updateReportStatus(item.id, "In-Progress")}
+              >
+                <Icon4
+                  name="spinner"
+                  size={24}
+                  color={item.status === "In-Progress" ? "#202A44" : "#ccc"}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => updateReportStatus(item.id, "Completed")}
+              >
+                <Icon4
+                  name="check-circle"
+                  size={24}
+                  color={item.status === "Completed" ? "#202A44" : "#ccc"}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setSelectedReport(item);
+                  setChatVisible(true);
+                  fetchChatMessages(item.userId);
+                }}
+              >
+                <Icon2 name="chatbox-outline" size={24} color="#202A44" />
+              </TouchableOpacity>
+          
           </View>
         </View>
       </View>
+    </View>
     );
   };
 
@@ -326,7 +333,7 @@ function Reporting() {
       {/* Ensure that statusIcons[item] exists and is valid */}
       {statusIcons[item] && (
         <Icon4 name={statusIcons[item]} size={16} color="#fff" />
-      )}
+      )} 
 
       {/* Text wrapped in <Text> */}
       <Text style={styles.btnText}>{item.toString()}</Text>
@@ -336,11 +343,18 @@ function Reporting() {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.appName}>InfraSmart</Text>
-      </View>
-
-      {/* Filters using FlatList */}
-      <FlatList
+        <View style={{
+          display: "flex",
+          flexDirection: "row",
+          alignContent: "space-between"
+        }}>
+           {/* Back Button */}
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <Icon name="arrow-left" size={20} color="#202A44" />
+          </TouchableOpacity>
+          <Text style={styles.appName}>InfraSmart</Text>
+        </View>
+        <FlatList
         data={filters}
         renderItem={renderFilterItem}
         keyExtractor={(item, index) => index.toString()}
@@ -348,6 +362,7 @@ function Reporting() {
         showsHorizontalScrollIndicator={false}
         style={styles.horScrollView}
       />
+      </View>
 
       {/* Reports List */}
       {loadingReports ? (
@@ -440,27 +455,36 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F2f9FB",
   },
+  backButton: {
+    position: 'absolute', 
+    top: 15,
+    left: 20,
+    padding: 10,
+    zIndex: 1, 
+  },
   headerContainer: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     padding: 20,
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
     zIndex: 10,
     backgroundColor: "#F2f9FB",
     elevation: 5,
+    marginBottom: 1,
   },
   appName: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#202A44",
     marginTop: 20,
+    marginLeft: 200
   },
   list: {
-    marginTop: 80,
+    marginTop: 160,
     padding: 20,
   },
   card: {
@@ -472,10 +496,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     marginLeft: 10,
     shadowColor: "#202A44",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.6,
-    shadowRadius: 7,
+    shadowOffset: { width: 4, height: 44 },
+    shadowOpacity: 0.9,
+    shadowRadius: 15,
     elevation: 3,
+    overflow: "hidden",
+    alignItems: 'center',
   },
   profileContainer: {
     marginRight: 10,
@@ -498,23 +524,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   reportImage: {
-    width: 200,
+    width: "100%",
     height: 100,
     borderRadius: 10,
-  },
-  description: {
-    fontSize: 16,
-    fontWeight: "500",
-    marginTop: 10,
-    color: "#202A44",
+    resizeMode: "cover",
+    alignSelf: "center",
+    marginBottom: 10, 
   },
   iconContainer: {
     flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 50,
-  },
-  horScrollView: {
-    marginTop: 100,
+    justifyContent: "space-between",
+    marginTop: 10,
   },
   btn: {
     borderRadius: 10,
@@ -599,7 +619,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)", 
   },
   locationText: {
     fontSize: 18,
@@ -612,8 +632,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   statusIcons: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
   },
   chatContainer: {
     flex: 1,
@@ -633,5 +654,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  detailsContainer: {
+    flex: 1, 
+  },
+  description: {
+    color: "#202A44",
+    fontWeight: "bold",
+    marginBottom: 4,
+    marginVertical: 4,
+  },
+  descriptionText: {
+    color: "#ccc",
+    marginBottom: 4,
+    marginVertical: 4,
+    marginRight: 23,
+  },
+  infoRow: {
+    flexDirection: 'row',
+  }
 });
 

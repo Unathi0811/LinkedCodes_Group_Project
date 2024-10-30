@@ -1,4 +1,16 @@
-import { View, Image, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Text, StyleSheet, TextInput, FlatList, Modal,ActivityIndicator } from "react-native";
+import {
+  View,
+  Image,
+  TouchableWithoutFeedback,
+  Keyboard,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  TextInput,
+  FlatList,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/Feather";
 import React, { useState, useEffect } from "react";
@@ -6,10 +18,24 @@ import React, { useState, useEffect } from "react";
 import useLocation from "../../../src/components/useLocation";
 import NetInfo from "@react-native-community/netinfo"; // To detect online status
 import { Overlay } from "@rneui/themed";
-import AsyncStorage from '@react-native-async-storage/async-storage'; // For offline storage
+import AsyncStorage from "@react-native-async-storage/async-storage"; // For offline storage
 import { db, storage } from "../../../firebase"; // Import Firebase
-import { collection, onSnapshot, doc, setDoc, deleteDoc, addDoc, query, where, } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  setDoc,
+  deleteDoc,
+  addDoc,
+  query,
+  where,
+} from "firebase/firestore";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
 
 export default function Reporting() {
@@ -23,8 +49,8 @@ export default function Reporting() {
   const [modalVisible2, setModalVisible2] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [urgency, setUrgency] = useState("Low"); // Default urgency level
-const [loading, setLoading] = useState(false); // For submit button loading
-const [imageLoading, setImageLoading] = useState(true); // For image loading
+  const [loading, setLoading] = useState(false); // For submit button loading
+  const [imageLoading, setImageLoading] = useState(true); // For image loading
 
   const auth = getAuth(); // Get the current authenticated user
 
@@ -47,15 +73,21 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
     if (!userId) return; // Exit if no user is authenticated
 
     // const q = collection(db, "reports"); // Query the reports collection
-    const q = query(collection(db, "reports"), where("userId", "==", userId))
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const loadedReports = snapshot.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-      // .filter((report) => report.userId === userId); // Filter by userId
-      setReports(loadedReports);
-    }, (error) => {
-      console.log("Error loading reports from Firestore: ", error);
-    });
+    const q = query(collection(db, "reports"), where("userId", "==", userId));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const loadedReports = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        // .filter((report) => report.userId === userId); // Filter by userId
+        setReports(loadedReports);
+      },
+      (error) => {
+        console.log("Error loading reports from Firestore: ", error);
+      }
+    );
 
     return unsubscribe; // Return unsubscribe function
   };
@@ -140,7 +172,7 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
           latitude,
           longitude,
           userId, // Include the authenticated user's ID
-          urgency
+          urgency,
         };
 
         // Check network status
@@ -158,14 +190,17 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
 
           // Add the new report to Firestore
           await addDoc(collection(db, "reports"), newReport);
-          setLoading(false)
+          setLoading(false);
         } else {
           // If offline, save the report locally using AsyncStorage
           const storedReports = await AsyncStorage.getItem("offlineReports");
           const reportsArray = storedReports ? JSON.parse(storedReports) : [];
           reportsArray.push(newReport);
 
-          await AsyncStorage.setItem("offlineReports", JSON.stringify(reportsArray));
+          await AsyncStorage.setItem(
+            "offlineReports",
+            JSON.stringify(reportsArray)
+          );
           console.log("Report saved offline");
         }
 
@@ -178,7 +213,9 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
         setVisible(true);
       }
     } else {
-      setOverlayMessage("Please add both an image, description and select urgency level");
+      setOverlayMessage(
+        "Please add both an image, description and select urgency level"
+      );
       setVisible(true);
     }
   };
@@ -192,22 +229,20 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
         console.log("Deleting report from Firebase...");
         const reportRef = doc(db, "reports", reportId); // Access the specific document
         await deleteDoc(reportRef); // Delete the document
-  
         // Delete image from Firebase Storage if it exists
         if (imageUri && userId) {
           console.log("Image URI before deletion:", imageUri);
-  
+
           // Construct the path based on the userId and image file
           const userImagePath = `users/${userId}/images/${imageUri}`;
-  
+
           const imageRef = ref(storage, userImagePath); // Get reference to the user's image
           await deleteObject(imageRef); // Delete the image
           console.log("Image deleted from Firebase Storage");
         }
-  
         console.log("Report and associated image deleted from Firebase");
       }
-  
+
       setOverlayMessage("Report successfully deleted.");
       setVisible(true);
     } catch (error) {
@@ -216,7 +251,6 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
       setVisible(true);
     }
   };
-  
 
   // Upload image from camera or gallery
   const uploadImage = async (mode) => {
@@ -289,7 +323,10 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
 
         {/* Modal for upload options */}
         <Modal transparent={true} visible={modalVisible} animationType="slide">
-          <TouchableOpacity style={styles.modalBackground} onPress={() => setModalVisible(false)}>
+          <TouchableOpacity
+            style={styles.modalBackground}
+            onPress={() => setModalVisible(false)}
+          >
             <TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
               <Text style={styles.modalHeader}>Upload Options</Text>
               <View style={styles.modalButtons}>
@@ -312,7 +349,10 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
                   </TouchableOpacity>
                 </View>
               </View>
-              <TouchableOpacity style={styles.button} onPress={() => setModalVisible(false)}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => setModalVisible(false)}
+              >
                 <Text style={styles.buttonText}>Close</Text>
               </TouchableOpacity>
             </TouchableOpacity>
@@ -326,7 +366,12 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
             <Image source={{ uri: image }} style={styles.image} />
           </TouchableOpacity>
         ) : (
-          <Icon onPress={() => setModalVisible(true)} name="camera" size={70} color={"#000"} />
+          <Icon
+            onPress={() => setModalVisible(true)}
+            name="camera"
+            size={70}
+            color={"#000"}
+          />
         )}
 
         <TextInput
@@ -337,27 +382,37 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
           style={styles.input}
           placeholder="Description"
         />
-          {/*this is the urgency dropdown*/}
+        {/*this is the urgency dropdown*/}
 
-          <Text style={styles.urgencyLabel}>Select Urgency Level:</Text>
-  <View style={styles.urgencyDropdown}>
-    <TouchableOpacity onPress={() => setUrgency("Low")} style={styles.urgencyOption(urgency === "Low")}>
-      <Text>Low</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => setUrgency("Medium")} style={styles.urgencyOption(urgency === "Medium")}>
-      <Text>Medium</Text>
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => setUrgency("High")} style={styles.urgencyOption(urgency === "High")}>
-      <Text>High</Text>
-    </TouchableOpacity>
-  </View>
+        <Text style={styles.urgencyLabel}>Select Urgency Level:</Text>
+        <View style={styles.urgencyDropdown}>
+          <TouchableOpacity
+            onPress={() => setUrgency("Low")}
+            style={styles.urgencyOption(urgency === "Low")}
+          >
+            <Text>Low</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setUrgency("Medium")}
+            style={styles.urgencyOption(urgency === "Medium")}
+          >
+            <Text>Medium</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setUrgency("High")}
+            style={styles.urgencyOption(urgency === "High")}
+          >
+            <Text>High</Text>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity style={styles.button} onPress={submitReport}>
-        {loading ? (
-        <ActivityIndicator size="small" color="#EAF1FF" />
-      ) : (
-        <Text><Text style={styles.buttonText}>Submit Report</Text></Text>
-      )}
-          
+          {loading ? (
+            <ActivityIndicator size="small" color="#EAF1FF" />
+          ) : (
+            <Text>
+              <Text style={styles.buttonText}>Submit Report</Text>
+            </Text>
+          )}
         </TouchableOpacity>
 
         {/* Historical Reports */}
@@ -369,13 +424,20 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
             renderItem={({ item }) => (
               <TouchableOpacity onPress={() => openReportDetails(item)}>
                 <View style={styles.reportItem}>
-                <Image source={{ uri: item.image }} style={styles.imageThumbnail} />
+                  <Image
+                    source={{ uri: item.image }}
+                    style={styles.imageThumbnail}
+                  />
                   <View style={styles.textContainer}>
                     <Text style={styles.description}>{item.description}</Text>
-                    <Text style={styles.timestamp}>{item.timestamp.toDate().toLocaleString()}</Text>
-                    <Text style={styles.urgency}>Urgency: {item.urgency}</Text> 
+                    <Text style={styles.timestamp}>
+                      {item.timestamp.toDate().toLocaleString()}
+                    </Text>
+                    <Text style={styles.urgency}>Urgency: {item.urgency}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => deleteReport(item.id, item.image)}>
+                  <TouchableOpacity
+                    onPress={() => deleteReport(item.id, item.image)}
+                  >
                     <Icon name="trash" size={24} color="#000" />
                   </TouchableOpacity>
                 </View>
@@ -386,33 +448,50 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
 
         {/* Overlay for error messages */}
 
-        <Overlay isVisible={visible} onBackdropPress={toggleOverlay} overlayStyle={styles.overlay}>
+        <Overlay
+          isVisible={visible}
+          onBackdropPress={toggleOverlay}
+          overlayStyle={styles.overlay}
+        >
           <View style={styles.overlayContent}>
-            <Icon name="info" size={50} color="#000" style={styles.overlayIcon} />
+            <Icon
+              name="info"
+              size={50}
+              color="#000"
+              style={styles.overlayIcon}
+            />
             <Text style={styles.overlayText}>{overlayMessage}</Text>
           </View>
         </Overlay>
 
-
         {/* Modal for report details */}
         <Modal transparent={true} visible={modalVisible2} animationType="slide">
-          <TouchableOpacity style={styles.modalBackground} onPress={() => setModalVisible2(false)}>
+          <TouchableOpacity
+            style={styles.modalBackground}
+            onPress={() => setModalVisible2(false)}
+          >
             <TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
               {selectedReport && (
                 <>
                   <Text style={styles.modalHeader}>Report Details</Text>
-                  <Text style={styles.description}>Description: {selectedReport.description}</Text>
+                  <Text style={styles.description}>
+                    Description: {selectedReport.description}
+                  </Text>
                   <Text style={styles.timestamp}>
                     Date: {selectedReport.timestamp.toDate().toLocaleString()}
                   </Text>
-                  <Text style={styles.urgency}>Urgency: {selectedReport.urgency}</Text>
-                  <Text style={styles.status}>
-                    Status: {selectedReport.status || 'No Status'}
+                  <Text style={styles.urgency}>
+                    Urgency: {selectedReport.urgency}
                   </Text>
-                  
+                  <Text style={styles.status}>
+                    Status: {selectedReport.status || "No Status"}
+                  </Text>
                 </>
               )}
-              <TouchableOpacity style={styles.button} onPress={() => setModalVisible2(false)}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => setModalVisible2(false)}
+              >
                 <Text style={styles.buttonText}>Close</Text>
               </TouchableOpacity>
             </TouchableOpacity>
@@ -483,7 +562,6 @@ const styles = StyleSheet.create({
     marginTop: 40,
     textAlign: "center",
     fontSize: 30,
-   
   },
   button: {
     width: "90%",
@@ -497,7 +575,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 18,
-    
+
     color: "#fff",
   },
   modalBackground: {
@@ -507,13 +585,13 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
   },
   modalContainer: {
-    width: '80%',
+    width: "80%",
     height: 320,
     borderRadius: 10,
     padding: 20,
     backgroundColor: "#EAF1FF",
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   closeIcon: {
     position: "absolute",
@@ -545,31 +623,30 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   imageheader: {
-   
-    fontSize: 20
+    fontSize: 20,
   },
   overlay: {
-    width: '80%',
+    width: "80%",
     height: 320,
     borderRadius: 10,
     padding: 20,
     backgroundColor: "#EAF1FF",
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   overlayContent: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   overlayIcon: {
     marginBottom: 15,
   },
   overlayText: {
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   icontext: {
     textAlign: "justify",
-    fontSize: 11
+    fontSize: 11,
   },
   status: {
     marginTop: 10,
@@ -587,13 +664,11 @@ const styles = StyleSheet.create({
   urgencyLabel: {
     marginTop: 10,
     marginBottom: 5,
-    
   },
 
   urgencyDropdown: {
-    flexDirection:"row",
-    justifyContent:"space-evenly",
-    width:"100%"
-
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    width: "100%",
   },
 });

@@ -7,15 +7,21 @@ import {
 } from "react-native";
 import React from "react";
 import Calendar from "../../../src/components/Calender";
-
+import { useRouter } from "expo-router";
+import Icon from "react-native-vector-icons/FontAwesome5";
 const Mantain = () => {
-  const handleMenuPress = () => {
-    console.log("Hamburger menu pressed");
-  };
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
+        {/* Back Button */}
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Icon name="arrow-left" size={20} color="#202A44" />
+        </TouchableOpacity>
         <Text style={styles.appName}>InfraSmart</Text>
       </View>
       <View style={styles.calendarCard}>
@@ -33,6 +39,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#F2f9FB",
     paddingTop: 70,
   },
+  backButton: {
+    position: "absolute",
+    top: 34,
+    left: 10,
+    padding: 10,
+    zIndex: 1,
+  },
   headerContainer: {
     position: "absolute",
     top: 0,
@@ -41,7 +54,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 20,
     justifyContent: "space-between",
-    alignItems: "center",
     zIndex: 10,
     backgroundColor: "#F2f9FB",
   },
@@ -50,6 +62,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#202A44",
     marginTop: 18,
+    marginLeft: 199,
   },
   cardContainer: {
     flex: 1,

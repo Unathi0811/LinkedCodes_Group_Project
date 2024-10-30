@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Text,
   View,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import {Image, Pressable } from "react-native";
@@ -25,7 +26,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 const Profile = () => {
   const { setUser, user } = useUser();
   const [image, setImage] = useState(user.profileImage);
-
+  const [loading, setLoading] = useState(false); 
   useEffect(() => {
     if (user) {
       setImage(user.profileImage);
@@ -42,6 +43,7 @@ const Profile = () => {
       });
 
       if (!result.canceled) {
+        setLoading(true); 
         setImage(result.assets[0].uri);
         const fileName = result.assets[0].uri.split("/").pop();
         const uploadResp = await uploadToFirebase(
@@ -57,6 +59,8 @@ const Profile = () => {
       }
     } catch (e) {
       console.log(e);
+    } finally {
+      setLoading(false); // Set loading to false after upload completes
     }
   };
 
@@ -66,14 +70,21 @@ const Profile = () => {
       <View style={styles.headerContainer}>
         <View style={styles.header}>
           <Pressable onPress={pickImage}>
-            <Image source={{ uri: user.profileImage ?? "https://via.placeholder.com/150" }} style={styles.image} />
+          {loading ? ( // Show ActivityIndicator if loading
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Image
+                source={{ uri: image ?? "https://via.placeholder.com/150" }}
+                style={styles.image}
+              />
+            )}
           </Pressable>
           <Text style={styles.username}>{user.username ?? "Unknown Name"}</Text>
         </View>
       </View>
 
       {/* Links and buttons */}
-      <ScrollView style={styles.content}>
+      <View style={styles.content}>
         <View style={styles.linksContainer}>
           {/* Personal Information link */}
           <Link href="/(tabs)/Profile/edit-profile" asChild>
@@ -117,7 +128,7 @@ const Profile = () => {
             <Icon name="sign-out" size={25} color="#fff" style={styles.icon} />
           </Pressable>
         </View>
-      </ScrollView>
+      </View>
 
     </View>
   );

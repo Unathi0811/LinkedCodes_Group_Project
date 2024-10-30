@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import { db } from "../../firebase"; 
 import { collection, addDoc } from "firebase/firestore";
 
@@ -7,26 +7,36 @@ const AuditContext = createContext();
 
 // Provide the Context
 const AuditContextProvider = ({ children }) => {
-    const logAudit = async (UserID, Action, TargetUserID, ActionDetails) => {
+    const [error, setError] = useState(null);
+
+    const logAudit = async (userEmail, errorMessage, userID, actionType, targetId, ipAddress, changesMade, status) => {
         const logEntry = {
-            Timestamp: new Date().toISOString(), // Capture the current timestamp
-            UserID,  // The user performing the action
-            Action,  // The action being performed
-            TargetUserID,  // The user being targeted by the action, if applicable
-            ActionDetails,  // Details about the action
+            timestamp: new Date().toISOString(),
+            userID,
+            actionType,
+            changesMade,
+            ipAddress,
+            status,
+            targetId,
+            errorMessage,
+            userEmail
         };
 
         try {
             // Add the log entry to the 'audit_log' collection in Firestore
             await addDoc(collection(db, "audit_log"), logEntry);
-            console.log("Audit log entry created:", logEntry); // Success message
+            console.log("Audit log entry created:", logEntry);
+            setError(null); // Clear error if successful
+            return true; // Return success indicator
         } catch (error) {
-            console.error("Error writing audit log: ", error); // Error handling
+            console.error("Error writing audit log: ", error);
+            setError(error); // Capture error
+            return false; // Return failure indicator
         }
     };
 
     return (
-        <AuditContext.Provider value={{ logAudit }}>
+        <AuditContext.Provider value={{ logAudit, error }}>
             {children}
         </AuditContext.Provider>
     );

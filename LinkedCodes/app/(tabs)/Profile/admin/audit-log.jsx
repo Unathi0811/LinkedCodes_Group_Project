@@ -1,32 +1,132 @@
 import { collection, getDocs } from "firebase/firestore"; 
 import { db } from '../../../../firebase';
 import React, { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, FlatList } from "react-native";
 
 const AdminAuditLogs = () => {
     const [logs, setLogs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchLogs = async () => {
+            setLoading(true);
             try {
                 const snapshot = await getDocs(collection(db, 'audit_log'));
                 const fetchedLogs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setLogs(fetchedLogs);
             } catch (error) {
                 console.error("Error fetching audit logs: ", error);
+                setError("Failed to load logs");
+            } finally {
+                setLoading(false);
             }
         };
         fetchLogs();
     }, []);
 
-    return (
-        <View>
-            { logs.map(log => (
-                <Text key={log.id}>{ `${log.Timestamp}: ${log.Action} by ${log.UserID}`}</Text>
-            )) }
+    if (loading) {
+        return (
+            <View style={styles.centered}>
+                <ActivityIndicator size="large" color="#202A44" />
+                <Text>Loading logs...</Text>
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.centered}>
+                <Text style={styles.errorText}>{error}</Text>
+            </View>
+        );
+    }
+
+    const renderItem = ({ item }) => (
+        <View style={styles.card}>
+            <View style={styles.logEntry}>
+                <Text style={styles.label}>Timestamp:</Text>
+                <Text style={styles.value}>{new Date(item.timestamp).toLocaleString()}</Text>
+            </View>
+            <View style={styles.logEntry}>
+                <Text style={styles.label}>User Email:</Text>
+                <Text style={styles.value}>{item.userEmail}</Text>
+            </View>
+            <View style={styles.logEntry}>
+                <Text style={styles.label}>Action Type:</Text>
+                <Text style={styles.value}>{item.actionType}</Text>
+            </View>
+            <View style={styles.logEntry}>
+                <Text style={styles.label}>Target ID:</Text>
+                <Text style={styles.value}>{item.targetId}</Text>
+            </View>
+            <View style={styles.logEntry}>
+                <Text style={styles.label}>Status:</Text>
+                <Text style={styles.value}>{item.status}</Text>
+            </View>
+            <View style={styles.logEntry}>
+                <Text style={styles.label}>Changes Made:</Text>
+                <Text style={styles.value}>{JSON.stringify(item.changesMade)}</Text>
+            </View>
         </View>
     );
+    
+    return ( 
+        <>
+        {/* <Stack.Screen
+        options={{
+          headerTitle: "Audit Log",
+          headerBackTitleVisible: false,
+          headerTintColor: "#202A44",
+        }}
+      /> */}
+        <FlatList
+            data={logs}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContainer}
+        />
+        </>  
+    );
 };
+
+const styles = StyleSheet.create({
+    centered: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    card: {
+        backgroundColor: '#ffffff',
+        borderRadius: 8,
+        padding: 16,
+        marginBottom: 12,
+        shadowColor: '#202A44',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3, 
+    },
+    logEntry: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+    },
+    label: {
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    value: {
+        color: '#555',
+    },
+    errorText: {
+        color: 'red',
+    },
+    listContainer: {
+        paddingBottom: 16,
+    },
+});
+
 
 export default AdminAuditLogs;
 

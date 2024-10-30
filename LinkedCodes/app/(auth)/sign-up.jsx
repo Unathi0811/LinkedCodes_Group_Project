@@ -11,11 +11,10 @@ import {
 } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { LinearGradient } from "expo-linear-gradient";
-import { MaterialIcons } from "react-native-vector-icons";
 import { doc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import { auth , db} from "../../firebase";
+import { auth, db } from "../../firebase";
+import logAudit from "../../services/auditlogFunction";
 
 const SignupScreen = () => {
   const [userData, setUserData] = React.useState({
@@ -25,27 +24,54 @@ const SignupScreen = () => {
     mobile: "",
   });
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     const { username, password, email, mobile } = userData;
     if (!username || !password || !email || !mobile) {
       Alert.alert("Please fill in all fields");
       return;
     }
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
-        const user = userCredential.user;
-        await setDoc(doc(db, "user", user.uid), {
-          username,
-          email,
-          mobile,
-          userType: false,
-        });
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        Alert.alert(errorMessage);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Save user data in Firestore
+      await setDoc(doc(db, "user", user.uid), {
+        username,
+        email,
+        mobile,
+        userType: false,
       });
+
+      // Log the sign-up action in the audit logs
+      await logAudit(
+        email,
+        null,          // No error message
+        user.uid,
+        "User Sign-Up",
+        user.uid,
+        "127.0.0.1",   // Example IP, replace with actual if available
+        "User account created",
+        "success"
+      );
+
+      console.log("Audit log created successfully.");
+    } catch (error) {
+      console.error("Error signing up user: ", error);
+      Alert.alert(error.message);
+
+      // Log the error in the audit logs
+      await logAudit(
+        email,
+        error.message,
+        null,
+        "User Sign-Up Failed",
+        null,
+        "127.0.0.1",
+        "Failed attempt",
+        "failure"
+      );
+    }
 
     setUserData({ username: "", password: "", email: "", mobile: "" });
   };
@@ -197,7 +223,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 4, height: 10 },
     shadowOpacity: 0.1,
     shadowColor: "#202A44",
-    gap: 10,  
+    gap: 10,
     paddingHorizontal: 10,
   },
   title: {
@@ -244,7 +270,7 @@ const styles = StyleSheet.create({
     elevation: 10,
     marginVertical: 20,
     height: 50,
-    justifyContent: "center", 
+    justifyContent: "center",
     alignItems: "center",
     shadowOffset: { width: 3, height: 10 },
     shadowOpacity: 0.2,

@@ -8,7 +8,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Alert } from "react-native";
 import { ThemeProvider } from "../src/cxt/theme";
-
+import { AuditContextProvider } from "../src/cxt/audit";
 const Layout = () => {
   const [inactivityTimeoutCount, setInactivityTimeoutCount] = useState(0);
   const [isActive, setIsActive] = useState(true); // to manage activity state
@@ -20,7 +20,7 @@ const Layout = () => {
       {
         text: "OK",
         onPress: () => {
-          console.log("User inactive, logging out...");
+          console.log("User inactive, logging out...") 
           signOut(auth)
             .then(() => {
               console.log("User logged out");
@@ -46,12 +46,14 @@ const Layout = () => {
     >
       {/* theme provider here, for the theme */}
     <ThemeProvider>
+    <AuditContextProvider>
       <ReportProvider>
         <UserProvider>
           <StatusBar style="dark" />
           <Slot />
         </UserProvider>
       </ReportProvider>
+      </AuditContextProvider>
     </ThemeProvider>
     </ReactNativeInactivity>
   );

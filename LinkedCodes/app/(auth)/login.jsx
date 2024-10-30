@@ -11,22 +11,58 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { Link } from "expo-router";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import ReactNativeBiometrics from 'react-native-biometrics';
+import {db} from "../../firebase"
+import { doc, setDoc } from "firebase/firestore";
+import { useUser } from "../../src/cxt/user";
+import logAudit from "../../services/auditlogFunction"
 
 const LoginScreen = () => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const {setUser} = useUser()
 
   const handleLogin = () => {
     if (email === "" || password === "") {
       alert("Please fill in all fields");
       return;
     }
+
     signInWithEmailAndPassword(getAuth(), email, password)
-      .then(() => {
+    .then((userCredential) => {
+      const user = userCredential.user;
+      
+      // Update user in context
+      setUser({
+        uid: user.uid,
+        email: user.email,
+        // Add additional fields if needed
+      });
+
+      // Log audit entry
+        logAudit(
+          email, 
+          null, // No error message on success
+          user.uid,
+          "login",
+          null, // No target ID
+          "N/A", // IP address
+          null, // No changes made
+          "success"
+        );
         // Redirect to the home screen
       })
       .catch((err) => {
         alert(err?.message);
+        // Log audit entry for failure
+        logAudit(
+          email, 
+          err?.message,
+          null, // User ID is null on failure
+          "login",
+          null, // No target ID
+          "N/A", // IP address
+          null, // No changes made
+          "failure")
       });
   };
 

@@ -4,7 +4,6 @@ import MapView, {Marker,Polyline} from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/FontAwesome';
 
 
@@ -235,7 +234,7 @@ const traffic = () => {
   if (!location) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        {warningMsg ? <Text>{warningMsg}</Text> : <ActivityIndicator size="large" color="#0000ff" />}
+        {warningMsg ? <Text>{warningMsg}</Text> : <ActivityIndicator size="large" color="#202A44" />}
       </View>
     );
   };
@@ -452,7 +451,7 @@ const traffic = () => {
 const styles = StyleSheet.create({
   trafficInfo: {
     padding: 10,
-    backgroundColor: '#EAF1FF',
+    backgroundColor: '#F2f9FB',
     borderRadius: 5,
   },
   trafficText: {

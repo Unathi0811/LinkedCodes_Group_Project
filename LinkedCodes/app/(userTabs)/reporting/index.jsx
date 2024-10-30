@@ -37,6 +37,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import { useRouter } from "expo-router";
 
 export default function Reporting() {
   const { latitude, longitude } = useLocation();
@@ -315,12 +316,17 @@ export default function Reporting() {
       </View>
     </TouchableOpacity>
   );
-
+  const router = useRouter();
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        <Text style={styles.Heading}>Reporting</Text>
-
+      <View style={styles.header}>
+        {/* Back Button */}
+        <TouchableOpacity onPress={() => router.push('/(userTabs)/home')} style={styles.backButton}>
+          <Icon name="arrow-left" size={20} color="#202A44" />
+        </TouchableOpacity>
+        <Text style={styles.headerApp}>InfraSmart</Text>
+      </View>
         {/* Modal for upload options */}
         <Modal transparent={true} visible={modalVisible} animationType="slide">
           <TouchableOpacity
@@ -505,10 +511,30 @@ export default function Reporting() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    backgroundColor: "#F2f9FB",
+  },
+  header: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignContent: "space-between",
     alignItems: "center",
+    padding: 20,
+    zIndex: 10,
+    backgroundColor: "#F2f9FB",
+    height: 100,
+    marginBottom: 45,
+  },
+  backButton: {
     padding: 10,
-    backgroundColor: "#EAF1FF",
+    marginRight: 10, 
+  },
+  headerApp: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "#202A44",
+    marginLeft: 130, 
   },
   image: {
     width: 200,
@@ -524,11 +550,6 @@ const styles = StyleSheet.create({
     width: "90%",
     marginTop: 10,
     padding: 5,
-  },
-  container2: {
-    flex: 2,
-    width: "100%",
-    backgroundColor: "#EAF1FF",
   },
   reportItem: {
     flexDirection: "row",

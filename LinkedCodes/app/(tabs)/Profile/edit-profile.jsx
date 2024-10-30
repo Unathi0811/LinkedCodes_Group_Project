@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {View,Text,TextInput,Button,Image,StyleSheet,TouchableOpacity,ScrollView, Pressable,} from "react-native";
+import {View,Text,TextInput,Button,Image,StyleSheet,TouchableOpacity,ScrollView, Pressable, Alert,} from "react-native";
 import { useUser } from "../../../src/cxt/user";
 import { auth, db } from "../../../firebase";
 import {doc,updateDoc,deleteDoc,addDoc,collection,} from "firebase/firestore";
@@ -77,27 +77,28 @@ const EditProfile = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      const currentUser = auth.currentUser;
+        const currentUser = auth.currentUser;
 
-      if (currentUser) {
-        // Delete user from Firebase Auth
-        await deleteUser(currentUser);
+        if (currentUser) {
+            // Delete user from Firebase Auth
+            await deleteUser(currentUser);
 
-        // Remove user data from Firestore
-        const userDoc = doc(db, "users", currentUser.uid);
-        await deleteDoc(userDoc);
+            // Remove user data from Firestore
+            const userDoc = doc(db, "user", currentUser.uid); // Updated to match your Firestore collection
+            await deleteDoc(userDoc);
 
-        // Sign out the user after deletion
-        await signOut(auth);
-        console.log("User account deleted and logged out");
-        alert("Your account has been deleted.");
-        // You can navigate to a login screen or homepage here
-      }
+            // Sign out the user after deletion
+            await auth.signOut(); // Ensure you're using the correct method to sign out
+            console.log("User account deleted and logged out");
+            Alert.alert("Your account has been deleted.");
+            // Navigate to login screen or homepage here
+            router.replace('/(auth)/login'); // Adjust the route as necessary
+        }
     } catch (error) {
-      console.error("Error deleting account:", error);
-      Alert.alert("Error", "Unable to delete account. Please try again.");
+        console.error("Error deleting account:", error);
+        Alert.alert("Error", "Unable to delete account. Please try again.");
     }
-  };
+};
 
   const confirmDeleteAccount = () => {
     Alert.alert(
@@ -299,7 +300,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   buttonText: {
-    color: "#202A44",
+    color: "red",
     fontWeight: "bold",
     marginLeft: 64,
     fontSize: 15,

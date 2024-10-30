@@ -349,7 +349,7 @@ function Reporting() {
           alignContent: "space-between"
         }}>
            {/* Back Button */}
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/Maintainance')} style={styles.backButton}>
             <Icon name="arrow-left" size={20} color="#202A44" />
           </TouchableOpacity>
           <Text style={styles.appName}>InfraSmart</Text>

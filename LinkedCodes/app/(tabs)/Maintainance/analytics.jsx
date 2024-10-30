@@ -12,7 +12,7 @@ const Analytics = () => {
       {/* Header */}
       <View style={styles.header}>
         {/* Back Button */}
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)/Maintainance')} style={styles.backButton}>
           <Icon name="arrow-left" size={20} color="#202A44" />
         </TouchableOpacity>
         <Text style={styles.headerApp}>InfraSmart</Text>
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     marginRight: 10, 
   },
   headerApp: {
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: "bold",
     color: "#202A44",
     marginLeft: 130, 

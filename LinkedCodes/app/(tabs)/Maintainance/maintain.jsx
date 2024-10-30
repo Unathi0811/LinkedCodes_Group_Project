@@ -17,7 +17,7 @@ const Mantain = () => {
       <View style={styles.headerContainer}>
         {/* Back Button */}
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.push('/(tabs)/Maintainance')}
           style={styles.backButton}
         >
           <Icon name="arrow-left" size={20} color="#202A44" />

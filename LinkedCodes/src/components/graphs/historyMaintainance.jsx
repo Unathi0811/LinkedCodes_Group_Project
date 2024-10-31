@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { PieChart } from "react-native-gifted-charts";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		padding: 20,
 		marginVertical: 10,
-		width: 370,
+		width: Platform.OS === "android" ? 370 : 340,
 		shadowColor: "#202A44",
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,

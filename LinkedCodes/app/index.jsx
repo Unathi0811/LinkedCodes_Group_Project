@@ -10,7 +10,6 @@ const Layout = () => {
 
 	getAuth(app).onAuthStateChanged(async (user) => {
 		if (!user) return router.replace("/(auth)");
-
 		try {
 			const docRef = doc(db, "user", user.uid);
 			const docSnap = await getDoc(docRef);

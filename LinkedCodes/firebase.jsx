@@ -8,7 +8,6 @@ import {
 import { getStorage } from "firebase/storage";
 
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyACLcDYK4lKrHdwbBnJy2Omp4dJq3Uq3M0",
@@ -25,13 +24,11 @@ const app = initializeApp(firebaseConfig, {
 	automaticDataCollectionEnabled: false,
 });
 
-let auth = getAuth();
-
-if (!auth) {
+let
 	auth = initializeAuth(app, {
 		persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 	});
-}
+
 
 // Initialize Cloud Firestore and get a reference to the service
 const db = initializeFirestore(app, {

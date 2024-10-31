@@ -93,7 +93,6 @@ export default function Reporting() {
         console.log("Error loading reports from Firestore: ", error);
       }
     );
-
     return unsubscribe; // Return unsubscribe function
   };
 
@@ -167,10 +166,21 @@ export default function Reporting() {
   const submitReport = async () => {
     if (image && input && userId && urgency) {
       try {
-        // const newReportId = uuidv4();
         setLoading(true);
+
+        // Determine report_type and accident_report based on selected category
+        let reportType = null;
+        let accidentReport = false;
+
+        if (category === "Accident") {
+          accidentReport = true; // Set to true if category is Accident
+        } else if (category === "Road") {
+          reportType = "Road"; // Set report_type to Road
+        } else if (category === "Bridge") {
+          reportType = "Bridge"; // Set report_type to Bridge
+        }
+
         const newReport = {
-          // id: newReportId,
           image, // Save the local image URI for now
           description: input,
           timestamp: new Date(),
@@ -178,6 +188,8 @@ export default function Reporting() {
           longitude,
           userId, // Include the authenticated user's ID
           urgency,
+          report_type: reportType, // Set report_type based on selected category
+          accident_report: accidentReport, // Set accident_report based on selected category
         };
 
         // Check network status
@@ -340,7 +352,13 @@ export default function Reporting() {
           </TouchableOpacity>
           <Text style={styles.headerApp}>InfraSmart</Text>
         </View>
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, alignContent: "center",
+          alignItems: "center", }} style={{ 
+          flex: 1,
+          backgroundColor: "#F2f9FB",
+          marginTop: 10,
+          height: "auto",
+          }}>
           {/* Modal for upload options */}
           <Modal
             transparent={true}
@@ -427,6 +445,9 @@ export default function Reporting() {
                 inputIOS: styles.pickerInput,
                 inputAndroid: styles.pickerInput,
                 iconContainer: styles.iconContainer,
+                done: {
+                  color: '#202A44', 
+                },
               }}
               useNativeAndroidPickerStyle={false}
               Icon={() => {
@@ -443,15 +464,18 @@ export default function Reporting() {
             <RNPickerSelect
               onValueChange={(value, index) => setCategory(value)}
               items={[
-                { label: "Accident", value: "Accident", key: "Accident" },
-                { label: "Road", value: "Road", key: "Road" },
-                { label: "Bridge", value: "Bridge", key: "Bridge" },
+                { label: "Accident", value: "Accident", key: "Accident", color: "#202A44" },
+                { label: "Road", value: "Road", key: "Road", color: "#202A44" },
+                { label: "Bridge", value: "Bridge", key: "Bridge", color: "#202A44" },
               ]}
               placeholder={{ label: "Select a category...", value: null }}
               style={{
                 inputIOS: styles.pickerInput,
                 inputAndroid: styles.pickerInput,
                 iconContainer: styles.iconContainer,
+                done: {
+                  color: '#202A44', 
+                },
               }}
               useNativeAndroidPickerStyle={false}
               Icon={() => {
@@ -533,14 +557,18 @@ export default function Reporting() {
           </Modal>
           {/* Historical Reports */}
           <View style={styles.container2}>
-            <Text style={{
-            fontSize: 20,
-    marginTop: 10,
-    marginRight: 95,
-    marginBottom: 15,
-    color: "#202A44",
-    fontWeight: "bold",
-            }}>HISTORICAL REPORTS</Text>
+            <Text
+              style={{
+                fontSize: 20,
+                marginTop: 10,
+                marginRight: 95,
+                marginBottom: 15,
+                color: "#202A44",
+                fontWeight: "bold",
+              }}
+            >
+              HISTORICAL REPORTS
+            </Text>
             <FlatList
               data={reports}
               keyExtractor={(item) => item.id}
@@ -559,8 +587,12 @@ export default function Reporting() {
                       <Text style={styles.urgency}>
                         Urgency: {item.urgency}
                       </Text>
-                      <Text style={styles.urgency}>
-                        Urgency: {item.urgency}
+                      <Text style={styles.category}>
+                        Report Type: {item.report_type}
+                      </Text>
+                      <Text style={styles.accidentReport}>
+                        Accident Report: {item.accident_report ? "Yes" : "No"}
+                        {/* Display accident report status */}
                       </Text>
                     </View>
                     <TouchableOpacity
@@ -572,6 +604,7 @@ export default function Reporting() {
                 </TouchableOpacity>
               )}
               nestedScrollEnabled={true}
+              
             />
           </View>
         </ScrollView>
@@ -581,14 +614,14 @@ export default function Reporting() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F2f9FB",
-    alignContent: "center",
-    alignItems: "center",
-    marginTop: 10,
-    height: "auto",
-  },
+  // container: {
+    // flex: 1,
+    // backgroundColor: "#F2f9FB",
+    // alignContent: "center",
+    // alignItems: "center",
+    // marginTop: 10,
+    // height: "auto",
+  // },
   header: {
     position: "absolute",
     left: 0,
@@ -770,7 +803,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   categoryLabel: {
-  fontSize: 20,
+    fontSize: 20,
     marginTop: 20,
     marginRight: 45,
     color: "#202A44",
@@ -827,6 +860,6 @@ const styles = StyleSheet.create({
     right: 10, // Align to the right
   },
   container2: {
-  marginTop: 10,
-  }
+    marginTop: 10,
+  },
 });

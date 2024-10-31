@@ -10,16 +10,16 @@ import {
   FlatList,
   Modal,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/Feather";
 import React, { useState, useEffect } from "react";
-//import { v4 as uuidv4 } from "uuid"; // For generating unique filenames
 import useLocation from "../../../src/components/useLocation";
-import NetInfo from "@react-native-community/netinfo"; // To detect online status
+import NetInfo from "@react-native-community/netinfo";
 import { Overlay } from "@rneui/themed";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // For offline storage
-import { db, storage } from "../../../firebase"; // Import Firebase
+import { db, storage } from "../../../firebase";
 import {
   collection,
   onSnapshot,
@@ -36,9 +36,11 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-import { getAuth } from "firebase/auth"; // Import Firebase Auth
-import {Link } from 'expo-router'
+import { getAuth } from "firebase/auth";
+import { Link } from "expo-router";
 import { useRouter } from "expo-router";
+import RNPickerSelect from "react-native-picker-select";
+import Icon2 from "react-native-vector-icons/MaterialIcons";
 
 export default function Reporting() {
   const { latitude, longitude } = useLocation();
@@ -51,6 +53,7 @@ export default function Reporting() {
   const [modalVisible2, setModalVisible2] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [urgency, setUrgency] = useState("Low"); // Default urgency level
+  const [category, setCategory] = useState("Accident");
   const [loading, setLoading] = useState(false); // For submit button loading
   const [imageLoading, setImageLoading] = useState(true); // For image loading
 
@@ -318,195 +321,260 @@ export default function Reporting() {
     </TouchableOpacity>
   );
   const router = useRouter();
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.container}>
-      <View style={styles.header}>
-        {/* Back Button */}
-        <TouchableOpacity onPress={() => router.push('/(userTabs)/home')} style={styles.backButton}>
-          <Icon name="arrow-left" size={20} color="#202A44" />
-        </TouchableOpacity>
-        <Text style={styles.headerApp}>InfraSmart</Text>
-      </View>
-        {/* Modal for upload options */}
-        <Modal transparent={true} visible={modalVisible} animationType="slide">
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#F2f9FB",
+        }}
+      >
+        <View style={styles.header}>
+          {/* Back Button */}
           <TouchableOpacity
-            style={styles.modalBackground}
-            onPress={() => setModalVisible(false)}
+            onPress={() => router.push("/(userTabs)/home")}
+            style={styles.backButton}
           >
-            <TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
-              <Text style={styles.modalHeader}>Upload Options</Text>
-              <View style={styles.modalButtons}>
-                <View style={styles.modalButtonsin}>
-                  <TouchableOpacity onPress={() => uploadImage("camera")}>
-                    <Icon name="camera" size={40} color={"#000"} />
-                    <Text style={styles.icontext}>Camera</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.modalButtonsin}>
-                  <TouchableOpacity onPress={() => uploadImage("gallery")}>
-                    <Icon name="image" size={40} color={"#000"} />
-                    <Text style={styles.icontext}>Gallery</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.modalButtonsin}>
-                  <TouchableOpacity onPress={removeImage}>
-                    <Icon name="trash-2" size={40} color={"#000"} />
-                    <Text style={styles.icontext}>Remove</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.buttonText}>Close</Text>
-              </TouchableOpacity>
-            </TouchableOpacity>
+            <Icon name="arrow-left" size={20} color="#202A44" />
           </TouchableOpacity>
-        </Modal>
-
-        {/* Report Submission UI */}
-        <Text style={styles.imageheader}>Upload Image</Text>
-        {image ? (
-          <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Image source={{ uri: image }} style={styles.image} />
-          </TouchableOpacity>
-        ) : (
-          <Icon
-            onPress={() => setModalVisible(true)}
-            name="camera"
-            size={70}
-            color={"#000"}
-          />
-        )}
-
-        <TextInput
-          multiline
-          keyboardType="default"
-          value={input}
-          onChangeText={setInput}
-          style={styles.input}
-          placeholder="Description"
-        />
-        {/*this is the urgency dropdown*/}
-
-        <Text style={styles.urgencyLabel}>Select Urgency Level:</Text>
-        <View style={styles.urgencyDropdown}>
-          <TouchableOpacity
-            onPress={() => setUrgency("Low")}
-            style={styles.urgencyOption(urgency === "Low")}
-          >
-            <Text>Low</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setUrgency("Medium")}
-            style={styles.urgencyOption(urgency === "Medium")}
-          >
-            <Text>Medium</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setUrgency("High")}
-            style={styles.urgencyOption(urgency === "High")}
-          >
-            <Text>High</Text>
-          </TouchableOpacity>
+          <Text style={styles.headerApp}>InfraSmart</Text>
         </View>
-        <TouchableOpacity style={styles.button} onPress={submitReport}>
-        {loading ? (
-        <ActivityIndicator size="small" color="#EAF1FF" />
-      ) : (
-        <Text><Text style={styles.buttonText}>Submit Report</Text></Text>
-      )}
-        </TouchableOpacity>
-        <Link href="/(userTabs)/reporting/userChat" asChild>
-    <TouchableOpacity>
-      <Text>User Chat</Text>
-    </TouchableOpacity>
-  </Link>
-
-        {/* Historical Reports */}
-        <View style={styles.container2}>
-          <Text style={styles.Heading2}>Historical Reports</Text>
-          <FlatList
-            data={reports}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => openReportDetails(item)}>
-                <View style={styles.reportItem}>
-                  <Image
-                    source={{ uri: item.image }}
-                    style={styles.imageThumbnail}
-                  />
-                  <View style={styles.textContainer}>
-                    <Text style={styles.description}>{item.description}</Text>
-                    <Text style={styles.timestamp}>
-                      {item.timestamp.toDate().toLocaleString()}
-                    </Text>
-                    <Text style={styles.urgency}>Urgency: {item.urgency}</Text>
+        <ScrollView contentContainerStyle={styles.container}>
+          {/* Modal for upload options */}
+          <Modal
+            transparent={true}
+            visible={modalVisible}
+            animationType="slide"
+          >
+            <TouchableOpacity
+              style={styles.modalBackground}
+              onPress={() => setModalVisible(false)}
+            >
+              <TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
+                <Text style={styles.modalHeader}>Upload Options</Text>
+                <View style={styles.modalButtons}>
+                  <View style={styles.modalButtonsin}>
+                    <TouchableOpacity onPress={() => uploadImage("camera")}>
+                      <Icon name="camera" size={40} color={"#000"} />
+                      <Text style={styles.icontext}>Camera</Text>
+                    </TouchableOpacity>
                   </View>
-                  <TouchableOpacity
-                    onPress={() => deleteReport(item.id, item.image)}
-                  >
-                    <Icon name="trash" size={24} color="#000" />
-                  </TouchableOpacity>
+                  <View style={styles.modalButtonsin}>
+                    <TouchableOpacity onPress={() => uploadImage("gallery")}>
+                      <Icon name="image" size={40} color={"#000"} />
+                      <Text style={styles.icontext}>Gallery</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.modalButtonsin}>
+                    <TouchableOpacity onPress={removeImage}>
+                      <Icon name="trash-2" size={40} color={"#000"} />
+                      <Text style={styles.icontext}>Remove</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-
-        {/* Overlay for error messages */}
-
-        <Overlay
-          isVisible={visible}
-          onBackdropPress={toggleOverlay}
-          overlayStyle={styles.overlay}
-        >
-          <View style={styles.overlayContent}>
-            <Icon
-              name="info"
-              size={50}
-              color="#000"
-              style={styles.overlayIcon}
-            />
-            <Text style={styles.overlayText}>{overlayMessage}</Text>
-          </View>
-        </Overlay>
-
-        {/* Modal for report details */}
-        <Modal transparent={true} visible={modalVisible2} animationType="slide">
-          <TouchableOpacity
-            style={styles.modalBackground}
-            onPress={() => setModalVisible2(false)}
-          >
-            <TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
-              {selectedReport && (
-                <>
-                  <Text style={styles.modalHeader}>Report Details</Text>
-                  <Text style={styles.description}>
-                    Description: {selectedReport.description}
-                  </Text>
-                  <Text style={styles.timestamp}>
-                    Date: {selectedReport.timestamp.toDate().toLocaleString()}
-                  </Text>
-                  <Text style={styles.urgency}>
-                    Urgency: {selectedReport.urgency}
-                  </Text>
-                  <Text style={styles.status}>
-                    Status: {selectedReport.status || "No Status"}
-                  </Text>
-                </>
-              )}
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => setModalVisible2(false)}
-              >
-                <Text style={styles.buttonText}>Close</Text>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
               </TouchableOpacity>
             </TouchableOpacity>
+          </Modal>
+
+          {/* Report Submission UI */}
+          <Text style={styles.imageheader}>UPLOAD IMAGE</Text>
+
+          {image ? (
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Image source={{ uri: image }} style={styles.image} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Icon name="camera" size={40} color={"#000"} />
+            </TouchableOpacity>
+          )}
+
+          <Text style={styles.descriptionText}>DESCRIPTION</Text>
+          <TextInput
+            multiline
+            keyboardType="default"
+            value={input}
+            onChangeText={setInput}
+            style={styles.input}
+            placeholder="write the description here"
+            numberOfLines={2}
+          />
+          {/*this is the urgency dropdown*/}
+
+          <Text style={styles.urgencyLabel}>SELECT URGENCY LEVEL</Text>
+          <View style={styles.urgencyDropdown}>
+            <RNPickerSelect
+              onValueChange={(value, index) => setUrgency(value)}
+              items={[
+                { label: "Low", value: "Low", key: "Low", color: "#00FF00" },
+                {
+                  label: "Medium",
+                  value: "Medium",
+                  key: "Medium",
+                  color: "#FFFF00",
+                },
+                { label: "High", value: "High", key: "High", color: "#FF0000" },
+              ]}
+              placeholder={{ label: "Select urgency...", value: null }}
+              style={{
+                inputIOS: styles.pickerInput,
+                inputAndroid: styles.pickerInput,
+                iconContainer: styles.iconContainer,
+              }}
+              useNativeAndroidPickerStyle={false}
+              Icon={() => {
+                return (
+                  <Icon2 name="arrow-drop-down" size={24} color="#202A44" />
+                );
+              }}
+              itemKey="key"
+            />
+          </View>
+
+          <Text style={styles.categoryLabel}>SELECT REPORT CATEGORY</Text>
+          <View style={styles.urgencyDropdown}>
+            <RNPickerSelect
+              onValueChange={(value, index) => setCategory(value)}
+              items={[
+                { label: "Accident", value: "Accident", key: "Accident" },
+                { label: "Road", value: "Road", key: "Road" },
+                { label: "Bridge", value: "Bridge", key: "Bridge" },
+              ]}
+              placeholder={{ label: "Select a category...", value: null }}
+              style={{
+                inputIOS: styles.pickerInput,
+                inputAndroid: styles.pickerInput,
+                iconContainer: styles.iconContainer,
+              }}
+              useNativeAndroidPickerStyle={false}
+              Icon={() => {
+                return (
+                  <Icon2 name="arrow-drop-down" size={24} color="#202A44" />
+                );
+              }}
+              itemKey="key"
+            />
+          </View>
+
+          <TouchableOpacity style={styles.button} onPress={submitReport}>
+            {loading ? (
+              <ActivityIndicator size="small" color="#EAF1FF" />
+            ) : (
+              <Text>
+                <Text style={styles.buttonText}>Submit Report</Text>
+              </Text>
+            )}
           </TouchableOpacity>
-        </Modal>
+          <Link href="/(userTabs)/reporting/userChat" asChild>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>User Chat</Text>
+            </TouchableOpacity>
+          </Link>
+          {/* Overlay for error messages */}
+          <Overlay
+            isVisible={visible}
+            onBackdropPress={toggleOverlay}
+            overlayStyle={styles.overlay}
+          >
+            <View style={styles.overlayContent}>
+              <Icon
+                name="info"
+                size={50}
+                color="#000"
+                style={styles.overlayIcon}
+              />
+              <Text style={styles.overlayText}>{overlayMessage}</Text>
+            </View>
+          </Overlay>
+
+          {/* Modal for report details */}
+          <Modal
+            transparent={true}
+            visible={modalVisible2}
+            animationType="slide"
+          >
+            <TouchableOpacity
+              style={styles.modalBackground}
+              onPress={() => setModalVisible2(false)}
+            >
+              <TouchableOpacity activeOpacity={1} style={styles.modalContainer}>
+                {selectedReport && (
+                  <>
+                    <Text style={styles.modalHeader}>Report Details</Text>
+                    <Text style={styles.description}>
+                      Description: {selectedReport.description}
+                    </Text>
+                    <Text style={styles.timestamp}>
+                      Date: {selectedReport.timestamp.toDate().toLocaleString()}
+                    </Text>
+                    <Text style={styles.urgency}>
+                      Urgency: {selectedReport.urgency}
+                    </Text>
+                    <Text style={styles.status}>
+                      Status: {selectedReport.status || "No Status"}
+                    </Text>
+                  </>
+                )}
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => setModalVisible2(false)}
+                >
+                  <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          </Modal>
+          {/* Historical Reports */}
+          <View style={styles.container2}>
+            <Text style={{
+            fontSize: 20,
+    marginTop: 10,
+    marginRight: 95,
+    marginBottom: 15,
+    color: "#202A44",
+    fontWeight: "bold",
+            }}>HISTORICAL REPORTS</Text>
+            <FlatList
+              data={reports}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => openReportDetails(item)}>
+                  <View style={styles.reportItem}>
+                    <Image
+                      source={{ uri: item.image }}
+                      style={styles.imageThumbnail}
+                    />
+                    <View style={styles.textContainer}>
+                      <Text style={styles.description}>{item.description}</Text>
+                      <Text style={styles.timestamp}>
+                        {item.timestamp.toDate().toLocaleString()}
+                      </Text>
+                      <Text style={styles.urgency}>
+                        Urgency: {item.urgency}
+                      </Text>
+                      <Text style={styles.urgency}>
+                        Urgency: {item.urgency}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => deleteReport(item.id, item.image)}
+                    >
+                      <Icon name="trash" size={24} color="#000" />
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              )}
+              nestedScrollEnabled={true}
+            />
+          </View>
+        </ScrollView>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -516,6 +584,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F2f9FB",
+    alignContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+    height: "auto",
   },
   header: {
     position: "absolute",
@@ -528,38 +600,40 @@ const styles = StyleSheet.create({
     zIndex: 10,
     backgroundColor: "#F2f9FB",
     height: 100,
-    marginBottom: 45,
+    marginBottom: 5,
+    borderBlockEndColor: "#ccc",
   },
   backButton: {
     padding: 10,
-    marginRight: 10, 
+    marginRight: 10,
   },
   headerApp: {
     fontSize: 25,
     fontWeight: "bold",
     color: "#202A44",
-    marginLeft: 130, 
+    marginLeft: 130,
   },
   image: {
-    width: 200,
-    height: 200,
+    width: 330,
+    height: 100,
     marginTop: 20,
-    borderRadius: 50,
+    borderRadius: 10,
+  },
+  placeholderBackground: {
+    width: 300,
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
   },
   input: {
-    borderColor: "#000",
-    
+    borderColor: "#202A44",
     height: 100,
-    
     width: "90%",
     marginTop: 10,
-    padding: 12,
     backgroundColor: "#fff",
     borderRadius: 12,
     padding: 12,
-   
     elevation: 5,
-    
     fontSize: 16,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
@@ -570,7 +644,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 50,
+    marginBottom: 10,
     padding: 10,
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -582,6 +656,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowColor: "#202A44",
+    height: 200,
+    width: 300,
   },
   imageThumbnail: {
     width: 100,
@@ -607,7 +683,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   button: {
-    padding:12,
+    padding: 12,
     backgroundColor: "#202A44",
     borderRadius: 12,
     marginTop: 20,
@@ -623,11 +699,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowColor: "#202A44",
-    
   },
   buttonText: {
     fontSize: 18,
-
     color: "#fff",
   },
   modalBackground: {
@@ -676,6 +750,31 @@ const styles = StyleSheet.create({
   },
   imageheader: {
     fontSize: 20,
+    marginTop: 104,
+    marginRight: 185,
+    color: "#202A44",
+    fontWeight: "bold",
+  },
+  descriptionText: {
+    fontSize: 20,
+    marginTop: 20,
+    marginRight: 185,
+    color: "#202A44",
+    fontWeight: "bold",
+  },
+  urgencyLabel: {
+    fontSize: 20,
+    marginTop: 20,
+    marginRight: 75,
+    color: "#202A44",
+    fontWeight: "bold",
+  },
+  categoryLabel: {
+  fontSize: 20,
+    marginTop: 20,
+    marginRight: 45,
+    color: "#202A44",
+    fontWeight: "bold",
   },
   overlay: {
     width: "80%",
@@ -704,23 +803,30 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: "bold",
   },
-  urgencyOption: (isSelected) => ({
-    padding: 10,
-    borderWidth: 1,
-    borderColor: isSelected ? "#202A44" : "grey", // Highlight selected option
-    backgroundColor: isSelected ? "#BFDBF7" : "#EAF1FF",
-    marginVertical: 5,
-    borderRadius: 5,
-  }),
-
-  urgencyLabel: {
-    marginTop: 10,
-    marginBottom: 5,
-  },
-
   urgencyDropdown: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    width: "100%",
   },
+  pickerInput: {
+    borderColor: "#202A44",
+    height: 50,
+    width: 330,
+    marginTop: 10,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 12,
+    elevation: 5,
+    fontSize: 16,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowColor: "#202A44",
+  },
+  iconContainer: {
+    top: 10, // Adjust the position of the arrow icon
+    right: 10, // Align to the right
+  },
+  container2: {
+  marginTop: 10,
+  }
 });

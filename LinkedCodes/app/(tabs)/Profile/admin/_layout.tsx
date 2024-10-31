@@ -5,15 +5,17 @@ import { useUser } from "../../../../src/cxt/user";
 const Layout = () => {
   const { user } = useUser();
 
-  if (!user?.admin) return <Redirect href="/(tabs)/Profile" />
+  if (!user?.admin) return <Redirect href="/(tabs)/Profile" />;
 
   return (
     <>
-      <Stack screenOptions={{ headerShown: true,
-      headerTintColor: "#202A44",
-      headerBackTitleVisible: false,
-      
-       }} />
+      <Stack
+        screenOptions={{
+          headerShown: true,
+          headerTintColor: "#202A44",
+          headerBackTitleVisible: false,
+        }}
+      />
     </>
   );
 };

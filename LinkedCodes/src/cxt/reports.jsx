@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 
 // Create a report context
-const ReportContext = createContext(null); 
+const ReportContext = createContext(null);  // Initialize with null to check if context is provided
 
 // Create a Report Provider component
 export const ReportProvider = ({ children }) => {

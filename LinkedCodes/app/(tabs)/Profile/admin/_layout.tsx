@@ -9,7 +9,11 @@ const Layout = () => {
 
   return (
     <>
-      <Stack screenOptions={{ headerShown: true }} />
+      <Stack screenOptions={{ headerShown: true,
+      headerTintColor: "#202A44",
+      headerBackTitleVisible: false,
+      
+       }} />
     </>
   );
 };

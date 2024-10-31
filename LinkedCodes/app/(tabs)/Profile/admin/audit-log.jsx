@@ -72,7 +72,9 @@ const AdminAuditLogs = () => {
     );
     
     return ( 
-        <>
+        <View style={{
+            backgroundColor: "#F2f9FB"
+        }}>
         {/* <Stack.Screen
         options={{
           headerTitle: "Audit Log",
@@ -86,7 +88,7 @@ const AdminAuditLogs = () => {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContainer}
         />
-        </>  
+        </View>  
     );
 };
 
@@ -103,9 +105,10 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         shadowColor: '#202A44',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0.5,
         shadowRadius: 4,
         elevation: 3, 
+        width: "100%"
     },
     logEntry: {
         flexDirection: 'row',
@@ -114,16 +117,18 @@ const styles = StyleSheet.create({
     },
     label: {
         fontWeight: 'bold',
-        color: '#333',
+        color: '#202A44',
     },
     value: {
-        color: '#555',
+        color: '#ccc',
     },
     errorText: {
         color: 'red',
     },
     listContainer: {
         paddingBottom: 16,
+        padding: 10,
+        backgroundColor: "#F2f9FB"
     },
 });
 

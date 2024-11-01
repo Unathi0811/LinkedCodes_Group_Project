@@ -1,6 +1,8 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, {useState} from 'react'
 import { Link, useRouter } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { auth } from '../../../../firebase'
 
 // our benefits, what they get when they upgrade, how wmuch it is per year/
 //headerShown: true
@@ -23,6 +25,14 @@ const Index = () => {
     nextYearDate.setFullYear(currentDate.getFullYear() + 1); // Adds 1 year to the curent year
     const formattedDate = nextYearDate.toLocaleDateString();
     const router = useRouter()
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [showAd, setShowAd] = useState(false);
+    const userId = auth.currentUser ? auth.currentUser.uid : null;
+
+    const handleProceedToCheckout = async () => {
+      await AsyncStorage.setItem(`isSubscribed_${userId}`, 'true');
+      setIsSubscribed(true);
+      setShowAd(false);};
     return (
       <View className="flex-1 bg-[#F2f9FB] p-6 ">
       {/* Premium Header */}
@@ -51,7 +61,7 @@ const Index = () => {
 
       {/* Proceed to Checkout Button */}
       <Link href="/(payment)/" asChild>
-        <TouchableOpacity
+        <TouchableOpacity onPress={handleProceedToCheckout}
           className="bg-[#202A44] text-white font-bold py-3 px-6 rounded-lg mb-4"
         >
           <Text className="text-white text-lg text-center">Proceed To Checkout</Text>

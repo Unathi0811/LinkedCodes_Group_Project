@@ -205,8 +205,8 @@ export default function Reporting() {
 
 				const imageUrl = await getDownloadURL(imageRef);
 				newReport.image = imageUrl; // Update image URL after upload
-          const imageUrl = await getDownloadURL(imageRef);
-          newReport.image = imageUrl; // Update image URL after upload
+        //   const imageUrl = await getDownloadURL(imageRef);
+        //   newReport.image = imageUrl; // Update image URL after upload
 
 				// Add the new report to Firestore
 				await addDoc(collection(db, "reports"), newReport);
@@ -219,18 +219,19 @@ export default function Reporting() {
           // Add the new report to Firestore
           await addDoc(collection(db, "reports"), newReport);
           setLoading(false);
-        } else {
-          // If offline, save the report locally using AsyncStorage
-          const storedReports = await AsyncStorage.getItem("offlineReports");
-          const reportsArray = storedReports ? JSON.parse(storedReports) : [];
-          reportsArray.push(newReport);
+        } 
+		// else {
+        //   // If offline, save the report locally using AsyncStorage
+        //   const storedReports = await AsyncStorage.getItem("offlineReports");
+        //   const reportsArray = storedReports ? JSON.parse(storedReports) : [];
+        //   reportsArray.push(newReport);
 
-          await AsyncStorage.setItem(
-            "offlineReports",
-            JSON.stringify(reportsArray)
-          );
-          console.log("Report saved offline");
-        }
+        //   await AsyncStorage.setItem(
+        //     "offlineReports",
+        //     JSON.stringify(reportsArray)
+        //   );
+        //   console.log("Report saved offline");
+        // }
 
         // Clear input and close modal
         setImage(null);

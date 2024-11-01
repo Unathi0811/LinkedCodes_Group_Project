@@ -1,94 +1,136 @@
-import React, { useState } from 'react'; 
-import { View, Text, TextInput, Button, Modal, StyleSheet, Dimensions, Pressable} from 'react-native';
+import React, { useState, useEffect } from 'react'; 
+import { View, Text, TextInput, Modal, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { Agenda } from 'react-native-calendars';
+import { auth, db } from '../../firebase'; // Ensure you have initialized Firebase correctly
+import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
 
 const Calendar = () => {
   const [items, setItems] = useState({});
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Set to current date
   const [modalVisible, setModalVisible] = useState(false);
   const [newActivity, setNewActivity] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [markedDates, setMarkedDates] = useState({}); // For marking dates with activities
 
-  // Load items for the calendar dates
-  const loadItems = (day) => {
-    setTimeout(() => {
-      const newItems = { ...items };
-      for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-        const strTime = timeToString(time);
-        if (!newItems[strTime]) {
-          newItems[strTime] = [];
-        }
+  useEffect(() => {
+    loadItems({ timestamp: Date.now() }); // Load items for the current month on mount
+  }, []);
+
+  const loadItems = async (day) => {
+    const userId = auth.currentUser.uid;
+    const startDate = timeToString(day.timestamp - (day.timestamp % (24 * 60 * 60 * 1000)));
+    const endDate = timeToString(day.timestamp + (24 * 60 * 60 * 1000));
+
+    // Fetch activities for the authenticated user
+    const q = query(
+      collection(db, 'activities'), 
+      where('userId', '==', userId), 
+      
+    );
+
+    const querySnapshot = await getDocs(q);
+    const newItems = {};
+    const newMarkedDates = {};
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (!newItems[data.date]) {
+        newItems[data.date] = [];
       }
-      setItems(newItems);
-    }, 1000);
+      newItems[data.date].push({ name: data.name, height: 50 });
+
+      // Mark this date as having an activity
+      newMarkedDates[data.date] = { marked: true, dotColor: '#FFD700' };
+    });
+
+    setItems((prevItems) => ({ ...prevItems, ...newItems }));
+    setMarkedDates((prevMarkedDates) => ({ ...prevMarkedDates, ...newMarkedDates }));
   };
 
-  // Convert timestamp to string date (YYYY-MM-DD)
-  const timeToString = (time) => {
-    const date = new Date(time);
-    return date.toISOString().split('T')[0];
-  };
-
-  // Handle adding a new activity
-  const addActivity = () => {
+  const addActivity = async () => {
     if (newActivity.trim() !== '') {
-      const newItems = { ...items };
-      if (!newItems[selectedDate]) {
-        newItems[selectedDate] = [];
-      }
-      newItems[selectedDate].push({
+      setLoading(true); // Start loading
+      const userId = auth.currentUser.uid;
+
+      // Add activity to Firestore
+      await addDoc(collection(db, 'activities'), {
+        userId,
+        date: selectedDate,
         name: newActivity,
-        height: 50,
       });
-      setItems(newItems);
-      setModalVisible(false); // Close modal
-      setNewActivity(''); // Reset the input field
+
+      // Update items and marked dates state
+      setItems((prevItems) => {
+        const newItems = { ...prevItems };
+        if (!newItems[selectedDate]) {
+          newItems[selectedDate] = [];
+        }
+        newItems[selectedDate].push({ name: newActivity, height: 50 });
+        return newItems;
+      });
+
+      // Update marked dates
+      setMarkedDates((prevMarkedDates) => ({
+        ...prevMarkedDates,
+        [selectedDate]: { marked: true, dotColor: '#fff' },
+      }));
+
+      setModalVisible(false);
+      setNewActivity('');
+      setLoading(false); // Stop loading
     }
   };
 
-  // Render the agenda
+  const timeToString = (time) => {
+    const date = new Date(time);
+    return date.toISOString().split('T')[0]; // Format YYYY-MM-DD
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.calendarCard}>
         <Agenda
           items={items}
           loadItemsForMonth={loadItems}
-          selected={selectedDate || '2024-09-05'}
+          selected={selectedDate}
           onDayPress={(day) => {
-            setSelectedDate(day.dateString); // Set the clicked date
-            setModalVisible(true); // Open the modal to add activity
+            setSelectedDate(day.dateString);
+            setModalVisible(true);
           }}
           renderItem={(item) => (
             <View style={styles.item}>
               <Text>{item.name}</Text>
             </View>
           )}
-          renderEmptyDate={() => (
-            <View style={styles.emptyDate}>
-              <Text>No activities for this date</Text>
-            </View>
-          )}
+          renderEmptyDate={() => {
+            const activities = items[selectedDate] || [];
+            console.log('Selected Date:', selectedDate);
+            console.log('Activities for Selected Date:', activities);
+            return (
+              <View style={styles.emptyDate}>
+                <Text>{activities.length === 0 ? 'No activities for this date' : ''}</Text>
+              </View>
+            );
+          }}
           rowHasChanged={(r1, r2) => r1.name !== r2.name}
-          
-          // Theme for the calendar
+          markedDates={markedDates} // Use markedDates to show dots
           theme={{
-            backgroundColor: '#202A44', // background
-            calendarBackground: '#202A44', // calendar background
-            textSectionTitleColor: '#FFFFFF', // section titles (weekdays)
-            selectedDayBackgroundColor: '#202A44', // selected day
-            selectedDayTextColor: '#202A44', // text on selected day
-            todayTextColor: '#FFD700', // text for today's date
-            dayTextColor: '#FFFFFF', // dates text
-            textDisabledColor: '#808080', // for disabled dates
-            dotColor: '#FFD700', // dot for days with items
-            selectedDotColor: '#202A44', // dot for selected day
-            arrowColor: '#FFD700', // arrows
-            monthTextColor: '#FFFFFF', // month text
+            backgroundColor: '#202A44',
+            calendarBackground: '#202A44',
+            textSectionTitleColor: '#FFFFFF',
+            selectedDayBackgroundColor: '#fff',
+            selectedDayTextColor: '#202A44',
+            todayTextColor: '#FFD700',
+            dayTextColor: '#FFFFFF',
+            textDisabledColor: '#808080',
+            dotColor: '#FFD700',
+            selectedDotColor: '#202A44',
+            arrowColor: '#FFD700',
+            monthTextColor: '#FFFFFF',
           }}
         />
       </View>
 
-      {/* Modal for adding a new activity */}
       <Modal visible={modalVisible} animationType="slide">
         <View style={styles.modalContent}>
           <Text style={styles.title}>ACTIVITY</Text>
@@ -103,14 +145,18 @@ const Calendar = () => {
             numberOfLines={5}
           />
 
-        <View style={styles.buttons}>
-            <Pressable style={styles.button} onPress={addActivity}>
-              <Text style={styles.buttonText}>Add Activity</Text>
-            </Pressable>
-            <Pressable style={styles.button} onPress={() => setModalVisible(false)}>
-              <Text style={styles.buttonText}>Close</Text>
-            </Pressable>
-        </View>
+          {loading ? ( // Show loading indicator while adding activity
+            <ActivityIndicator size="large" color="#202A44" />
+          ) : (
+            <View style={styles.buttons}>
+              <Pressable style={styles.button} onPress={addActivity}>
+                <Text style={styles.buttonText}>Add Activity</Text>
+              </Pressable>
+              <Pressable style={styles.button} onPress={() => setModalVisible(false)}>
+                <Text style={styles.buttonText}>Close</Text>
+              </Pressable>
+            </View>
+          )}
         </View>
       </Modal>
     </View>
@@ -195,3 +241,4 @@ const styles = StyleSheet.create({
 });
 
 export default Calendar;
+

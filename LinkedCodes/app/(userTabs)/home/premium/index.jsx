@@ -1,7 +1,10 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import React from "react";
+import React, {useState} from "react";
 import { Link, useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome"
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { auth } from '../../../../firebase'
+
 // our benefits, what they get when they upgrade, how wmuch it is per year/
 //headerShown: true
 //a card with the following, premium infraSmart
@@ -23,6 +26,14 @@ const Index = () => {
 	nextYearDate.setFullYear(currentDate.getFullYear() + 1); // Adds 1 year to the curent year
 	const formattedDate = nextYearDate.toLocaleDateString();
 	const router = useRouter();
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [showAd, setShowAd] = useState(false);
+    const userId = auth.currentUser ? auth.currentUser.uid : null;
+
+    const handleProceedToCheckout = async () => {
+      await AsyncStorage.setItem(`isSubscribed_${userId}`, 'true');
+      setIsSubscribed(true);
+      setShowAd(false);};
 	return (
 		<View className="flex-1 bg-[#F2f9FB] p-6 ">
 			{/* Premium Header */}
@@ -45,7 +56,7 @@ const Index = () => {
 			
 
 			{/* Plan Renewal Card */}
-			<View className="bg-white p-4 rounded-xl shadow-md mb-6 mt-24">
+			<View className="bg-white p-4 rounded-xl shadow-md mb-6 mt-28">
 				<Text className="text-lg font-semibold text-[#202A44]">
 					Your plan will automatically renew on {formattedDate}.
 				</Text>

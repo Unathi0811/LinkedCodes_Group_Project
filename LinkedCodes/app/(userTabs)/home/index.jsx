@@ -146,7 +146,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EAF1FF",
+    backgroundColor: "#F2f9FB",
   },
   username: {
     fontSize: 20,
@@ -183,7 +183,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 5,
     marginLeft:12,
-    backgroundColor:'#EAF1FF'
   },
   content: {
     marginTop: 130,

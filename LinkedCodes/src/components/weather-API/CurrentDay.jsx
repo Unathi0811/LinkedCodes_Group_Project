@@ -130,7 +130,7 @@ const CurrentDay = () => {
 						flexDirection: "row",
 						paddingHorizontal: 6,
 						borderRadius: 8,
-						backgroundColor: "#EAF1FF",
+						backgroundColor: "#F2f9FB",
 						paddingVertical: "1%",
 						marginBottom: "2%",
 						marginTop: "30%",

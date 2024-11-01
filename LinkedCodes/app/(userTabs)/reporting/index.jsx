@@ -17,6 +17,7 @@ import Icon from "react-native-vector-icons/Feather";
 import React, { useState, useEffect } from "react";
 import useLocation from "../../../src/components/useLocation";
 import NetInfo from "@react-native-community/netinfo";
+import * as Notifications from 'expo-notifications';
 import { Overlay } from "@rneui/themed";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // For offline storage
 import { db, storage } from "../../../firebase";
@@ -169,118 +170,118 @@ export default function Reporting() {
 		return () => unsubscribe(); // Cleanup network listener on unmount
 	}, []);
 
-	// Submit report to Firestore (or AsyncStorage if offline)
-	const submitReport = async () => {
-		if (image && input && userId && urgency) {
-			try {
-				setLoading(true);
-
-				// Determine report_type and accident_report based on selected category
-				let reportType = null;
-				let accidentReport = false;
-
-				if (category === "Accident") {
-					accidentReport = true; // Set to true if category is Accident
-				} else if (category === "Road") {
-					reportType = "Road"; // Set report_type to Road
-				} else if (category === "Bridge") {
-					reportType = "Bridge"; // Set report_type to Bridge
-				}
-
-				const newReport = {
-					image, // Save the local image URI for now
-					description: input,
-					timestamp: new Date(),
-					latitude,
-					longitude,
-					userId, // Include the authenticated user's ID
-					urgency,
-					report_type: reportType, // Set report_type based on selected category
-					accident_report: accidentReport, // Set accident_report based on selected category
-				};
-
-				// Check network status
-				const isOnline = await checkIfOnline();
-
-				if (isOnline) {
-					// If online, upload image and report to Firebase
-					const imageRef = ref(storage, `images/`);
-					const response = await fetch(image);
-					const blob = await response.blob();
-					await uploadBytes(imageRef, blob);
-
-					const imageUrl = await getDownloadURL(imageRef);
-					newReport.image = imageUrl; // Update image URL after upload
-
-					// Add the new report to Firestore
-					await addDoc(collection(db, "reports"), newReport);
-					setLoading(false);
-				} else {
-					// If offline, save the report locally using AsyncStorage
-					const storedReports = await AsyncStorage.getItem(
-						"offlineReports"
-					);
-					const reportsArray = storedReports
-						? JSON.parse(storedReports)
-						: [];
-					reportsArray.push(newReport);
-
-					await AsyncStorage.setItem(
-						"offlineReports",
-						JSON.stringify(reportsArray)
-					);
-					console.log("Report saved offline");
-				}
-
-				// Clear input and close modal
-				setImage(null);
-				setInput("");
-				setModalVisible(false);
-			} catch (error) {
-				setOverlayMessage("Error submitting report: " + error.message);
-				setVisible(true);
-			}
-		} else {
-			setOverlayMessage(
-				"Please add both an image, description and select urgency level"
-			);
-			setVisible(true);
-		}
-	};
-
-	// Delete a report from Firebase (if online)
-	const deleteReport = async (reportId, imageUri, userId) => {
+// Submit report to Firestore (or AsyncStorage if offline)
+const submitReport = async () => {
+	if (image && input && userId && urgency) {
 		try {
-			// Check if online before deleting from Firebase
-			const isOnline = await checkIfOnline();
-			if (isOnline) {
-				console.log("Deleting report from Firebase...");
-				const reportRef = doc(db, "reports", reportId); // Access the specific document
-				await deleteDoc(reportRef); // Delete the document
-				// Delete image from Firebase Storage if it exists
-				if (imageUri && userId) {
-					console.log("Image URI before deletion:", imageUri);
+			setLoading(true);
 
-					// Construct the path based on the userId and image file
-					const userImagePath = `users/${userId}/images/${imageUri}`;
+			// Determine report_type and accident_report based on selected category
+			let reportType = null;
+			let accidentReport = false;
 
-					const imageRef = ref(storage, userImagePath); // Get reference to the user's image
-					await deleteObject(imageRef); // Delete the image
-					console.log("Image deleted from Firebase Storage");
-				}
-				console.log(
-					"Report and associated image deleted from Firebase"
-				);
+			if (category === "Accident") {
+				accidentReport = true; // Set to true if category is Accident
+			} else if (category === "Road") {
+				reportType = "Road"; // Set report_type to Road
+			} else if (category === "Bridge") {
+				reportType = "Bridge"; // Set report_type to Bridge
 			}
 
-			setOverlayMessage("Report successfully deleted.");
-			setVisible(true);
+			const newReport = {
+				image, // Save the local image URI for now
+				description: input,
+				timestamp: new Date(),
+				latitude, // Ensure latitude and longitude are defined in your component
+				longitude,
+				userId, // Include the authenticated user's ID
+				urgency,
+				report_type: reportType, // Set report_type based on selected category
+				accident_report: accidentReport, // Set accident_report based on selected category
+			};
+
+			// Check network status
+			const isOnline = await checkIfOnline();
+
+			if (isOnline) {
+				// If online, upload image and report to Firebase
+				const imageRef = ref(storage, `images/${newReport.userId}_${Date.now()}.jpg`); // Ensure a unique image filename
+				const response = await fetch(image);
+				const blob = await response.blob();
+				await uploadBytes(imageRef, blob);
+
+				const imageUrl = await getDownloadURL(imageRef);
+				newReport.image = imageUrl; // Update image URL after upload
+
+				// Add the new report to Firestore
+				await addDoc(collection(db, "reports"), newReport);
+				await sendNotification("Your report has been submitted successfully."); // Send notification
+			} else {
+				// If offline, save the report locally using AsyncStorage
+				const storedReports = await AsyncStorage.getItem("offlineReports");
+				const reportsArray = storedReports ? JSON.parse(storedReports) : [];
+				reportsArray.push(newReport);
+
+				await AsyncStorage.setItem("offlineReports", JSON.stringify(reportsArray));
+				console.log("Report saved offline");
+			}
+
+			// Clear input and close modal
+			setImage(null);
+			setInput("");
+			setModalVisible(false);
 		} catch (error) {
-			console.error("Error deleting report: ", error);
-			setOverlayMessage("Error deleting report: " + error.message);
+			setOverlayMessage("Error submitting report: " + error.message);
 			setVisible(true);
 		}
-	};
+	} else {
+		setOverlayMessage("Please add both an image, description and select urgency level");
+		setVisible(true);
+	}
+};
+// Delete a report from Firebase (if online)
+// Delete a report from Firebase (if online)
+const deleteReport = async (reportId, imageUri, userId) => {
+	try {
+		// Check if online before deleting from Firebase
+		const isOnline = await checkIfOnline();
+		if (isOnline) {
+			console.log("Deleting report from Firebase...");
+			const reportRef = doc(db, "reports", reportId); // Access the specific document
+			await deleteDoc(reportRef); // Delete the document
+
+			// Delete image from Firebase Storage if it exists
+			if (imageUri && userId) {
+				console.log("Image URI before deletion:", imageUri);
+
+				// Construct the path based on the userId and image file
+				const userImagePath = `users/${userId}/images/${imageUri.split('/').pop()}`; // Extract the filename
+
+				const imageRef = ref(storage, userImagePath); // Get reference to the user's image
+				await deleteObject(imageRef); // Delete the image
+				console.log("Image deleted from Firebase Storage");
+			}
+
+			console.log("Report and associated image deleted from Firebase");
+			
+			// Show notification for successful deletion
+			setOverlayMessage("Report successfully deleted.");
+			showNotification("Success", "Your report has been deleted successfully.");
+		} else {
+			setOverlayMessage("You are currently offline. Unable to delete report.");
+			showNotification("Offline", "Unable to delete report, you are offline.");
+		}
+
+		setVisible(true);
+	} catch (error) {
+		console.error("Error deleting report: ", error);
+		setOverlayMessage("Error deleting report: " + error.message);
+		setVisible(true);
+		showNotification("Error", "Error deleting report: " + error.message);
+	}
+};
+
+
 
 	// Upload image from camera or gallery
 	const uploadImage = async (mode) => {

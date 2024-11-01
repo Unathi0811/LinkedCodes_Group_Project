@@ -18,7 +18,6 @@ const Layout = () => {
         name="home"
         options={{
           tabBarIcon: ({ color, size }) => (
-            // <Ionicons name="home-outline" color={color} size={size} />
             <MaterialIcons name="home" size={30} color={color} />
           ),
         }}
@@ -37,6 +36,14 @@ const Layout = () => {
         options={{
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="traffic" size={30} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="settings" size={30} color={color} />
           ),
         }}
       />

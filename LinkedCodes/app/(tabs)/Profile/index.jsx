@@ -171,11 +171,6 @@ const styles = StyleSheet.create({
 		backgroundColor: "#202A44",
 	},
 	headerContainer: {
-		// position: "absolute",
-		// top: 35,
-		// left: 0,
-		// right: 0,
-		// marginBottom: 20,
 		paddingHorizontal: 20,
 		paddingVertical: 50,
 		backgroundColor: "#202A44",

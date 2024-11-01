@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, TextInput, Alert } from 'react-native';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { auth, db } from "../../../firebase";
-
+import { useRouter } from 'expo-router';
+import Icon from "react-native-vector-icons/FontAwesome"
 const RateUs = ({ isDarkMode }) => {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({
@@ -10,7 +11,7 @@ const RateUs = ({ isDarkMode }) => {
     rating: 0,
     comment: '',
   });
-
+  const router = useRouter()
   useEffect(() => {
     const fetchReviews = async () => {
       const reviewsCollection = collection(db, 'reviews');
@@ -60,6 +61,20 @@ const RateUs = ({ isDarkMode }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#000000' : '#EAF1FF' }]}>
+      <View style={styles.header}>
+					{/* Back Button */}
+					<TouchableOpacity
+						onPress={() => router.push("/(userTabs)/home")}
+						style={styles.backButton}
+					>
+						<Icon
+							name="arrow-left"
+							size={20}
+							color="#202A44"
+						/>
+					</TouchableOpacity>
+					<Text style={styles.headerApp}>InfraSmart</Text>
+				</View>
       <FlatList
         data={reviews}
         renderItem={renderReview}
@@ -103,6 +118,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 20,
+    marginTop: 94
   },
   reviewContainer: {
     flexDirection: 'row',
@@ -155,6 +171,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  header: {
+		position: "absolute",
+		left: 0,
+		right: 0,
+		flexDirection: "row",
+		alignContent: "space-between",
+		alignItems: "center",
+		padding: 20,
+		zIndex: 10,
+		backgroundColor: "#fff",
+		height: 100,
+		marginBottom: 5,
+		borderBlockEndColor: "#ccc",
+	},
+	backButton: {
+		padding: 10,
+		marginRight: 10,
+	},
+	headerApp: {
+		fontSize: 25,
+		fontWeight: "bold",
+		color: "#202A44",
+		marginLeft: 130,
+	},
 });
 
 export default RateUs;

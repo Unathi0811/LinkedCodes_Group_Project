@@ -76,7 +76,7 @@ const RateUs = ({ isDarkMode }) => {
     <View style={[styles.reviewContainer, { backgroundColor: isDarkMode ? '#2C2C2C' : '#FFFFFF' }]}>
       <View style={styles.reviewContent}>
         <Text style={[styles.userName, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>
-          {item.userName} {/* Now using item.userName which is set from the context */}
+         {user.username}
         </Text>
         <View style={styles.ratingContainer}>
           {Array.from({ length: 5 }, (_, index) => (

@@ -43,29 +43,6 @@ const Layout = () => {
 		}
 	});
 
-<<<<<<< HEAD
-        setUser({ ...uData, uid: docSnap.id });
-        userType = docSnap.data().userType;
-      } else {
-        setUser({ uid: user.uid, email: user.email });
-      }
-
-      return userType
-        ? router.replace("/(tabs)/Home")
-        : router.replace("/(userTabs)/home");
-    } catch (error) {
-      console.error("Error fetching user data: ", error);
-    }
-  });
-
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ActivityIndicator size="large" color="#202A44" />
-      <Text>Loading...</Text>
- 
-    </View>
-  );
-=======
 	return (
 		<View
 			style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -78,7 +55,6 @@ const Layout = () => {
 			{/* <Link href="/(userTabs)/traffic">user</Link> */}
 		</View>
 	);
->>>>>>> origin/master
 };
 
 export default Layout;

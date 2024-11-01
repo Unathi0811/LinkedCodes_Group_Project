@@ -37,5 +37,5 @@ export interface User {
   userType ?: boolean;
   blocked?: boolean,
   deleted?: boolean,
-  admin?: boolean
+  admin?: boolean
 }

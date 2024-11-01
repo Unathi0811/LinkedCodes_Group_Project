@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, TextInput, Alert } from 'react-native';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { auth, db } from "../../../firebase";
+import { db, auth } from '../../../firebase'; // Adjust these imports based on your directory structure
+import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { LogBox } from 'react-native';
+import { useUser } from '../../../src/cxt/user';
+
+LogBox.ignoreLogs([
+  '[Reanimated] Reduced motion setting is enabled on this device.',
+]);
 
 const RateUs = ({ isDarkMode }) => {
   const [reviews, setReviews] = useState([]);
@@ -9,51 +15,80 @@ const RateUs = ({ isDarkMode }) => {
     userName: '',
     rating: 0,
     comment: '',
+    timestamp: '',
   });
+  const { user } = useUser(); // Use the user context
 
   useEffect(() => {
-    const fetchReviews = async () => {
-      const reviewsCollection = collection(db, 'reviews');
-      const reviewsSnapshot = await getDocs(reviewsCollection);
-      const reviewsList = reviewsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setReviews(reviewsList);
+    const fetchUserReviews = async () => {
+      if (auth.currentUser) {
+        const reviewsCollectionRef = collection(db, 'reviews');
+        const q = query(reviewsCollectionRef, where('uid', '==', auth.currentUser.uid));
+        const reviewsSnapshot = await getDocs(q);
+        const reviewsList = reviewsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setReviews(reviewsList);
+      }
     };
-    fetchReviews();
+
+    fetchUserReviews();
   }, []);
 
   const handleAddReview = async () => {
-    if (newReview.userName && newReview.comment && newReview.rating > 0) {
+    const trimmedComment = newReview.comment.trim();
+
+    if (reviews.length >= 2) {
+      Alert.alert('Error', 'You can only submit up to 2 comments.');
+      return;
+    }
+
+    if (user.username && trimmedComment && newReview.rating > 0) {
       try {
-        await addDoc(collection(db, 'reviews'), newReview);
-        setReviews([...reviews, { ...newReview, id: (reviews.length + 1).toString() }]);
+        const reviewWithTimestamp = {
+          ...newReview,
+          uid: auth.currentUser.uid, // Add the user's unique identifier
+          userName: user.username, // Use the username from the user context
+          comment: trimmedComment,
+          timestamp: new Date().toISOString(),
+        };
+        const docRef = await addDoc(collection(db, 'reviews'), reviewWithTimestamp);
+        setReviews([...reviews, { id: docRef.id, ...reviewWithTimestamp }]);
         setNewReview({
-          userName: '',
+          userName: user.username, // Reset the userName based on user context
           rating: 0,
           comment: '',
+          timestamp: '',
         });
       } catch (error) {
         console.error('Error adding review:', error);
         Alert.alert('Error', 'Could not add review. Please try again.');
       }
     } else {
-      Alert.alert('Error', 'Please provide a name, rating, and comment.');
+      Alert.alert('Error', 'Please provide a rating and a non-empty comment.');
     }
-  };
-
-  const renderStars = (rating) => {
-    return Array.from({ length: 5 }, (_, index) => (
-      <Text key={index} style={styles.star}>
-        {index < rating ? '★' : '☆'}
-      </Text>
-    ));
   };
 
   const renderReview = ({ item }) => (
     <View style={[styles.reviewContainer, { backgroundColor: isDarkMode ? '#2C2C2C' : '#FFFFFF' }]}>
       <View style={styles.reviewContent}>
-        <Text style={[styles.userName, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>{item.userName}</Text>
-        <View style={styles.ratingContainer}>{renderStars(item.rating)}</View>
-        <Text style={[styles.comment, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>{item.comment}</Text>
+        <Text style={[styles.userName, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>
+          {item.userName} {/* Now using item.userName which is set from the context */}
+        </Text>
+        <View style={styles.ratingContainer}>
+          {Array.from({ length: 5 }, (_, index) => (
+            <Text key={index} style={styles.star}>
+              {index < item.rating ? '★' : '☆'}
+            </Text>
+          ))}
+        </View>
+        <Text style={[styles.comment, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>
+          {item.comment}
+        </Text>
+        <Text style={[styles.timestamp, { color: isDarkMode ? '#AAAAAA' : '#444444' }]}>
+          Submitted on: {new Date(item.timestamp).toLocaleString()}
+        </Text>
       </View>
     </View>
   );
@@ -66,14 +101,8 @@ const RateUs = ({ isDarkMode }) => {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
       />
+     
       <View style={[styles.newReviewContainer, { backgroundColor: isDarkMode ? '#1e1e1e' : '#ffffff' }]}>
-        <TextInput
-          style={[styles.input, { backgroundColor: isDarkMode ? '#333333' : '#ffffff', color: isDarkMode ? '#ffffff' : '#000000' }]}
-          placeholder="Your Name"
-          placeholderTextColor={isDarkMode ? '#aaaaaa' : '#aaa'}
-          value={newReview.userName}
-          onChangeText={(text) => setNewReview({ ...newReview, userName: text })}
-        />
         <TextInput
           style={[styles.input, { backgroundColor: isDarkMode ? '#333333' : '#ffffff', color: isDarkMode ? '#ffffff' : '#000000' }]}
           placeholder="Your Comment"
@@ -97,64 +126,19 @@ const RateUs = ({ isDarkMode }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  listContainer: {
-    paddingBottom: 20,
-  },
-  reviewContainer: {
-    flexDirection: 'row',
-    marginBottom: 15,
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'flex-start',
-  },
-  reviewContent: {
-    flex: 1,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    marginBottom: 5,
-  },
-  star: {
-    fontSize: 18,
-    color: '#FFD700',
-    marginRight: 2,
-  },
-  comment: {
-    fontSize: 14,
-  },
-  newReviewContainer: {
-    marginTop: 20,
-    padding: 10,
-    borderRadius: 10,
-  },
-  input: {
-    height: 40,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  button: {
-    backgroundColor: '#202A44',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  container: { flex: 1, padding: 20 },
+  listContainer: { paddingBottom: 20 },
+  reviewContainer: { flexDirection: 'row', marginBottom: 15, padding: 15, borderRadius: 10, alignItems: 'flex-start' },
+  reviewContent: { flex: 1 },
+  userName: { fontSize: 16, fontWeight: 'bold', marginBottom: 5 },
+  ratingContainer: { flexDirection: 'row', marginBottom: 5 },
+  star: { fontSize: 18, color: '#202A44', marginRight: 2 },
+  comment: { fontSize: 14 },
+  timestamp: { fontSize: 12, marginTop: 5 },
+  newReviewContainer: { marginTop: 20, padding: 10, borderRadius: 10 },
+  input: { height: 40, borderColor: '#ddd', borderWidth: 1, borderRadius: 5, marginBottom: 10, paddingHorizontal: 10 },
+  button: { backgroundColor: '#202A44', padding: 15, borderRadius: 10, alignItems: 'center' },
+  buttonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
 });
 
 export default RateUs;

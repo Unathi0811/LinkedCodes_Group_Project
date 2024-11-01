@@ -7,7 +7,7 @@ import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 
 const GOOGLE_API_KEY = 'AIzaSyAQ6VsdSIFTQYmic060gIGuGQQd2TW4jsw';  // Google API Key
 const TOMTOM_API_KEY = 'EErTrgCfI6nmg4kR8fboWoe2LJdDDs4E';  // TomTom API Key
@@ -27,6 +27,7 @@ const traffic = () => {
   const [isSubscribed, setIsSubscribed] = useState(false); // Subscription status
   const inactivityTimeoutRef = useRef(null)
   const userId = auth.currentUser ? auth.currentUser.uid : null;
+  const router = useRouter()
   // ask for permission to use the location
   useEffect(() => {
     (async () => {
@@ -476,7 +477,7 @@ const traffic = () => {
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
             <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
               <Text>wala wala wee wadiweleeeee</Text>
-              <Link href="/(userTabs)/home/premium/index" asChild>
+              <Link href="/home/premium" asChild>
               <TouchableOpacity >
                 <Text style={{ color: 'black', marginTop: 20 }}>Subscribe to Premuim</Text>
               </TouchableOpacity>

@@ -9,8 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // For off
 import { db, storage, auth} from "../../../firebase"; 
 import { collection, onSnapshot, doc, setDoc, deleteDoc, addDoc, query, where, } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-
-import {Link } from 'expo-router'
+import Icon3 from "react-native-vector-icons/FontAwesome"
+import {Link, useRouter} from 'expo-router'
 
 export default function Reporting() {
   const { latitude, longitude } = useLocation();

@@ -5,8 +5,6 @@ import { app, db } from "../firebase";
 import { useUser } from "../src/cxt/user";
 import { doc, getDoc } from "firebase/firestore";
 
-
-
 const Layout = () => {
 	const { setUser } = useUser();
 

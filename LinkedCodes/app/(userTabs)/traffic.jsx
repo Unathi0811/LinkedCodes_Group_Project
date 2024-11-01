@@ -1,12 +1,14 @@
-import { View, Text, ActivityIndicator, TextInput, TouchableOpacity, Linking, StyleSheet, FlatList } from 'react-native';
+import { View, Text, ActivityIndicator, TextInput, TouchableOpacity, Linking, StyleSheet, FlatList, Modal} from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, {Marker,Polyline} from 'react-native-maps';
+import { auth } from '../../firebase';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/FontAwesome';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Link } from 'expo-router';
 
 const GOOGLE_API_KEY = 'AIzaSyAQ6VsdSIFTQYmic060gIGuGQQd2TW4jsw';  // Google API Key
 const TOMTOM_API_KEY = 'EErTrgCfI6nmg4kR8fboWoe2LJdDDs4E';  // TomTom API Key
@@ -22,7 +24,10 @@ const traffic = () => {
   const [loading, setLoading] = useState(false);
   const [mapRegion, setMapRegion] = useState(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState(null); // For destination marker
-
+  const [showAd, setShowAd] = useState(false); // Ad visibility
+  const [isSubscribed, setIsSubscribed] = useState(false); // Subscription status
+  const inactivityTimeoutRef = useRef(null)
+  const userId = auth.currentUser ? auth.currentUser.uid : null;
   // ask for permission to use the location
   useEffect(() => {
     (async () => {
@@ -127,6 +132,28 @@ const traffic = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      const subscriptionStatus = await AsyncStorage.getItem(`isSubscribed_${userId}`);
+      if (subscriptionStatus === 'true') {
+        setIsSubscribed(true);
+        setShowAd(false); // Disable ads if subscribed
+      } else {
+        setShowAd(true);
+      }
+    };
+    if (userId) checkSubscription();
+  }, [userId]);
+
+  const handleActivity = () => {
+    clearTimeout(inactivityTimeoutRef.current);
+    if (!isSubscribed) {
+      inactivityTimeoutRef.current = setTimeout(() => setShowAd(true), 5000); // Show ad only if not subscribed
+    }
+  };
+
+ 
   // get the destination the user has searched 
   const getDestinationCoordinates = async (destination) => {
     try {
@@ -445,6 +472,22 @@ const traffic = () => {
                       </View>
                     )}
           </View>
+        {/*This is for the add*/}
+        <Modal visible={showAd && !isSubscribed} transparent>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
+              <Text>wala wala wee wadiweleeeee</Text>
+              <Link href="/(userTabs)/home/premium/index" asChild>
+              <TouchableOpacity >
+                <Text style={{ color: 'black', marginTop: 20 }}>Subscribe to Premuim</Text>
+              </TouchableOpacity>
+              </Link>
+              <TouchableOpacity onPress={() => setShowAd(false)}>
+                <Text style={{ color: 'black', marginTop: 20 }}>Close Ad</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
   );
 };

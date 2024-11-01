@@ -1,16 +1,16 @@
-import { View, Image, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Text, StyleSheet, TextInput, FlatList, Modal,ActivityIndicator } from "react-native";
+import { View, Image, TouchableWithoutFeedback, Keyboard, TouchableOpacity, Text, StyleSheet, TextInput, FlatList, Modal,ActivityIndicator, Button} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/Feather";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef} from "react";
 //import { v4 as uuidv4 } from "uuid"; // For generating unique filenames
 import useLocation from "../../../src/components/useLocation";
 import NetInfo from "@react-native-community/netinfo"; // To detect online status
 import { Overlay } from "@rneui/themed";
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For offline storage
-import { db, storage } from "../../../firebase"; // Import Firebase
+import { db, storage, auth} from "../../../firebase"; 
 import { collection, onSnapshot, doc, setDoc, deleteDoc, addDoc, query, where, } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { getAuth } from "firebase/auth"; // Import Firebase Auth
+
 import {Link } from 'expo-router'
 
 export default function Reporting() {
@@ -26,8 +26,11 @@ export default function Reporting() {
   const [urgency, setUrgency] = useState("Low"); // Default urgency level
 const [loading, setLoading] = useState(false); // For submit button loading
 const [imageLoading, setImageLoading] = useState(true); // For image loading
+const [showAd, setShowAd] = useState(false); // Ad visibility
+  const [isSubscribed, setIsSubscribed] = useState(false); // Subscription status
+  const inactivityTimeoutRef = useRef(null)
 
-  const auth = getAuth(); // Get the current authenticated user
+ 
 
   // Get the current user ID
   const userId = auth.currentUser ? auth.currentUser.uid : null;
@@ -183,6 +186,28 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
       setVisible(true);
     }
   };
+// ads
+  useEffect(() => {
+    const checkSubscription = async () => {
+      const subscriptionStatus = await AsyncStorage.getItem(`isSubscribed_${userId}`);
+      if (subscriptionStatus === 'true') {
+        setIsSubscribed(true);
+        setShowAd(false); // Disable ads if subscribed
+      } else {
+        setShowAd(true);
+      }
+    };
+    if (userId) checkSubscription();
+  }, [userId]);
+
+  const handleActivity = () => {
+    clearTimeout(inactivityTimeoutRef.current);
+    if (!isSubscribed) {
+      inactivityTimeoutRef.current = setTimeout(() => setShowAd(true), 5000); // Show ad only if not subscribed
+    }
+  };
+
+  
 
   // Delete a report from Firebase (if online)
   const deleteReport = async (reportId, imageUri, userId) => {
@@ -286,7 +311,7 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        <Text style={styles.Heading}>Reporting</Text>
+       
 
         {/* Modal for upload options */}
         <Modal transparent={true} visible={modalVisible} animationType="slide">
@@ -398,6 +423,22 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
           </View>
         </Overlay>
 
+            {/*This is for the add*/}
+        <Modal visible={showAd && !isSubscribed} transparent>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
+              <Text>wala wala wee wadiweleeeee</Text>
+              <Link href="/(userTabs)/home/premium/index" asChild>
+              <TouchableOpacity >
+                <Text style={{ color: 'black', marginTop: 20 }}>Subscribe to Premuim</Text>
+              </TouchableOpacity>
+              </Link>
+              <TouchableOpacity onPress={() => setShowAd(false)}>
+                <Text style={{ color: 'black', marginTop: 20 }}>Close Ad</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         {/* Modal for report details */}
         <Modal transparent={true} visible={modalVisible2} animationType="slide">
@@ -494,13 +535,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     paddingLeft: 20,
   },
-  Heading: {
-    color: "#202A44",
-    marginTop: 20,
-    textAlign: "center",
-    fontSize: 35,
-    marginBottom: 50,
-  },
+
   Heading2: {
     color: "#202A44",
     marginTop: 40,

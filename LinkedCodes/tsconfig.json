@@ -1,4 +1,23 @@
 {
-  "compilerOptions": {},
-  "extends": "expo/tsconfig.base"
+  "compilerOptions": {
+    "target": "esnext",                      // Specify ECMAScript target version
+    "module": "esnext",                      // Specify module code generation
+    "lib": ["esnext", "dom"],                // Specify library files to be included in the compilation
+    "jsx": "react-native",                   // Specify JSX code generation
+    "strict": true,                          // Enable all strict type-checking options
+    "esModuleInterop": true,                 // Enables emit interoperability between CommonJS and ES Modules
+    "skipLibCheck": true,                    // Skip type checking of all declaration files
+    "forceConsistentCasingInFileNames": true // Disallow inconsistently-cased references to the same file
+  },
+  "extends": "expo/tsconfig.base",
+ "include": [
+    "src",             // Ensure 'src' is the correct folder if used
+    "app",             // Include app directory if using expo-router
+    "App.tsx"          // Main entry file
+],
+  "exclude": [
+    "node_modules",                          // Exclude node_modules
+    "**/*.spec.ts",                          // Exclude test files if applicable
+    "**/*.test.tsx"
+  ]
 }

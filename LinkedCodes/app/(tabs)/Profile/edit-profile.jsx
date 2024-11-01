@@ -248,7 +248,7 @@ const EditProfile = () => {
 						</Text>
 					</TouchableOpacity>
 
-					<TouchableOpacity
+					{/* <TouchableOpacity
 						style={{
 							alignItems: "center",
 							justifyContent: "center",
@@ -260,7 +260,7 @@ const EditProfile = () => {
 						onPress={confirmDeleteAccount}
 					>
 						<Text style={styles.buttonText}>Delete Account</Text>
-					</TouchableOpacity>
+					</TouchableOpacity> */}
 				</View>
 			</ScrollView>
 		</View>

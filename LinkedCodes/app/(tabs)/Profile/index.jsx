@@ -1,4 +1,4 @@
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Image, Pressable } from "react-native";
 import * as ImagePicker from "expo-image-picker";
@@ -8,7 +8,7 @@ import {
 	uploadBytesResumable,
 	getDownloadURL,
 } from "firebase/storage";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { doc, updateDoc } from "firebase/firestore";
 import { useUser } from "../../../src/cxt/user";
 import { db, auth } from "../../../firebase";
@@ -19,6 +19,7 @@ const Profile = () => {
 	const { setUser, user } = useUser();
 	const [image, setImage] = useState(user.profileImage);
 	const [loading, setLoading] = useState(false);
+	const router = useRouter()
 	useEffect(() => {
 		if (user) {
 			setImage(user.profileImage);
@@ -60,6 +61,16 @@ const Profile = () => {
 		<View style={styles.container}>
 			{/* Fixed header with profile details */}
 			<View style={styles.headerContainer}>
+			<TouchableOpacity
+						onPress={() => router.push("/(tabs)/Home")}
+						style={styles.backButton}
+					>
+						<Icon
+							name="arrow-left"
+							size={20}
+							color="#fff"
+						/>
+					</TouchableOpacity>
 				<View style={styles.header}>
 					<Pressable onPress={pickImage}>
 						{loading ? ( // Show ActivityIndicator if loading
@@ -230,6 +241,11 @@ const styles = StyleSheet.create({
 	},
 	icon: {
 		marginLeft: 10,
+	},
+	backButton: {
+		padding: 10,
+		marginRight: 10,
+		color: "#fff",
 	},
 });
 

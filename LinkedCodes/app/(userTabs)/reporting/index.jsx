@@ -41,6 +41,7 @@ import { Link } from "expo-router";
 import { useRouter } from "expo-router";
 import RNPickerSelect from "react-native-picker-select";
 import Icon2 from "react-native-vector-icons/MaterialIcons";
+import Icon3 from "react-native-vector-icons/FontAwesome";
 
 export default function Reporting() {
 	const { latitude, longitude } = useLocation();
@@ -365,9 +366,9 @@ export default function Reporting() {
 						onPress={() => router.push("/(userTabs)/home")}
 						style={styles.backButton}
 					>
-						<Icon
+						<Icon3
 							name="arrow-left"
-							size={20}
+							size={24}
 							color="#202A44"
 						/>
 					</TouchableOpacity>

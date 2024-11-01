@@ -8,6 +8,7 @@ import {
 	TouchableOpacity,
 	ScrollView,
 	Pressable,
+	Alert,
 } from "react-native";
 import { useUser } from "../../../src/cxt/user";
 import { auth, db } from "../../../firebase";
@@ -100,8 +101,9 @@ const EditProfile = () => {
 				// Sign out the user after deletion
 				await signOut(auth);
 				console.log("User account deleted and logged out");
-				alert("Your account has been deleted.");
+				Alert.alert("Your account has been deleted.");
 				// You can navigate to a login screen or homepage here
+				router.replace("/(auth)/login"); // Adjust the route as necessary
 			}
 		} catch (error) {
 			console.error("Error deleting account:", error);
@@ -134,7 +136,7 @@ const EditProfile = () => {
 			<View style={styles.profileImageContainer}>
 				{/* Back Button */}
 				<Pressable
-					onPress={() => router.back()}
+					onPress={() => router.back("/(userTabs/home/profile")}
 					style={styles.backButton}
 				>
 					<Icon

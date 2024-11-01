@@ -1,4 +1,4 @@
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Image, Pressable } from "react-native";
 import * as ImagePicker from "expo-image-picker";
@@ -8,7 +8,7 @@ import {
 	uploadBytesResumable,
 	getDownloadURL,
 } from "firebase/storage";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 import { doc, updateDoc } from "firebase/firestore";
 import { useUser } from "../../../src/cxt/user";
 import { db, auth } from "../../../firebase";
@@ -51,16 +51,16 @@ const Profile = () => {
 			}
 		} catch (e) {
 			console.log(e);
-		}finally {
+		} finally {
 			setLoading(false); // Set loading to false after upload completes
 		}
 	};
-	const router = useRouter()
+
 	return (
 		<View style={styles.container}>
 			{/* Fixed header with profile details */}
 			<View style={styles.headerContainer}>
-					<TouchableOpacity
+			<TouchableOpacity
 						onPress={() => router.push("/(userTabs)/home")}
 						style={styles.backButton}
 					>
@@ -72,21 +72,21 @@ const Profile = () => {
 					</TouchableOpacity>
 				<View style={styles.header}>
 					<Pressable onPress={pickImage}>
-					{loading ? ( // Show ActivityIndicator if loading
+						{loading ? ( // Show ActivityIndicator if loading
 							<ActivityIndicator
 								size="small"
 								color="#fff"
 							/>
 						) : (
-						<Image
-							source={{
-								uri:
-									user.profileImage ??
-									"https://via.placeholder.com/150",
-								cache: "force-cache",
-							}}
-							style={styles.image}
-						/>
+							<Image
+								source={{
+									uri:
+										image ??
+										"https://via.placeholder.com/150",
+									cache: "force-cache",
+								}}
+								style={styles.image}
+							/>
 						)}
 					</Pressable>
 					<Text style={styles.username}>
@@ -119,7 +119,7 @@ const Profile = () => {
 					{/* Admin link (only if the user is an admin) */}
 					{user?.admin && (
 						<Link
-							href="/(userTabs)/Profile/admin"
+							href="/(tabs)/Profile/admin"
 							asChild
 						>
 							<Pressable style={styles.card}>
@@ -178,14 +178,13 @@ export default Profile;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#F2f9FB",
+		backgroundColor: "#202A44",
 	},
 	headerContainer: {
 		paddingHorizontal: 20,
 		paddingVertical: 50,
 		backgroundColor: "#202A44",
 		zIndex: 1,
-		
 	},
 	header: {
 		alignItems: "center",

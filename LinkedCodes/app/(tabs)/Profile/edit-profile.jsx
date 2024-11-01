@@ -34,6 +34,7 @@ import {
 	EmailAuthProvider,
 } from "firebase/auth";
 import { useRouter } from "expo-router";
+
 const EditProfile = () => {
 	const { user, setUser } = useUser();
 	const [username, setUsername] = useState(user?.username || "");
@@ -43,6 +44,7 @@ const EditProfile = () => {
 	const [password, setPassword] = useState("");
 	const [overlayMessage, setOverlayMessage] = useState("");
 	const router = useRouter();
+
 	const handleSave = async () => {
 		try {
 			const userDoc = doc(db, "user", user.uid); // Update user doc in Firestore
@@ -104,7 +106,6 @@ const EditProfile = () => {
 	const handleDeleteAccount = async () => {
 		try {
 			const currentUser = auth.currentUser;
-
 			if (currentUser) {
 				// Delete user from Firebase Auth
 				await deleteUser(currentUser);

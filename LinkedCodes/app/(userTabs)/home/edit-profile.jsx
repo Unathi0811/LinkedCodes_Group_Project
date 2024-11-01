@@ -7,6 +7,7 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	ScrollView,
+	Pressable,
 } from "react-native";
 import { useUser } from "../../../src/cxt/user";
 import { auth, db } from "../../../firebase";
@@ -20,7 +21,7 @@ import {
 } from "firebase/storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { deleteUser } from "firebase/auth";
-
+import { useRouter } from "expo-router";
 const EditProfile = () => {
 	const { user, setUser } = useUser();
 	const [username, setUsername] = useState(user?.username || "");
@@ -28,7 +29,8 @@ const EditProfile = () => {
 	const [mobile, setMobile] = useState(user?.mobile || "");
 	const [image, setImage] = useState(user.profileImage);
 	const [password, setPassword] = useState("");
-
+	const router = useRouter()
+	
 	const handleSave = async () => {
 		try {
 			const userDoc = doc(db, "user", user.uid); // Update user doc in Firestore
@@ -130,6 +132,31 @@ const EditProfile = () => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.profileImageContainer}>
+				{/* Back Button */}
+				<Pressable
+					onPress={() => router.back()}
+					style={styles.backButton}
+				>
+					<Icon
+						name="arrow-left"
+						size={20}
+						color="#fff"
+					/>
+				</Pressable>
+				<View
+					style={{
+						width: 100,
+						height: 100,
+						borderRadius: 50,
+						borderColor: "#202A44",
+						borderWidth: 2,
+						marginTop: 30,
+						marginBottom: 10,
+						position: "relative",
+						zIndex: 1,
+						marginTop: 10,
+					}}
+				>
 				<Image
 					style={styles.profileImage}
 					source={{
@@ -149,6 +176,7 @@ const EditProfile = () => {
 						color="#202A44"
 					/>
 				</TouchableOpacity>
+				</View>
 			</View>
 			<ScrollView style={styles.scrollContainer}>
 				<View style={styles.inputContainer}>
@@ -188,6 +216,7 @@ const EditProfile = () => {
 						value={mobile}
 						onChangeText={setMobile}
 						keyboardType="numeric"
+						placeholder="0823554565"
 					/>
 				</View>
 
@@ -202,7 +231,14 @@ const EditProfile = () => {
 					</TouchableOpacity>
 
 					<TouchableOpacity
-						style={styles.button}
+						style={{
+							alignItems: "center",
+							justifyContent: "center",
+							borderColor: "red",
+							borderWidth: 1,
+							borderRadius: 12,
+							paddingVertical: 12,
+						}}
 						onPress={confirmDeleteAccount}
 					>
 						<Text style={styles.buttonText}>Delete Account</Text>
@@ -269,20 +305,26 @@ const styles = StyleSheet.create({
 		paddingBottom: 30,
 		height: 150,
 	},
+	backButton: {
+		position: "absolute",
+		left: 20,
+		top: 70,
+		padding: 10,
+	},
 	profileImage: {
 		width: 100,
 		height: 100,
 		borderRadius: 50,
-		borderColor: "#202A44",
-		borderWidth: 2,
-		marginTop: 30,
-		marginBottom: 10,
+		// borderColor: "#202A44",
+		// borderWidth: 2,
+		marginTop: 2,
+		// marginBottom: 10,
 	},
 	cameraIcon: {
 		position: "absolute",
-		bottom: 40,
-		right: 170,
-		padding: 5,
+		// padding: 5,
+		top: 37,
+		left: 37,
 	},
 	inputContainer: {
 		marginBottom: 18,
@@ -315,7 +357,7 @@ const styles = StyleSheet.create({
 	buttonText: {
 		color: "#202A44",
 		fontWeight: "bold",
-		marginLeft: 64,
+		// marginLeft: 64,
 		fontSize: 15,
 	},
 	deleteButton: {

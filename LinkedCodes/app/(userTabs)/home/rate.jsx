@@ -8,7 +8,8 @@ import { useUser } from '../../../src/cxt/user';
 LogBox.ignoreLogs([
   '[Reanimated] Reduced motion setting is enabled on this device.',
 ]);
-
+import { useRouter } from 'expo-router';
+import Icon from "react-native-vector-icons/FontAwesome"
 const RateUs = ({ isDarkMode }) => {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({
@@ -17,6 +18,7 @@ const RateUs = ({ isDarkMode }) => {
     comment: '',
     timestamp: '',
   });
+  const router = useRouter()  
   const { user } = useUser(); // Use the user context
 
   useEffect(() => {
@@ -95,6 +97,20 @@ const RateUs = ({ isDarkMode }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#000000' : '#EAF1FF' }]}>
+      <View style={styles.header}>
+					{/* Back Button */}
+					<TouchableOpacity
+						onPress={() => router.push("/(userTabs)/home")}
+						style={styles.backButton}
+					>
+						<Icon
+							name="arrow-left"
+							size={20}
+							color="#202A44"
+						/>
+					</TouchableOpacity>
+					<Text style={styles.headerApp}>InfraSmart</Text>
+				</View>
       <FlatList
         data={reviews}
         renderItem={renderReview}
@@ -126,19 +142,89 @@ const RateUs = ({ isDarkMode }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  listContainer: { paddingBottom: 20 },
-  reviewContainer: { flexDirection: 'row', marginBottom: 15, padding: 15, borderRadius: 10, alignItems: 'flex-start' },
-  reviewContent: { flex: 1 },
-  userName: { fontSize: 16, fontWeight: 'bold', marginBottom: 5 },
-  ratingContainer: { flexDirection: 'row', marginBottom: 5 },
-  star: { fontSize: 18, color: '#202A44', marginRight: 2 },
-  comment: { fontSize: 14 },
-  timestamp: { fontSize: 12, marginTop: 5 },
-  newReviewContainer: { marginTop: 20, padding: 10, borderRadius: 10 },
-  input: { height: 40, borderColor: '#ddd', borderWidth: 1, borderRadius: 5, marginBottom: 10, paddingHorizontal: 10 },
-  button: { backgroundColor: '#202A44', padding: 15, borderRadius: 10, alignItems: 'center' },
-  buttonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  listContainer: {
+    paddingBottom: 20,
+    marginTop: 94
+  },
+  reviewContainer: {
+    flexDirection: 'row',
+    marginBottom: 15,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'flex-start',
+  },
+  reviewContent: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+  star: {
+    fontSize: 18,
+    color: '#FFD700',
+    marginRight: 2,
+  },
+  comment: {
+    fontSize: 14,
+  },
+  newReviewContainer: {
+    marginTop: 20,
+    padding: 10,
+    borderRadius: 10,
+  },
+  input: {
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  button: {
+    backgroundColor: '#202A44',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  header: {
+		position: "absolute",
+		left: 0,
+		right: 0,
+		flexDirection: "row",
+		alignContent: "space-between",
+		alignItems: "center",
+		padding: 20,
+		zIndex: 10,
+		backgroundColor: "#fff",
+		height: 100,
+		marginBottom: 5,
+		borderBlockEndColor: "#ccc",
+	},
+	backButton: {
+		padding: 10,
+		marginRight: 10,
+	},
+	headerApp: {
+		fontSize: 25,
+		fontWeight: "bold",
+		color: "#202A44",
+		marginLeft: 130,
+	},
 });
 
 export default RateUs;

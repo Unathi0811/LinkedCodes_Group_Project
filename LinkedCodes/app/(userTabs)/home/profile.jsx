@@ -1,4 +1,4 @@
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Image, Pressable } from "react-native";
 import * as ImagePicker from "expo-image-picker";
@@ -8,7 +8,7 @@ import {
 	uploadBytesResumable,
 	getDownloadURL,
 } from "firebase/storage";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { doc, updateDoc } from "firebase/firestore";
 import { useUser } from "../../../src/cxt/user";
 import { db, auth } from "../../../firebase";
@@ -18,7 +18,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 const Profile = () => {
 	const { setUser, user } = useUser();
 	const [image, setImage] = useState(user.profileImage);
-
+	const [loading, setLoading] = useState(false);
 	useEffect(() => {
 		if (user) {
 			setImage(user.profileImage);
@@ -35,6 +35,7 @@ const Profile = () => {
 			});
 
 			if (!result.canceled) {
+				setLoading(true);
 				setImage(result.assets[0].uri);
 				const fileName = result.assets[0].uri.split("/").pop();
 				const uploadResp = await uploadToFirebase(
@@ -50,15 +51,33 @@ const Profile = () => {
 			}
 		} catch (e) {
 			console.log(e);
+		}finally {
+			setLoading(false); // Set loading to false after upload completes
 		}
 	};
-
+	const router = useRouter()
 	return (
 		<View style={styles.container}>
 			{/* Fixed header with profile details */}
 			<View style={styles.headerContainer}>
+					<TouchableOpacity
+						onPress={() => router.push("/(userTabs)/home")}
+						style={styles.backButton}
+					>
+						<Icon
+							name="arrow-left"
+							size={20}
+							color="#fff"
+						/>
+					</TouchableOpacity>
 				<View style={styles.header}>
 					<Pressable onPress={pickImage}>
+					{loading ? ( // Show ActivityIndicator if loading
+							<ActivityIndicator
+								size="small"
+								color="#fff"
+							/>
+						) : (
 						<Image
 							source={{
 								uri:
@@ -68,6 +87,7 @@ const Profile = () => {
 							}}
 							style={styles.image}
 						/>
+						)}
 					</Pressable>
 					<Text style={styles.username}>
 						{user.username ?? "Unknown Name"}
@@ -76,7 +96,7 @@ const Profile = () => {
 			</View>
 
 			{/* Links and buttons */}
-			<ScrollView style={styles.content}>
+			<View style={styles.content}>
 				<View style={styles.linksContainer}>
 					{/* Personal Information link */}
 					<Link
@@ -147,7 +167,7 @@ const Profile = () => {
 						/>
 					</Pressable>
 				</View>
-			</ScrollView>
+			</View>
 		</View>
 	);
 };
@@ -161,15 +181,11 @@ const styles = StyleSheet.create({
 		backgroundColor: "#F2f9FB",
 	},
 	headerContainer: {
-		position: "absolute",
-		top: -25,
-		left: 0,
-		right: 0,
-		marginBottom: 20,
 		paddingHorizontal: 20,
 		paddingVertical: 50,
 		backgroundColor: "#202A44",
 		zIndex: 1,
+		
 	},
 	header: {
 		alignItems: "center",
@@ -181,21 +197,25 @@ const styles = StyleSheet.create({
 		height: 100,
 		borderRadius: 50,
 		marginBottom: 20,
-		marginTop: 20,
+		marginTop: 30,
 	},
 	username: {
 		fontSize: 20,
 		fontWeight: "bold",
 		color: "#fff",
-		marginBottom: 20,
+		marginBottom: -10,
 	},
 	email: {
 		fontSize: 12,
 		color: "#fff",
 	},
 	content: {
-		marginTop: 280,
+		// marginTop: 280,
 		paddingHorizontal: 30,
+		backgroundColor: "#F2f9FB",
+		flex: 1,
+		borderTopLeftRadius: 30,
+		borderTopRightRadius: 30,
 	},
 	linksContainer: {
 		width: "100%",
@@ -221,6 +241,11 @@ const styles = StyleSheet.create({
 	},
 	icon: {
 		marginLeft: 10,
+	},
+	backButton: {
+		padding: 10,
+		marginRight: 10,
+		color: "#fff",
 	},
 });
 

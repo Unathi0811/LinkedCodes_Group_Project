@@ -3,16 +3,48 @@ import { Slot } from "expo-router";
 import { UserProvider } from "../src/cxt/user";
 import { ReportProvider } from "../src/cxt/reports";
 import ReactNativeInactivity from "react-native-inactivity";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Alert } from "react-native";
-import { ThemeProvider } from "../src/cxt/theme";
+import { ThemeProvider } from "../src/cxt/theme"; // Make sure the path is correct
+import * as Notifications from 'expo-notifications';
+
+// Request notification permissions and set notification handler
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 const Layout = () => {
   const [inactivityTimeoutCount, setInactivityTimeoutCount] = useState(0);
-  const [isActive, setIsActive] = useState(true); // to manage activity state
+  const [isActive, setIsActive] = useState(true); // To manage activity state
   const [loop] = useState(true);
+
+  // Function to request permissions for notifications
+  const requestNotificationPermissions = async () => {
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') {
+      const { status: newStatus } = await Notifications.requestPermissionsAsync();
+      if (newStatus !== 'granted') {
+        Alert.alert('Notification permission not granted');
+      }
+    }
+  };
+
+  // Function to schedule a local notification
+  const scheduleNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Session Ended",
+        body: "You have been logged out due to inactivity.",
+      },
+      trigger: null, // Triggers immediately
+    });
+  };
 
   // What to do when user is inactive
   const handleInactivity = () => {
@@ -24,6 +56,7 @@ const Layout = () => {
           signOut(auth)
             .then(() => {
               console.log("User logged out");
+              scheduleNotification(); // Schedule notification on logout
             })
             .catch((error) => {
               console.log("Error logging out: ", error);
@@ -33,6 +66,10 @@ const Layout = () => {
     ]);
   };
 
+  useEffect(() => {
+    requestNotificationPermissions(); // Request permissions on component mount
+  }, []);
+
   return (
     <ReactNativeInactivity
       isActive={isActive}
@@ -40,19 +77,18 @@ const Layout = () => {
         setInactivityTimeoutCount(inactivityTimeoutCount + 1);
         handleInactivity(); // Call the logout function
       }}
-      timeForInactivity={1300000} // 60000 is 1 minute, u30 miuntes ngu 1800000
+      timeForInactivity={1300000} // 30 minutes
       restartTimerOnActivityAfterExpiration={false}
       loop={loop}
     >
-      {/* theme provider here, for the theme */}
-    <ThemeProvider>
-      <ReportProvider>
-        <UserProvider>
-          <StatusBar style="dark" />
-          <Slot />
-        </UserProvider>
-      </ReportProvider>
-    </ThemeProvider>
+      <ThemeProvider>
+        <ReportProvider>
+          <UserProvider>
+            <StatusBar style="dark" />
+            <Slot />
+          </UserProvider>
+        </ReportProvider>
+      </ThemeProvider>
     </ReactNativeInactivity>
   );
 };

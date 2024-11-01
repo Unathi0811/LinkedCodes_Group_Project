@@ -6,67 +6,57 @@ import React, { useState, useEffect } from "react";
 import useLocation from "../../../src/components/useLocation";
 import NetInfo from "@react-native-community/netinfo"; // To detect online status
 import { Overlay } from "@rneui/themed";
-import AsyncStorage from '@react-native-async-storage/async-storage'; // For offline storage
-import { db, storage } from "../../../firebase"; // Import Firebase
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import { db, storage } from "../../../firebase"; 
 import { collection, onSnapshot, doc, setDoc, deleteDoc, addDoc, query, where, } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import { getAuth } from "firebase/auth";
+import * as Notifications from 'expo-notifications';
 
 export default function Reporting() {
   const { latitude, longitude } = useLocation();
   const [image, setImage] = useState(null);
   const [input, setInput] = useState("");
-  const [reports, setReports] = useState([]); // Array to store reports
+  const [reports, setReports] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const [overlayMessage, setOverlayMessage] = useState("");
   const [modalVisible2, setModalVisible2] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
-  const [urgency, setUrgency] = useState("Low"); // Default urgency level
-const [loading, setLoading] = useState(false); // For submit button loading
-const [imageLoading, setImageLoading] = useState(true); // For image loading
+  const [urgency, setUrgency] = useState("Low"); 
+const [loading, setLoading] = useState(false); 
+const [imageLoading, setImageLoading] = useState(true); 
 
-  const auth = getAuth(); // Get the current authenticated user
-
-  // Get the current user ID
+  const auth = getAuth();
   const userId = auth.currentUser ? auth.currentUser.uid : null;
 
-  // Toggle overlay for error messages
   const toggleOverlay = () => {
     setVisible(!visible);
   };
 
-  // Check if the app is online
   const checkIfOnline = async () => {
     const state = await NetInfo.fetch();
     return state.isConnected;
   };
 
-  // Load reports from Firestore in real-time (if online) or from AsyncStorage (if offline)
-  const loadReportsFromFirestore = () => {
-    if (!userId) return; // Exit if no user is authenticated
 
-    // const q = collection(db, "reports"); // Query the reports collection
-    const q = query(collection(db, "reports"), where("userId", "==", userId))
+  
+  const loadReportsFromFirestore = () => {
+    if (!userId) return;
+    const q = query(collection(db, "reports"), where("userId", "==", userId));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const loadedReports = snapshot.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-      // .filter((report) => report.userId === userId); // Filter by userId
+      const loadedReports = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setReports(loadedReports);
     }, (error) => {
       console.log("Error loading reports from Firestore: ", error);
     });
-
-    return unsubscribe; // Return unsubscribe function
+    return unsubscribe;
   };
 
-  // Load reports from AsyncStorage (when offline)
   const loadReportsFromLocalStorage = async () => {
     try {
       const storedReports = await AsyncStorage.getItem("offlineReports");
-      if (storedReports) {
-        setReports(JSON.parse(storedReports));
-      }
+      if (storedReports) setReports(JSON.parse(storedReports));
     } catch (error) {
       console.error("Error loading reports from local storage:", error);
     }
@@ -76,18 +66,15 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
     const fetchData = async () => {
       const isOnline = await checkIfOnline();
       if (isOnline && userId) {
-        const unsubscribe = loadReportsFromFirestore(); // Load reports in real-time
-        return () => unsubscribe(); // Cleanup listener on unmount
+        const unsubscribe = loadReportsFromFirestore();
+        return () => unsubscribe();
       } else {
-        // Load locally stored reports if offline
         await loadReportsFromLocalStorage();
       }
     };
-
     fetchData();
   }, [userId]);
 
-  // Sync offline reports to Firebase when the device goes online
   const syncOfflineReports = async () => {
     try {
       const storedReports = await AsyncStorage.getItem("offlineReports");
@@ -100,14 +87,10 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
           await uploadBytes(imageRef, blob);
           const imageUrl = await getDownloadURL(imageRef);
 
-          // Update the report with the correct image URL
           const updatedReport = { ...report, image: imageUrl };
           await setDoc(doc(firestore, "reports", report.id), updatedReport);
         }
-
-        // Clear offline reports after successful sync
         await AsyncStorage.removeItem("offlineReports");
-        console.log("Offline reports synced to Firebase");
       }
     } catch (error) {
       console.error("Error syncing offline reports:", error);
@@ -115,61 +98,71 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
   };
 
   useEffect(() => {
-    // Listen for network changes and sync offline data when back online
     const unsubscribe = NetInfo.addEventListener(async (state) => {
-      if (state.isConnected) {
-        // Sync offline reports to Firebase
-        await syncOfflineReports();
-      }
+      if (state.isConnected) await syncOfflineReports();
     });
-
-    return () => unsubscribe(); // Cleanup network listener on unmount
+    return () => unsubscribe();
   }, []);
+  
+//local notification
+const sendNotification = async (message) => {
+  
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Report Update",
+      body: message,
+      sound: "default",
+    },
+    trigger: null,
+  });
 
-  // Submit report to Firestore (or AsyncStorage if offline)
+  // Store notification in Firestore
+  if (userId) {
+    const notification = {
+      userId,
+      message,
+      timestamp: new Date(),
+    };
+
+    await addDoc(collection(db, "notifications"), notification);
+  }
+};
   const submitReport = async () => {
     if (image && input && userId && urgency) {
       try {
-        // const newReportId = uuidv4();
         setLoading(true);
         const newReport = {
-          // id: newReportId,
-          image, // Save the local image URI for now
+          image,
           description: input,
           timestamp: new Date(),
           latitude,
           longitude,
-          userId, // Include the authenticated user's ID
-          urgency
+          userId,
+          urgency,
         };
 
-        // Check network status
         const isOnline = await checkIfOnline();
 
         if (isOnline) {
-          // If online, upload image and report to Firebase
           const imageRef = ref(storage, `images/`);
           const response = await fetch(image);
           const blob = await response.blob();
           await uploadBytes(imageRef, blob);
 
           const imageUrl = await getDownloadURL(imageRef);
-          newReport.image = imageUrl; // Update image URL after upload
+          newReport.image = imageUrl;
 
-          // Add the new report to Firestore
           await addDoc(collection(db, "reports"), newReport);
-          setLoading(false)
+          setLoading(false);
+          await sendNotification("Your report has been submitted successfully.");
         } else {
-          // If offline, save the report locally using AsyncStorage
           const storedReports = await AsyncStorage.getItem("offlineReports");
           const reportsArray = storedReports ? JSON.parse(storedReports) : [];
           reportsArray.push(newReport);
-
           await AsyncStorage.setItem("offlineReports", JSON.stringify(reportsArray));
-          console.log("Report saved offline");
+          await sendNotification("Report saved offline. It will sync when online.");
         }
 
-        // Clear input and close modal
         setImage(null);
         setInput("");
         setModalVisible(false);
@@ -183,39 +176,28 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
     }
   };
 
-  // Delete a report from Firebase (if online)
   const deleteReport = async (reportId, imageUri, userId) => {
     try {
-      // Check if online before deleting from Firebase
       const isOnline = await checkIfOnline();
       if (isOnline) {
-        console.log("Deleting report from Firebase...");
-        const reportRef = doc(db, "reports", reportId); // Access the specific document
-        await deleteDoc(reportRef); // Delete the document
-  
-        // Delete image from Firebase Storage if it exists
+        const reportRef = doc(db, "reports", reportId);
+        await deleteDoc(reportRef);
+
         if (imageUri && userId) {
-          console.log("Image URI before deletion:", imageUri);
-  
-          // Construct the path based on the userId and image file
           const userImagePath = `users/${userId}/images/${imageUri}`;
-  
-          const imageRef = ref(storage, userImagePath); // Get reference to the user's image
-          await deleteObject(imageRef); // Delete the image
-          console.log("Image deleted from Firebase Storage");
+          const imageRef = ref(storage, userImagePath);
+          await deleteObject(imageRef);
         }
-  
-        console.log("Report and associated image deleted from Firebase");
+        await sendNotification("Report successfully deleted.");
       }
-  
-      setOverlayMessage("Report successfully deleted.");
-      setVisible(true);
     } catch (error) {
       console.error("Error deleting report: ", error);
       setOverlayMessage("Error deleting report: " + error.message);
       setVisible(true);
     }
   };
+
+  // Rest of you
   
 
   // Upload image from camera or gallery
@@ -422,6 +404,13 @@ const [imageLoading, setImageLoading] = useState(true); // For image loading
     </TouchableWithoutFeedback>
   );
 }
+const requestNotificationPermission = async () => {
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== 'granted') {
+    alert('Notification permissions not granted!');
+  }
+};
+
 
 const styles = StyleSheet.create({
   container: {
@@ -597,3 +586,4 @@ const styles = StyleSheet.create({
 
   },
 });
+

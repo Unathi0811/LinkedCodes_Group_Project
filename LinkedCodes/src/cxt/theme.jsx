@@ -1,10 +1,10 @@
 import React, { createContext, useState, useContext } from 'react';
 
-//default theme values for light and dark mode
+// Default theme values for light and dark mode
 const themes = {
   dark: {
     text: '#FFFFFF', // White text
-    background: '#202A44', //navy blue background
+    background: '#202A44', // Navy blue background
   },
   light: {
     text: '#202A44', // Navy blue text
@@ -12,10 +12,10 @@ const themes = {
   },
 };
 
-// then create the ThemeContext
+// Create the ThemeContext
 const ThemeContext = createContext();
 
-// selt created hook to use the theme context
+// Custom hook to use the theme context
 export const useTheme = () => useContext(ThemeContext);
 
 // ThemeProvider component to manage theme state
@@ -33,3 +33,4 @@ export const ThemeProvider = ({ children }) => {
     </ThemeContext.Provider>
   );
 };
+

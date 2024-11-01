@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,45 +7,51 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useUser } from "../../../src/cxt/user";
+import { useNavigation } from "@react-navigation/native";
 import { auth, db } from "../../../firebase";
-import {
-  doc,
-  updateDoc,
-  deleteDoc,
-} from "firebase/firestore";
+import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
-import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "firebase/storage";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import Icon from "react-native-vector-icons/FontAwesome";
-import {
-  deleteUser
-} from "firebase/auth";
+import { deleteUser, signOut, updatePassword } from "firebase/auth";
+import { useTheme } from "../../../src/cxt/theme"; // Adjust path as necessary
 
 const EditProfile = () => {
+  const navigation = useNavigation();
   const { user, setUser } = useUser();
+  const { theme } = useTheme(); // Use the theme context
   const [username, setUsername] = useState(user?.username || "");
   const [email, setEmail] = useState(user?.email || "");
   const [mobile, setMobile] = useState(user?.mobile || "");
   const [image, setImage] = useState(user.profileImage);
-  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState(""); // New password state
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Set navigation options with setProfileImage function
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={pickImage}>
+          <Icon name="camera" size={24} color={theme.text} />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, theme.text]);
 
   const handleSave = async () => {
+    setIsLoading(true);
     try {
-      const userDoc = doc(db, "user", user.uid); // Update user doc in Firestore
-
+      const userDoc = doc(db, "user", user.uid);
       await updateDoc(userDoc, {
         username,
         email,
         mobile,
       });
 
-      // update the user context
       setUser({
         ...user,
         username,
@@ -53,9 +59,19 @@ const EditProfile = () => {
         mobile,
       });
 
+      // If a new password is provided, update it
+      if (newPassword) {
+        await updatePassword(auth.currentUser, newPassword);
+        Alert.alert("Success", "Password updated successfully.");
+      }
+
       console.log("Profile updated successfully");
+      navigation.navigate("profile");
     } catch (error) {
       console.error("Error updating profile:", error);
+      Alert.alert("Error", "Unable to update profile. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -74,15 +90,10 @@ const EditProfile = () => {
         const uploadResp = await uploadToFirebase(
           result.assets[0].uri,
           fileName,
-          (progress) => {
-            console.log(progress); // Show upload progress
-          }
+          (progress) => console.log(progress)
         );
         await saveProfileImage(user.uid, uploadResp.downloadUrl);
-        setUser({
-          ...user,
-          profileImage: uploadResp.downloadUrl,
-        });
+        setUser({ ...user, profileImage: uploadResp.downloadUrl });
       }
     } catch (e) {
       console.log(e);
@@ -94,18 +105,12 @@ const EditProfile = () => {
       const currentUser = auth.currentUser;
 
       if (currentUser) {
-        // Delete user from Firebase Auth
         await deleteUser(currentUser);
-
-        // Remove user data from Firestore
         const userDoc = doc(db, "users", currentUser.uid);
         await deleteDoc(userDoc);
-
-        // Sign out the user after deletion
         await signOut(auth);
         console.log("User account deleted and logged out");
-        alert("Your account has been deleted.");
-        // You can navigate to a login screen or homepage here
+        Alert.alert("Your account has been deleted.");
       }
     } catch (error) {
       console.error("Error deleting account:", error);
@@ -118,37 +123,24 @@ const EditProfile = () => {
       "Delete Account",
       "Are you sure you want to delete your account? This action is irreversible.",
       [
-        {
-          text: "Cancel",
-          onPress: () => console.log("Account deletion canceled"),
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          onPress: handleDeleteAccount,
-          style: "destructive",
-        },
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", onPress: handleDeleteAccount, style: "destructive" },
       ],
       { cancelable: true }
     );
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.profileImageContainer}>
         <Image
           style={styles.profileImage}
-          source={{
-            uri: user.profileImage ?? "https://via.placeholder.com/150",
-          }}
+          source={{ uri: image ?? "https://via.placeholder.com/150" }}
         />
-        <TouchableOpacity style={styles.cameraIcon} onPress={pickImage}>
-          <Icon name="camera" size={24} color="#202A44" />
-        </TouchableOpacity>
       </View>
       <ScrollView style={styles.scrollContainer}>
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Username</Text>
+          <Text style={[styles.label, { color: theme.text }]}>Username</Text>
           <TextInput
             style={styles.input}
             value={username}
@@ -157,7 +149,7 @@ const EditProfile = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={[styles.label, { color: theme.text }]}>Email</Text>
           <TextInput
             style={styles.input}
             value={email}
@@ -167,18 +159,18 @@ const EditProfile = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Password</Text>
+          <Text style={[styles.label, { color: theme.text }]}>New Password</Text>
           <TextInput
             style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={true}
-            placeholder="**********"
+            value={newPassword}
+            onChangeText={setNewPassword}
+            secureTextEntry
+            placeholder="Enter new password"
           />
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Mobile</Text>
+          <Text style={[styles.label, { color: theme.text }]}>Mobile</Text>
           <TextInput
             style={styles.input}
             value={mobile}
@@ -188,24 +180,20 @@ const EditProfile = () => {
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.deleteButton} onPress={handleSave}>
-            <Text style={styles.deleteButtonText}>Save Changes</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={confirmDeleteAccount}
-          >
-            <Text style={styles.buttonText}>Delete Account</Text>
-          </TouchableOpacity>
-
+          {isLoading ? (
+            <ActivityIndicator size="large" color={theme.text} />
+          ) : (
+            <TouchableOpacity style={styles.deleteButton} onPress={handleSave}>
+              <Text style={styles.deleteButtonText}>Save Changes</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </View>
   );
 };
 
-// Additional Firebase-related functions (unchanged)
+// Firebase-related functions
 const uploadToFirebase = async (uri, name, onProgress) => {
   const fetchResponse = await fetch(uri);
   const blob = await fetchResponse.blob();
@@ -220,11 +208,8 @@ const uploadToFirebase = async (uri, name, onProgress) => {
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         onProgress && onProgress(progress);
       },
-      (error) => reject(error),
-      async () => {
-        const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
-        resolve({ downloadUrl });
-      }
+      reject,
+      async () => resolve({ downloadUrl: await getDownloadURL(uploadTask.snapshot.ref) })
     );
   });
 };
@@ -238,7 +223,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
     color: "#202A44",
   },
   scrollContainer: {
@@ -258,6 +242,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
     paddingBottom: 30,
     height: 150,
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
+    overflow: 'hidden',
   },
   profileImage: {
     width: 100,
@@ -268,19 +255,12 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginBottom: 10,
   },
-  cameraIcon: {
-    position: "absolute",
-    bottom: 40,
-    right: 170,
-    padding: 5,
-  },
   inputContainer: {
     marginBottom: 18,
   },
   label: {
     fontSize: 16,
     marginBottom: 8,
-    color: "#202A44",
     marginLeft: 20,
   },
   input: {
@@ -300,33 +280,23 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginTop: 20,
     marginHorizontal: 20,
-    gap: 20,
-  },
-  buttonText: {
-    color: "#202A44",
-    fontWeight: "bold",
-    marginLeft: 64,
-    fontSize: 15,
+    marginBottom: 30,
   },
   deleteButton: {
     backgroundColor: "#202A44",
     borderRadius: 12,
-    paddingVertical: 12,
-    marginHorizontal: 20,
-    width: "100%",
-    marginLeft: 0,
-    elevation: 5,
+    padding: 15,
     alignItems: "center",
+    elevation: 5,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     shadowColor: "#202A44",
-    marginTop: 0,
   },
   deleteButtonText: {
     color: "#fff",
+    fontSize: 16,
     fontWeight: "bold",
-    fontSize: 18,
   },
 });
 

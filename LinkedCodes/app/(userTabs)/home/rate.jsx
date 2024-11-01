@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, TextInput, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, TextInput, Alert } from 'react-native';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { auth, db } from "../../../firebase";
+import { useTheme } from '../../../src/cxt/theme'; // Import the useTheme hook
+import globalStyles from '../../../src/cxt/globalstyle'; // Import global styles
 
-const RateUs = ({ isDarkMode }) => {
+const RateUs = () => {
+  const { theme } = useTheme(); // Access the current theme
+  const styles = globalStyles(theme); // Get styles based on the current theme
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({
     userName: '',
@@ -49,35 +53,35 @@ const RateUs = ({ isDarkMode }) => {
   };
 
   const renderReview = ({ item }) => (
-    <View style={[styles.reviewContainer, { backgroundColor: isDarkMode ? '#2C2C2C' : '#FFFFFF' }]}>
+    <View style={styles.reviewContainer}>
       <View style={styles.reviewContent}>
-        <Text style={[styles.userName, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>{item.userName}</Text>
+        <Text style={styles.userName}>{item.userName}</Text>
         <View style={styles.ratingContainer}>{renderStars(item.rating)}</View>
-        <Text style={[styles.comment, { color: isDarkMode ? '#FFFFFF' : '#000000' }]}>{item.comment}</Text>
+        <Text style={styles.comment}>{item.comment}</Text>
       </View>
     </View>
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#000000' : '#EAF1FF' }]}>
+    <View style={styles.container}>
       <FlatList
         data={reviews}
         renderItem={renderReview}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
       />
-      <View style={[styles.newReviewContainer, { backgroundColor: isDarkMode ? '#1e1e1e' : '#ffffff' }]}>
+      <View style={styles.newReviewContainer}>
         <TextInput
-          style={[styles.input, { backgroundColor: isDarkMode ? '#333333' : '#ffffff', color: isDarkMode ? '#ffffff' : '#000000' }]}
+          style={styles.input}
           placeholder="Your Name"
-          placeholderTextColor={isDarkMode ? '#aaaaaa' : '#aaa'}
+          placeholderTextColor="#aaa"
           value={newReview.userName}
           onChangeText={(text) => setNewReview({ ...newReview, userName: text })}
         />
         <TextInput
-          style={[styles.input, { backgroundColor: isDarkMode ? '#333333' : '#ffffff', color: isDarkMode ? '#ffffff' : '#000000' }]}
+          style={styles.input}
           placeholder="Your Comment"
-          placeholderTextColor={isDarkMode ? '#aaaaaa' : '#aaa'}
+          placeholderTextColor="#aaa"
           value={newReview.comment}
           onChangeText={(text) => setNewReview({ ...newReview, comment: text })}
         />
@@ -95,66 +99,5 @@ const RateUs = ({ isDarkMode }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  listContainer: {
-    paddingBottom: 20,
-  },
-  reviewContainer: {
-    flexDirection: 'row',
-    marginBottom: 15,
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'flex-start',
-  },
-  reviewContent: {
-    flex: 1,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    marginBottom: 5,
-  },
-  star: {
-    fontSize: 18,
-    color: '#FFD700',
-    marginRight: 2,
-  },
-  comment: {
-    fontSize: 14,
-  },
-  newReviewContainer: {
-    marginTop: 20,
-    padding: 10,
-    borderRadius: 10,
-  },
-  input: {
-    height: 40,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  button: {
-    backgroundColor: '#202A44',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
 
 export default RateUs;

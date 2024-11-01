@@ -66,21 +66,20 @@ function Reporting() {
             const locationDescription =
               data.latitude && data.longitude
                 ? await fetchLocationDescription(data.latitude, data.longitude)
-                : "Location not available"; // Fetch location description for each report
+                : "Location not available";
 
             return {
               id: doc.id,
               ...data,
-              locationDescription, // Attach the location description
+              locationDescription,
             };
           })
         );
 
-        console.log("Fetched Reports:", reportList);
-
         const filteredReports = reportList.filter(
           (report) => report.userId !== undefined
         );
+
         const userIds = [
           ...new Set(filteredReports.map((report) => report.userId)),
         ];
@@ -92,21 +91,20 @@ function Reporting() {
             return {
               userId,
               name: userData.username,
-              profilePhoto:
-                userData.profileImage || "https://via.placeholder.com/60", // Default image if not set
+              profilePhoto: userData.profileImage || "https://via.placeholder.com/60",
             };
           }
           return {
             userId,
             name: "Unknown User",
             profilePhoto: "https://via.placeholder.com/60",
-          }; // Placeholder image for missing users
+          };
         });
 
         const userData = await Promise.all(userPromises);
         const userMap = {};
         userData.forEach((user) => {
-          userMap[user.userId] = user; // Store user data (name and profilePhoto)
+          userMap[user.userId] = user;
         });
 
         setUserNames(userMap);
@@ -123,13 +121,10 @@ function Reporting() {
     fetchReports();
   }, [user]);
 
-  // const filteredReports = reports.filter((report) => report.status === filter);
-
   const fetchLocationDescription = async (lat, long) => {
     try {
       const res = await Geocoder.from(lat, long);
-      const address = res.results[0].formatted_address; // Assuming results[0] has the address
-      return address;
+      return res.results[0]?.formatted_address || "Unable to fetch location."; // Use optional chaining
     } catch (error) {
       console.error("Geocoding error:", error);
       return "Unable to fetch location.";
@@ -137,42 +132,51 @@ function Reporting() {
   };
 
   const handleFilterChange = (filter) => {
-    setSelectedFilter(filter === selectedFilter ? null : filter); // Toggle filter
+    setSelectedFilter(filter === selectedFilter ? null : filter);
   };
 
   const filteredReports =
     selectedFilter === "Submitted"
       ? reports
       : selectedFilter
-        ? reports.filter((report) => report.status === selectedFilter)
-        : [];
-  //updating the report status
-  const updateReportStatus = async (reportId, newStatus) => {
-    try {
-      const reportRef = doc(db, "reports", reportId); // Reference to the specific report
-      await updateDoc(reportRef, {
-        status: newStatus, // Update the status field
-      });
-      console.log(`Report ${reportId} updated to ${newStatus}`);
+      ? reports.filter((report) => report.status === selectedFilter)
+      : [];
+const updateReportStatus = async (reportId, newStatus) => {
+  try {
+    const reportRef = doc(db, "reports", reportId);
+    const reportSnapshot = await getDoc(reportRef);
 
-      // Optionally, you can update the local state or show a success message
+    if (reportSnapshot.exists()) {
+      const reportData = reportSnapshot.data();
+      const userId = reportData.userId; // Get the userId from the report
+
+      // Update the report status
+      await updateDoc(reportRef, { status: newStatus });
+
+      // Create a notification for the user who submitted the report
+      await addDoc(collection(db, "notifications"), {
+        userId: userId,
+        reportId: reportId,
+        status: newStatus,
+        timestamp: new Date(),
+      });
+
       setReports((prevReports) =>
         prevReports.map((report) =>
           report.id === reportId ? { ...report, status: newStatus } : report
         )
       );
-    } catch (error) {
-      console.error("Error updating report status: ", error);
-      setError("Could not update report status. Please try again later.");
-      setOverlayVisible(true); // Show overlay for errors
     }
-  };
+  } catch (error) {
+    console.error("Error updating report status: ", error);
+    setError("Could not update report status. Please try again later.");
+    setOverlayVisible(true);
+  }
+};
 
-  // Fetch chat messages for the selected report
   const fetchChatMessages = (reportCreatorId) => {
     const currentUserId = auth.currentUser.uid;
     const chatId = [reportCreatorId, currentUserId].sort().join("_");
-
     const collectionRef = collection(db, "chats");
     const q = query(
       collectionRef,
@@ -194,29 +198,6 @@ function Reporting() {
     });
 
     return () => unsubscribe();
-  };
-
-  const statusIcons = {
-    Submitted: "file-text-o",
-    "In-Progress": "spinner",
-    Completed: "check-circle",
-  };
-
-  // For the location
-  const showLocation = async (lat, long) => {
-    setLatitude(lat);
-    setLongitude(long);
-
-    try {
-      const res = await Geocoder.from(lat, long); // Get location description from latitude and longitude
-      const address = res.results[0].formatted_address; // Assuming results[0] has the address
-      setLocationDescription(address);
-    } catch (error) {
-      console.error("Geocoding error:", error);
-      setLocationDescription("Unable to fetch location.");
-    }
-
-    setLocationModalVisible(true);
   };
 
   const onSend = useCallback(
@@ -245,13 +226,13 @@ function Reporting() {
     const user = userNames[item.userId] || {
       name: "Unknown User",
       profilePhoto: "https://via.placeholder.com/60",
-    }; // Default values for unknown users
+    };
 
     return (
       <View key={item.id} style={styles.card}>
         <View style={styles.profileContainer}>
           <Image
-            source={{ uri: user.profilePhoto }} // Display the user profile picture
+            source={{ uri: user.profilePhoto }}
             style={styles.profileImage}
           />
           <Text style={styles.initials}>{user.name}</Text>
@@ -265,20 +246,17 @@ function Reporting() {
             }
           />
           <Text style={styles.description}>
-            Descption: {item.description || "No description available."}
+            Description: {item.description || "No description available."}
           </Text>
           <Text style={styles.description}>
             Urgency Level: {item.urgency}
           </Text>
-          {/* Display location directly under the description */}
           {item.latitude && item.longitude && (
             <Text style={styles.description}>
               Location: {item.locationDescription || "No location available"}
             </Text>
           )}
-
-          <Text style={styles.description}>Status: </Text>
-          {/* Status Update Icons */}
+          <Text style={styles.description}>Status:</Text>
           <View style={styles.statusIcons}>
             <TouchableOpacity
               onPress={() => updateReportStatus(item.id, "In-Progress")}
@@ -286,150 +264,80 @@ function Reporting() {
               <Icon4
                 name="spinner"
                 size={20}
-                color={item.status === "In-Progress" ? "#202A44" : "#ccc"}
+                color={item.status === "In-Progress" ? "blue" : "gray"}
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => updateReportStatus(item.id, "Completed")}
+              onPress={() => updateReportStatus(item.id, "Resolved")}
             >
               <Icon4
-                name="check-circle"
+                name="check"
                 size={20}
-                color={item.status === "Completed" ? "#202A44" : "#ccc"}
+                color={item.status === "Resolved" ? "green" : "gray"}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => updateReportStatus(item.id, "Unresolved")}
+            >
+              <Icon4
+                name="times"
+                size={20}
+                color={item.status === "Unresolved" ? "red" : "gray"}
               />
             </TouchableOpacity>
           </View>
-
-          <View style={styles.iconContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedReport(item);
-                setChatVisible(true);
-                fetchChatMessages(item.userId);
-              }}
-            >
-              <Icon2 name="chatbox-outline" size={24} color="#202A44" />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.chatButton}
+            onPress={() => {
+              setChatVisible(true);
+              setSelectedReport(item);
+              fetchChatMessages(item.userId);
+            }}
+          >
+            <Text style={styles.chatButtonText}>Chat</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
   };
 
-  const filters = ["Submitted", "In-Progress", "Completed"];
-
-  const renderFilterItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.btn}
-      onPress={() => handleFilterChange(item)} // Ensure handleFilterChange exists
-    >
-      {/* Ensure that statusIcons[item] exists and is valid */}
-      {statusIcons[item] && (
-        <Icon4 name={statusIcons[item]} size={16} color="#fff" />
-      )}
-
-      {/* Text wrapped in <Text> */}
-      <Text style={styles.btnText}>{item.toString()}</Text>
-    </TouchableOpacity>
-  );
-
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.appName}>InfraSmart</Text>
-      </View>
-
-      {/* Filters using FlatList */}
-      <FlatList
-        data={filters}
-        renderItem={renderFilterItem}
-        keyExtractor={(item, index) => index.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.horScrollView}
-      />
-
-      {/* Reports List */}
+    <SafeAreaView style={styles.container}>
       {loadingReports ? (
-        <ActivityIndicator size="large" color="#202A44" />
-      ) : filteredReports.length > 0 ? (
-        <FlatList
-          data={filteredReports}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-        />
-      ) : selectedFilter !== "Submitted" ? (
-        <Text style={styles.emptyRep}>
-          No reports available for this status.
-        </Text>
-      ) : reports.length > 0 ? (
-        <FlatList
-          data={reports}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-        />
+        <ActivityIndicator size="large" color="#0000ff" />
       ) : (
-        <Text style={styles.emptyRep}>No reports available.</Text>
+        <FlatList
+          data={filteredReports.length > 0 ? filteredReports : reports}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id || item.index}
+          style={styles.list}
+        />
       )}
-
-      {/* Error Overlay */}
       <Overlay
         isVisible={overlayVisible}
         onBackdropPress={() => setOverlayVisible(false)}
-        overlayStyle={styles.overlay}
       >
-        <View style={styles.overlayContent}>
-          <Icon3
-            name="info"
-            size={50}
-            color="#000"
-            style={styles.overlayIcon}
-          />
-          <Text style={styles.overlayText}>{error}</Text>
-        </View>
+        <Text>{error}</Text>
       </Overlay>
-
-      {/* Confirmation Overlay */}
-      <Overlay
-        isVisible={confirmationVisible}
-        onBackdropPress={() => setConfirmationVisible(false)}
-        overlayStyle={styles.overlay}
-      >
-        <Text>Confirmation Message</Text>
-      </Overlay>
-
-      {/* Chat Modal */}
-      <Modal
-        visible={chatVisible}
-        onRequestClose={() => setChatVisible(false)}
-        animationType="slide"
-      >
-        <SafeAreaView style={styles.chatContainer}>
-          <View style={styles.chatHeader}>
-            <Text style={styles.chatTitle}>
-              Chat with{" "}
-              {userNames[selectedReport?.userId]?.name || "Unknown User"}
-            </Text>
-            <TouchableOpacity onPress={() => setChatVisible(false)}>
-              <Icon2 name="close" size={24} color="#202A44" />
-            </TouchableOpacity>
-          </View>
-          <GiftedChat
-            messages={messages}
-            onSend={(messages) => onSend(messages)}
-            user={{
-              _id: auth.currentUser.uid, // Current user's ID
-            }}
-            renderLoading={() => (
-              <ActivityIndicator size="large" color="#202A44" />
-            )}
-          />
-          {loadingChat && <ActivityIndicator size="large" color="#202A44" />}
-        </SafeAreaView>
+      <Modal visible={chatVisible} animationType="slide">
+        <GiftedChat
+          messages={messages}
+          onSend={onSend}
+          user={{
+            _id: auth.currentUser.uid,
+          }}
+          renderLoading={() => (
+            <ActivityIndicator size="large" color="#0000ff" />
+          )}
+        />
+        <TouchableOpacity
+          onPress={() => setChatVisible(false)}
+          style={styles.closeChatButton}
+        >
+          <Text style={styles.closeChatButtonText}>Close</Text>
+        </TouchableOpacity>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -634,4 +542,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-

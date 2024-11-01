@@ -18,6 +18,8 @@ const Layout = () => {
                     elevation: 0,
                     shadowOpacity: 0,
                     },
+                    headerBackTitleVisible: false,
+                    headerTintColor: '#fff' 
                 }} 
                 />
         </>

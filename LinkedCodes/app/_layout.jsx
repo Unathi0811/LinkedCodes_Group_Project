@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Alert } from "react-native";
+<<<<<<< HEAD
 import { ThemeProvider } from "../src/cxt/theme"; // Make sure the path is correct
 import * as Notifications from 'expo-notifications';
 
@@ -19,6 +20,10 @@ Notifications.setNotificationHandler({
   }),
 });
 
+=======
+import { ThemeProvider } from "../src/cxt/theme";
+import { AuditContextProvider } from "../src/cxt/audit";
+>>>>>>> origin/master
 const Layout = () => {
   const [inactivityTimeoutCount, setInactivityTimeoutCount] = useState(0);
   const [isActive, setIsActive] = useState(true); // To manage activity state
@@ -52,7 +57,7 @@ const Layout = () => {
       {
         text: "OK",
         onPress: () => {
-          console.log("User inactive, logging out...");
+          console.log("User inactive, logging out...") 
           signOut(auth)
             .then(() => {
               console.log("User logged out");
@@ -75,12 +80,13 @@ const Layout = () => {
       isActive={isActive}
       onInactive={() => {
         setInactivityTimeoutCount(inactivityTimeoutCount + 1);
-        handleInactivity(); // Call the logout function
+        handleInactivity(); 
       }}
       timeForInactivity={1300000} // 30 minutes
       restartTimerOnActivityAfterExpiration={false}
       loop={loop}
     >
+<<<<<<< HEAD
       <ThemeProvider>
         <ReportProvider>
           <UserProvider>
@@ -89,6 +95,19 @@ const Layout = () => {
           </UserProvider>
         </ReportProvider>
       </ThemeProvider>
+=======
+      {/* theme provider here, for the theme */}
+    <ThemeProvider>
+    <AuditContextProvider>
+      <ReportProvider>
+        <UserProvider>
+          <StatusBar style="dark" />
+          <Slot />
+        </UserProvider>
+      </ReportProvider>
+      </AuditContextProvider>
+    </ThemeProvider>
+>>>>>>> origin/master
     </ReactNativeInactivity>
   );
 };

@@ -6,26 +6,42 @@ import { useUser } from "../src/cxt/user";
 import { doc, getDoc } from "firebase/firestore";
 
 const Layout = () => {
-  const { setUser } = useUser();
+	const { setUser } = useUser();
 
-  getAuth(app).onAuthStateChanged(async (user) => {
-    if (!user) return router.replace("/(auth)");
+	getAuth(app).onAuthStateChanged(async (user) => {
+		if (!user) return router.replace("/(auth)");
+		try {
+			const docRef = doc(db, "user", user.uid);
+			const docSnap = await getDoc(docRef);
 
-    try {
-      const docRef = doc(db, "user", user.uid);
-      const docSnap = await getDoc(docRef);
+			let userType = false;
+			if (docSnap.exists()) {
+				const uData = docSnap.data();
 
-      let userType = false;
-      if (docSnap.exists()) {
-        const uData = docSnap.data();
+				if (uData.blocked || uData.deleted) {
+					Alert.alert(
+						"Acess Denied",
+						"User account disabled or deleted."
+					);
+					signOut(getAuth());
+					return <Redirect href="/(auth)/login"></Redirect>;
+				}
 
+				setUser({ ...uData, uid: docSnap.id });
+				userType = docSnap.data().userType;
+			} else {
+				setUser({ uid: user.uid, email: user.email });
+			}
 
-        if (uData.blocked || uData.deleted) {
-          Alert.alert("Acess Denied", "User account disabled or deleted.");
-          signOut(getAuth())
-          return <Redirect href="/(auth)/login"></Redirect>;
-        }
+			return userType
+				? router.replace("/(tabs)/Home")
+				: router.replace("/(userTabs)/home");
+		} catch (error) {
+			console.error("Error fetching user data: ", error);
+		}
+	});
 
+<<<<<<< HEAD
         setUser({ ...uData, uid: docSnap.id });
         userType = docSnap.data().userType;
       } else {
@@ -47,6 +63,20 @@ const Layout = () => {
  
     </View>
   );
+=======
+	return (
+		<View
+			style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+		>
+			<ActivityIndicator
+				size="large"
+				color="#202A44"
+			/>
+			<Text>Loading...</Text>
+			{/* <Link href="/(userTabs)/traffic">user</Link> */}
+		</View>
+	);
+>>>>>>> origin/master
 };
 
 export default Layout;

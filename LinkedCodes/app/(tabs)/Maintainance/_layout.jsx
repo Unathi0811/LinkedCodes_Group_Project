@@ -1,15 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { StatusBar } from 'expo-status-bar'
-import { Stack } from 'expo-router'
+import React from "react";
+import { Stack } from "expo-router";
 
-const Layout = () => {
-    return (
-        <>
-            <StatusBar style="light" />
-            <Stack screenOptions={{ headerShown: false}} />
-        </>
-    )
-}
+const Layout = () => (
+	<Stack
+		screenOptions={{ headerShown: false }}
+		initialRouteName="index"
+	/>
+);
 
-export default Layout
+export default Layout;

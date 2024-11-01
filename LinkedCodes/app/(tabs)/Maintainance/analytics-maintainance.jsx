@@ -12,6 +12,8 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import CategotyAnalytics from "../../../src/components/graphs/ReportsCategory";
 import FutureAnalysis from "../../../src/components/graphs/FutureAnalysis";
 import ReportTypeAnalyticts from "../../../src/components/graphs/TypeOfReport";
+import MaintainaceAnalytics from "../../../src/components/graphs/historyMaintainance";
+import MaintenanceStatus from "../../../src/components/graphs/historyMaintainanceStatus";
 
 const Analytics = () => {
 	const router = useRouter();
@@ -22,7 +24,7 @@ const Analytics = () => {
 				options={{
 					headerShown: true,
 					headerStyle: {},
-					headerTitle: "Analytics",
+					headerTitle: "Analytics Maintainance",
 					headerLeft: () => (
 						<TouchableOpacity
 							style={styles.backButton}
@@ -42,11 +44,8 @@ const Analytics = () => {
 				style={{ flex: 1 }}
 				contentContainerStyle={styles.scrollContent}
 			>
-				<ReportTypeAnalyticts />
-				<FutureAnalysis />
-				<ReviewsAnalytics />
-				<CategotyAnalytics />
-				{/* Add more graph components here as needed */}
+				<MaintainaceAnalytics />
+				<MaintenanceStatus />
 			</ScrollView>
 		</View>
 	);

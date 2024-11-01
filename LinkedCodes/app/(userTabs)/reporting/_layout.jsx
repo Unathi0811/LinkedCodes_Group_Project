@@ -1,3 +1,7 @@
 import { Stack } from "expo-router";
 
-export default Stack;
+export default Layout = () => <Stack
+screenOptions={{
+  headerShown: false,
+}}
+/>

@@ -9,7 +9,8 @@ import {
   Alert,
 } from "react-native";
 import { MaterialIcons, AntDesign, FontAwesome } from "@expo/vector-icons"; // Importing icons
-
+import Icon from "react-native-vector-icons/FontAwesome"
+import { useRouter } from "expo-router";
 const Emergency = () => {
   // Preloaded emergency contacts including public works number
   const contacts = [
@@ -17,7 +18,7 @@ const Emergency = () => {
     { id: "2", name: "Department of Road and Traffic", phone: "0795822643" },
     { id: "3", name: "Public Works", phone: "065 515 8443" }, // Public works number added
   ];
-
+  const router = useRouter()
   // Define SOS number (South African number)
   const sosNumber = "10111"; // South African SOS number
 
@@ -79,7 +80,21 @@ const Emergency = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Emergency Contacts</Text>
+      <View style={styles.header}>
+					{/* Back Button */}
+					<TouchableOpacity
+						onPress={() => router.push("/(userTabs)/home")}
+						style={styles.backButton}
+					>
+						<Icon
+							name="arrow-left"
+							size={20}
+							color="#202A44"
+						/>
+					</TouchableOpacity>
+					<Text style={styles.title}>Emergency Contacts</Text>
+				</View>
+      
       <FlatList
         data={contacts}
         renderItem={renderContact}
@@ -131,14 +146,15 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: "700",
     color: "#202A44",
-    marginBottom: 25,
+    marginTop: 25,
     textAlign: "center",
   },
   contactList: {
     paddingBottom: 20,
+    marginTop: 93,
   },
   contactItem: {
     flexDirection: "row",
@@ -200,6 +216,25 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#333",
   },
+  header: {
+		position: "absolute",
+		left: 0,
+		right: 0,
+		flexDirection: "row",
+		alignContent: "space-between",
+		alignItems: "center",
+		padding: 20,
+		zIndex: 10,
+		backgroundColor: "#fff",
+		height: 100,
+		marginBottom: 5,
+    gap: 49,
+		borderBlockEndColor: "#ccc",
+	},
+	backButton: {
+		padding: 10,
+		marginTop: 20,
+	},
 });
 
 export default Emergency;

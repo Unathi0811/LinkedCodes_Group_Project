@@ -1,84 +1,65 @@
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
-import React, { useState } from 'react';
+import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { router } from 'expo-router';
-// import { useTheme, themes } from '../../../src/cxt/theme';
 
 const Settings = () => {
-  // const { theme, toggleTheme } = useTheme();
-
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Settings</Text>
-      <ScrollView contentContainerStyle={styles.scrollContainer} >
+      <View style={styles.scrollContainer} >
         <TouchableOpacity style={styles.option}
           onPress={() => {
-            router.push('/(tabs)/Settings/notifications' );
-            }}
+            router.push('/(tabs)/Settings/notifications');
+          }}
         >
-          <Text style={styles.optionText}>Notification Settings
-            {/* a bell icon that shows how many noticifications the admin has... */}
-          </Text>
+          <Text style={styles.optionText}>Notifications</Text>
           <Icon 
-            style={styles.bellIcon}
-            name='bell' color="#fff" size={22}
+            name='bell' 
+            color="#fff" 
+            size={22} 
+            style={styles.icon}
           />
         </TouchableOpacity>
-        {/* theme here */}
-        {/* <TouchableOpacity style={styles.option} onPress={toggleTheme}>
-          <Text style={[styles.optionText, { color: theme.text }]}>Theme</Text>
-          <Icon
-            name={theme === themes.light ? 'moon' : 'sun'}
-            color={theme.text}
-            size={22}
-            style={styles.themeIcon}
-          />
-        </TouchableOpacity> */}
-        
+
         <TouchableOpacity style={styles.option}
-        onPress={() => {
-          router.push('/(tabs)/Settings/support-page' );
+          onPress={() => {
+            router.push('/(tabs)/Settings/support-page');
           }}
         >
           <Text style={styles.optionText}>Feedback and Support</Text>
           <Icon 
-          style={styles.feedbackIcon}
-          name='comments' 
-          color="#fff" 
-          size={22} 
-        />
+            name='comments' 
+            color="#fff" 
+            size={22} 
+            style={styles.icon} 
+          />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.option}
-        onPress={() => {
-          router.push('/(tabs)/Settings/permissions' );
+          onPress={() => {
+            router.push('/(tabs)/Settings/permissions');
           }}
         >
           <Text style={styles.optionText}>Permissions</Text>
           <Icon 
-          style={{
-            marginLeft: 104,
-          }}
-          name='lock' 
-          color="#fff" 
-          size={22} 
-        />
+            name='lock' 
+            color="#fff" 
+            size={22} 
+            style={styles.icon} // Updated here
+          />
         </TouchableOpacity>
-        
-        {/* when this touchable opacity is pressed it should pop up an alert that has fingerprint and face recognition, both with an enable and disable button of some sort, so when pressed it can enabe the biometrics
-          for the user, which means they dont have to use their passwords to login anymore, they can login using either fo thr two.
-        */}
-        <TouchableOpacity style={styles.option}
-        >
+
+        <TouchableOpacity style={styles.option}>
           <Text style={styles.optionText}>Biometrics</Text>
           <Icon 
-          style={styles.biometricsIcon}
-          name='fingerprint' 
-          color="#fff" 
-          size={22} 
-        /> 
+            name='fingerprint' 
+            color="#fff" 
+            size={22} 
+            style={styles.icon}
+          /> 
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -104,7 +85,6 @@ const styles = StyleSheet.create({
     right: 0,
     paddingHorizontal: 20,
     paddingVertical: 50,
-    backgroundColor: "#202A44",
     zIndex: 1,
   },
   scrollContainer: {
@@ -121,24 +101,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1,
     flexDirection: "row",
-    gap: 70,
-    alignContent: "space-between"
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
   },
   optionText: {
     fontSize: 18,
     color: '#fff',
   },
-  bellIcon: {
-    marginTop: 4,
-    marginLeft: 21,
+  icon: {
+    marginLeft: 10, 
   },
-  biometricsIcon: {
-    marginLeft: 120,
-  },
-  themeIcon: {
-    marginLeft: 156,
-  },
-  feedbackIcon: {
-    marginRight: 166,
-  }
 });

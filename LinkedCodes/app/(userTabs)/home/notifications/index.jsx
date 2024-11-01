@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router'; // Import useRouter from expo-router
@@ -9,18 +7,18 @@ const NotificationsScreen = ({ isDarkMode }) => {
 
     return (
         <View style={[styles.container, { backgroundColor: isDarkMode ? '#202A44' : '#F0F4F8' }]}>
-            <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#003366' }]}>Notifications</Text>
+            <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#202A44' }]}>Notifications</Text>
 
             <TouchableOpacity
-                style={[styles.button, { backgroundColor: isDarkMode ? '#333' : '#003366' }]}
-                onPress={() => router.push('/Messages')} // Use router.push for navigation
+                style={[styles.button, { backgroundColor: isDarkMode ? '#333' : '#202A44' }]}
+                onPress={() => router.push('/(userTabs)/home/notifications/Messages')} // Use router.push for navigation
             >
                 <Text style={styles.buttonText}>Go to Messages</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-                style={[styles.button, { backgroundColor: isDarkMode ? '#333' : '#003366' }]}
-                onPress={() => router.push('/Reports')} // Use router.push for navigation
+                style={[styles.button, { backgroundColor: isDarkMode ? '#333' : '#202A44' }]}
+                onPress={() => router.push('/(userTabs)/reporting')} // Use router.push for navigation
             >
                 <Text style={styles.buttonText}>Go to Reports</Text>
             </TouchableOpacity>

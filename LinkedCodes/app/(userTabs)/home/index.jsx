@@ -57,7 +57,7 @@ const Home = () => {
 
               <TouchableOpacity
                 style={styles.drawerItem}
-                onPress={() => router.push("/(userTabs)/home/settings")}
+                onPress={() => router.push("/(userTabs)/settings")}
               >
                 <Text style={styles.drawerItemText}>Settings</Text>
                 <Icon name="cog" size={20} color="#fff" style={styles.drawerIcon} />
@@ -69,6 +69,14 @@ const Home = () => {
               >
                 <Text style={styles.drawerItemText}>Rate Us</Text>
                 <Icon2 name="star" size={24} color="#fff" style={styles.drawerIcon} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.drawerItem}
+                onPress={() => router.push("/(userTabs)/home/emergency")}
+              >
+                <Text style={styles.drawerItemText}>Emergency</Text>
+                <Icon2 name="phone" size={24} color="#fff" style={styles.drawerIcon} />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -156,7 +164,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     zIndex: 10,
-    backgroundColor: "#F2f9FB",
+    backgroundColor: "#fff",
   },
   hamburgerButton: {
     padding: 10,

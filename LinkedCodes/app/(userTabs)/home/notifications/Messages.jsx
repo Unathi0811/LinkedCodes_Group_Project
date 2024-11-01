@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router'; // Import useRouter from expo-router
@@ -23,7 +21,6 @@ const Messages = ({ isDarkMode }) => {
             ) : (
                 <FlatList data={messagesData} renderItem={renderItem} keyExtractor={(item) => item.id} />
             )}
-          
             <TouchableOpacity style={styles.backButton} onPress={() => router.push('/Notifications')}> 
                 <Text style={styles.backButtonText}>Back to Notifications</Text>
             </TouchableOpacity>

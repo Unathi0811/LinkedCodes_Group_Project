@@ -72,60 +72,6 @@ function Reporting() {
 								  )
 								: "Location not available"; // Fetch location description for each report
 
-<<<<<<< HEAD
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        setLoadingReports(true);
-        const reportsCollection = collection(db, "reports");
-        const reportSnapshot = await getDocs(reportsCollection);
-        const reportList = await Promise.all(
-          reportSnapshot.docs.map(async (doc) => {
-            const data = doc.data();
-            const locationDescription =
-              data.latitude && data.longitude
-                ? await fetchLocationDescription(data.latitude, data.longitude)
-                : "Location not available";
-
-            return {
-              id: doc.id,
-              ...data,
-              locationDescription,
-            };
-          })
-        );
-
-        const filteredReports = reportList.filter(
-          (report) => report.userId !== undefined
-        );
-
-        const userIds = [
-          ...new Set(filteredReports.map((report) => report.userId)),
-        ];
-
-        const userPromises = userIds.map(async (userId) => {
-          const userDoc = await getDoc(doc(db, "user", userId));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            return {
-              userId,
-              name: userData.username,
-              profilePhoto: userData.profileImage || "https://via.placeholder.com/60",
-            };
-          }
-          return {
-            userId,
-            name: "Unknown User",
-            profilePhoto: "https://via.placeholder.com/60",
-          };
-        });
-
-        const userData = await Promise.all(userPromises);
-        const userMap = {};
-        userData.forEach((user) => {
-          userMap[user.userId] = user;
-        });
-=======
 						return {
 							id: doc.id,
 							...data,
@@ -178,77 +124,12 @@ function Reporting() {
 				setLoadingReports(false);
 			}
 		};
->>>>>>> origin/master
 
 		fetchReports();
 	}, [user]);
 
 	// const filteredReports = reports.filter((report) => report.status === filter);
 
-<<<<<<< HEAD
-  const fetchLocationDescription = async (lat, long) => {
-    try {
-      const res = await Geocoder.from(lat, long);
-      return res.results[0]?.formatted_address || "Unable to fetch location."; // Use optional chaining
-    } catch (error) {
-      console.error("Geocoding error:", error);
-      return "Unable to fetch location.";
-    }
-  };
-
-  const handleFilterChange = (filter) => {
-    setSelectedFilter(filter === selectedFilter ? null : filter);
-  };
-
-  const filteredReports =
-    selectedFilter === "Submitted"
-      ? reports
-      : selectedFilter
-      ? reports.filter((report) => report.status === selectedFilter)
-      : [];
-const updateReportStatus = async (reportId, newStatus) => {
-  try {
-    const reportRef = doc(db, "reports", reportId);
-    const reportSnapshot = await getDoc(reportRef);
-
-    if (reportSnapshot.exists()) {
-      const reportData = reportSnapshot.data();
-      const userId = reportData.userId; // Get the userId from the report
-
-      // Update the report status
-      await updateDoc(reportRef, { status: newStatus });
-
-      // Create a notification for the user who submitted the report
-      await addDoc(collection(db, "notifications"), {
-        userId: userId,
-        reportId: reportId,
-        status: newStatus,
-        timestamp: new Date(),
-      });
-
-      setReports((prevReports) =>
-        prevReports.map((report) =>
-          report.id === reportId ? { ...report, status: newStatus } : report
-        )
-      );
-    }
-  } catch (error) {
-    console.error("Error updating report status: ", error);
-    setError("Could not update report status. Please try again later.");
-    setOverlayVisible(true);
-  }
-};
-
-  const fetchChatMessages = (reportCreatorId) => {
-    const currentUserId = auth.currentUser.uid;
-    const chatId = [reportCreatorId, currentUserId].sort().join("_");
-    const collectionRef = collection(db, "chats");
-    const q = query(
-      collectionRef,
-      where("chatId", "==", chatId),
-      orderBy("createdAt", "desc")
-    );
-=======
 	const fetchLocationDescription = async (lat, long) => {
 		try {
 			const res = await Geocoder.from(lat, long);
@@ -318,7 +199,6 @@ const updateReportStatus = async (reportId, newStatus) => {
 			);
 			setLoadingChat(false);
 		});
->>>>>>> origin/master
 
 		return () => unsubscribe();
 	};
@@ -329,13 +209,6 @@ const updateReportStatus = async (reportId, newStatus) => {
 		Completed: "check-circle",
 	};
 
-<<<<<<< HEAD
-  const onSend = useCallback(
-    (messages = []) => {
-      const currentUserId = auth.currentUser.uid;
-      const reportCreatorId = selectedReport.userId;
-      const chatId = [reportCreatorId, currentUserId].sort().join("_");
-=======
 	// For the location
 	const showLocation = async (lat, long) => {
 		setLatitude(lat);
@@ -362,7 +235,6 @@ const updateReportStatus = async (reportId, newStatus) => {
 			setMessages((previousMessages) =>
 				GiftedChat.append(previousMessages, messages)
 			);
->>>>>>> origin/master
 
 			const { _id, createdAt, text, user } = messages[0];
 			addDoc(collection(db, "chats"), {
@@ -382,125 +254,6 @@ const updateReportStatus = async (reportId, newStatus) => {
 			profilePhoto: "https://via.placeholder.com/60",
 		}; // Default values for unknown users
 
-<<<<<<< HEAD
-  const renderItem = ({ item }) => {
-    const user = userNames[item.userId] || {
-      name: "Unknown User",
-      profilePhoto: "https://via.placeholder.com/60",
-    };
-
-    return (
-      <View key={item.id} style={styles.card}>
-        <View style={styles.profileContainer}>
-          <Image
-            source={{ uri: user.profilePhoto }}
-            style={styles.profileImage}
-          />
-          <Text style={styles.initials}>{user.name}</Text>
-        </View>
-        <View style={styles.reportContainer}>
-          <Image
-            source={{ uri: item.image || "https://via.placeholder.com/100" }}
-            style={styles.reportImage}
-            onError={(e) =>
-              console.log("Image load error:", e.nativeEvent.error)
-            }
-          />
-          <Text style={styles.description}>
-            Description: {item.description || "No description available."}
-          </Text>
-          <Text style={styles.description}>
-            Urgency Level: {item.urgency}
-          </Text>
-          {item.latitude && item.longitude && (
-            <Text style={styles.description}>
-              Location: {item.locationDescription || "No location available"}
-            </Text>
-          )}
-          <Text style={styles.description}>Status:</Text>
-          <View style={styles.statusIcons}>
-            <TouchableOpacity
-              onPress={() => updateReportStatus(item.id, "In-Progress")}
-            >
-              <Icon4
-                name="spinner"
-                size={20}
-                color={item.status === "In-Progress" ? "blue" : "gray"}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => updateReportStatus(item.id, "Resolved")}
-            >
-              <Icon4
-                name="check"
-                size={20}
-                color={item.status === "Resolved" ? "green" : "gray"}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => updateReportStatus(item.id, "Unresolved")}
-            >
-              <Icon4
-                name="times"
-                size={20}
-                color={item.status === "Unresolved" ? "red" : "gray"}
-              />
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-            style={styles.chatButton}
-            onPress={() => {
-              setChatVisible(true);
-              setSelectedReport(item);
-              fetchChatMessages(item.userId);
-            }}
-          >
-            <Text style={styles.chatButtonText}>Chat</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      {loadingReports ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        <FlatList
-          data={filteredReports.length > 0 ? filteredReports : reports}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id || item.index}
-          style={styles.list}
-        />
-      )}
-      <Overlay
-        isVisible={overlayVisible}
-        onBackdropPress={() => setOverlayVisible(false)}
-      >
-        <Text>{error}</Text>
-      </Overlay>
-      <Modal visible={chatVisible} animationType="slide">
-        <GiftedChat
-          messages={messages}
-          onSend={onSend}
-          user={{
-            _id: auth.currentUser.uid,
-          }}
-          renderLoading={() => (
-            <ActivityIndicator size="large" color="#0000ff" />
-          )}
-        />
-        <TouchableOpacity
-          onPress={() => setChatVisible(false)}
-          style={styles.closeChatButton}
-        >
-          <Text style={styles.closeChatButtonText}>Close</Text>
-        </TouchableOpacity>
-      </Modal>
-    </SafeAreaView>
-  );
-=======
 		return (
 			<View
 				key={item.id}
@@ -783,7 +536,6 @@ const updateReportStatus = async (reportId, newStatus) => {
 			</Modal>
 		</View>
 	);
->>>>>>> origin/master
 }
 
 export default Reporting;

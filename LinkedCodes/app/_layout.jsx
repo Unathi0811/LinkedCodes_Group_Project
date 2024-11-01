@@ -7,23 +7,8 @@ import { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Alert } from "react-native";
-<<<<<<< HEAD
-import { ThemeProvider } from "../src/cxt/theme"; // Make sure the path is correct
-import * as Notifications from 'expo-notifications';
-
-// Request notification permissions and set notification handler
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
-=======
 import { ThemeProvider } from "../src/cxt/theme";
 import { AuditContextProvider } from "../src/cxt/audit";
->>>>>>> origin/master
 const Layout = () => {
   const [inactivityTimeoutCount, setInactivityTimeoutCount] = useState(0);
   const [isActive, setIsActive] = useState(true); // To manage activity state
@@ -86,16 +71,6 @@ const Layout = () => {
       restartTimerOnActivityAfterExpiration={false}
       loop={loop}
     >
-<<<<<<< HEAD
-      <ThemeProvider>
-        <ReportProvider>
-          <UserProvider>
-            <StatusBar style="dark" />
-            <Slot />
-          </UserProvider>
-        </ReportProvider>
-      </ThemeProvider>
-=======
       {/* theme provider here, for the theme */}
     <ThemeProvider>
     <AuditContextProvider>
@@ -107,7 +82,6 @@ const Layout = () => {
       </ReportProvider>
       </AuditContextProvider>
     </ThemeProvider>
->>>>>>> origin/master
     </ReactNativeInactivity>
   );
 };

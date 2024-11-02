@@ -1,5 +1,5 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useUser } from "../../../../src/cxt/user";
 import { db } from "../../../../firebase";
 import { collection, getDocs } from "firebase/firestore";
@@ -38,8 +38,9 @@ const Finances = () => {
   if (loading) {
     return (
       <>
-        <ActivityIndicator size="large" color="#202A44" />
-        <Text>Loading...</Text>;
+        <ActivityIndicator size="large" color="#202A44" style={{
+          flex: 1
+        }}/>
       </>
     );
   }

@@ -72,6 +72,7 @@ const NotificationsScreen = () => {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.heading, { color: theme.text }]}>Notifications</Text>
+      
       <FlatList
         data={notifications}
         keyExtractor={(item) => item.id}

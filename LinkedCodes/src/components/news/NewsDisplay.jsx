@@ -5,50 +5,91 @@ import {
   FlatList,
   Linking,
   TouchableOpacity,
+  StyleSheet,
+  Modal
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { NewsFromGoogleSerpApi } from "./News";
 import { useNavigation } from "@react-navigation/native";
 import { Link, useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome5";
+
+
 const NewsDisplay = () => {
   const [news, setNews] = useState([]);
   const [error, setErrors] = useState(null);
   const router = useRouter();
+  const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    const GettingNews = async () => {
-      try {
-        const FromGoogleSerpApi = await NewsFromGoogleSerpApi();
-        // to filter the news, for the purpose of getting the ones related to traffic
-        const filteredNews = FromGoogleSerpApi.filter(
-          (item) =>
-            item.title.toLowerCase().includes("traffic") ||
-            item.title.toLowerCase().includes("road") ||
-            item.title.toLowerCase().includes("roadblock") ||
-            item.title.toLowerCase().includes("South africa") ||
-            item.title.toLowerCase().includes("crash")
-        );
 
-        // for Sortering the filtered news by date
+  useEffect(() => {  
+    const GettingNews = async () => {  
+      try {  
+        const FromGoogleSerpApi = await NewsFromGoogleSerpApi();  
+        const filterParams = {  
+          keywords: [ 'traffic','roads','crash','traffic incident', 'traffic lights','road conditions'],  
+          location: 'south africa',  
+        };  
+  
+        // to filter the news, for the purpose of getting the ones related to traffic  
+        const filteredNews = FromGoogleSerpApi.filter((item) =>  
+          filterParams.keywords.some((keyword) =>  
+            item.title.toLowerCase().includes(keyword.toLowerCase())  
+          ) &&  
+          item.title.toLowerCase().includes(filterParams.location.toLowerCase())  
+        );  
+  
+        // for Sorting the filtered news by date  
         const sortedNews = filteredNews.sort((a, b) => {
-          const dateA = new Date(a.date.replace(/, \+0000 UTC/, " GMT"));
-          const dateB = new Date(b.date.replace(/, \+0000 UTC/, " GMT"));
-          return dateA - dateB; // to Sort them in descending order
+          const parseDate = (dateString) => {
+            // cleaning the date by Removing the UTC part
+            const cleanedDate = dateString.replace(/,\s*\+\d{4}\s+UTC/, '');
+            // Split the string into date and time (separete them)
+            const [datePart, timePart] = cleanedDate.split(', ');
+        
+            // Further split the date part 
+            const [month, day, year] = datePart.split('/').map(Number);
+            const [time, modifier] = timePart.split(' ');
+        
+            // Split the time into hours and minutes
+            let [hours, minutes] = time.split(':').map(Number);
+            
+            // Convert hours to 24-hour format
+            if (modifier === 'PM' && hours < 12) {
+              hours += 12;
+            } else if (modifier === 'AM' && hours === 12) {
+              hours = 0;
+            }
+        
+            // Create a new date object for the whole date and time formate
+            return new Date(year, month - 1, day, hours, minutes);
+          };
+        
+          const dateA = parseDate(a.date);
+          const dateB = parseDate(b.date);
+        
+          return dateB - dateA; // Sort in descending order
         });
+         
+  
+        setNews(sortedNews);  
+      } catch (error) {  
+        setErrors(error.message || "An unknown error occurred.");
+        setModalVisible(true); 
 
-        setNews(sortedNews);
-      } catch (error) {
-        setErrors(error.message);
-      }
-    };
-
-    GettingNews();
+        if (error.message.includes('Rate limit exceeded')) {
+          setModalVisible(true); 
+        }
+      }  
+    };  
+  
+    GettingNews();  
   }, []);
 
-  if (error) {
-    return <Text>Error: {error}</Text>;
-  }
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
 
   const renderItem = ({ item }) => {
     const dateString = item.date;
@@ -126,6 +167,22 @@ const NewsDisplay = () => {
         keyExtractor={(item) => item.link}
       />
 
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={closeModal}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.errorText}>Error: {error}</Text>
+            <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <Link asChild href="/(userTabs)/home/ChatBot">
         <TouchableOpacity
           style={{
@@ -160,5 +217,35 @@ const NewsDisplay = () => {
     </View>
   );
 };
+const styles = StyleSheet.create({
+	overlay: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "rgba(0, 0, 0, 0.5)",
+	},
+  	modalContent: {
+		width: "80%",
+		padding: 20,
+		backgroundColor: "white",
+		borderRadius: 10,
+		alignItems: "center",
+	},
+  	errorText: {
+		fontSize: 18,
+		color: "red",
+		textAlign: "center",
+	},
+  	closeButton: {
+		marginTop: 20,
+		padding: 10,
+		backgroundColor: "#202A44",
+		borderRadius: 5,
+	},
+  	closeButtonText: {
+		color: "white",
+		fontSize: 16,
+	},
+})
 
 export default NewsDisplay;

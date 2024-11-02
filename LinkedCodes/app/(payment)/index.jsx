@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		backgroundColor: "#f5f5f5",
 		padding: 20,
+		marginBottom: 123,
 	},
 	title: {
 		color: "#202A44",

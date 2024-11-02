@@ -669,8 +669,7 @@ export default function Reporting() {
                   </View>
                 </TouchableOpacity>
               )}
-              
-			  nestedScrollEnabled
+              nestedScrollEnabled={true}
             />
           </View>
         </ScrollView>

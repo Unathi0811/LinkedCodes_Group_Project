@@ -1,102 +1,234 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
-import * as Location from 'expo-location';
-import * as ImagePicker from 'expo-image-picker';
-import { Camera } from 'expo-camera';
-import * as Contacts from 'expo-contacts';
-import { useRouter } from 'expo-router';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import React, { useState, useEffect } from "react";
+import { View, Text, Switch, Alert, StyleSheet, TouchableOpacity } from "react-native";
+import { Camera } from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
+import * as Contacts from "expo-contacts";
+import * as Notifications from "expo-notifications";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as LocalAuthentication from "expo-local-authentication";
+import Icon from "react-native-vector-icons/FontAwesome"
+import { useRouter } from "expo-router";
+import { ScrollView } from "react-native";
 
-const PermissionsScreen = () => {
-  const [permissionsStatus, setPermissionsStatus] = useState({
-    location: null,
-    camera: null,
-    photos: null,
-    contacts: null,
+const Settings = ({ toggleTheme, isDarkMode }) => {
+  const [permissions, setPermissions] = useState({
+    camera: false,
+    gallery: false,
+    contacts: false,
+    notifications: false,
   });
 
-  const router = useRouter();
+  const router = useRouter()
 
-  const requestLocationPermission = async () => {
+  const [biometryEnabled, setBiometryEnabled] = useState({
+    faceId: false,
+    fingerprint: false,
+  });
+
+  const [biometrySupported, setBiometrySupported] = useState(false);
+
+  useEffect(() => {
+    checkBiometryAvailability();
+    loadPermissions();
+    loadBiometricPreference();
+  }, []);
+
+  const checkBiometryAvailability = async () => {
+    const hasBiometrics = await LocalAuthentication.isEnrolledAsync();
+    const supportedBiometrics =
+      await LocalAuthentication.supportedAuthenticationTypesAsync();
+
+    setBiometrySupported(hasBiometrics && supportedBiometrics.length > 0);
+
+    setBiometryEnabled({
+      faceId: supportedBiometrics.includes(
+        LocalAuthentication.AuthenticationType.FACE_ID
+      ),
+      fingerprint: supportedBiometrics.includes(
+        LocalAuthentication.AuthenticationType.FINGERPRINT
+      ),
+    });
+  };
+
+  const loadBiometricPreference = async () => {
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      setPermissionsStatus((prev) => ({ ...prev, location: status }));
+      const value = await AsyncStorage.getItem("biometricEnabled");
+      if (value) setBiometryEnabled(JSON.parse(value));
     } catch (error) {
-      Alert.alert('Error', 'Failed to request location permission');
       console.error(error);
     }
   };
 
-  const requestCameraPermission = async () => {
-    try {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setPermissionsStatus((prev) => ({ ...prev, camera: status }));
-    } catch (error) {
-      Alert.alert('Error', 'Failed to request camera permission');
-      console.error(error);
+  const toggleBiometricPreference = async (type) => {
+    const newValue = !biometryEnabled[type];
+    const updatedBiometry = { ...biometryEnabled, [type]: newValue };
+    setBiometryEnabled(updatedBiometry);
+
+    await AsyncStorage.setItem(
+      "biometricEnabled",
+      JSON.stringify(updatedBiometry)
+    );
+    Alert.alert(
+      newValue ? `${type} Enabled` : `${type} Disabled`,
+      `You have ${
+        newValue ? "enabled" : "disabled"
+      } ${type.toLowerCase()} authentication.`
+    );
+  };
+
+  const loadPermissions = async () => {
+    const cameraPermission = await Camera.getCameraPermissionsAsync();
+    const galleryPermission =
+      await ImagePicker.getMediaLibraryPermissionsAsync();
+    const contactsPermission = await Contacts.getPermissionsAsync();
+    const notificationPermission = await Notifications.getPermissionsAsync();
+
+    setPermissions({
+      camera: cameraPermission.status === "granted",
+      gallery: galleryPermission.status === "granted",
+      contacts: contactsPermission.status === "granted",
+      notifications: notificationPermission.status === "granted",
+    });
+  };
+
+  const requestPermission = async (type) => {
+    let status;
+
+    switch (type) {
+      case "camera":
+        ({ status } = await Camera.requestCameraPermissionsAsync());
+        break;
+      case "gallery":
+        ({ status } = await ImagePicker.requestMediaLibraryPermissionsAsync());
+        break;
+      case "contacts":
+        ({ status } = await Contacts.requestPermissionsAsync());
+        break;
+      case "notifications":
+        ({ status } = await Notifications.requestPermissionsAsync());
+        break;
+    }
+
+    if (status === "granted") {
+      Alert.alert("Permission Granted", `${type} access has been enabled.`);
+      setPermissions((prev) => ({ ...prev, [type]: true }));
+    } else {
+      Alert.alert(
+        "Permission Denied",
+        `${type} access is required for this feature.`
+      );
     }
   };
 
-  const requestPhotosPermission = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      setPermissionsStatus((prev) => ({ ...prev, photos: status }));
-    } catch (error) {
-      Alert.alert('Error', 'Failed to request photos permission');
-      console.error(error);
+  const handleTogglePermission = (type, enabled) => {
+    if (enabled) {
+      requestPermission(type);
+    } else {
+      Alert.alert(
+        `${type} Access Disabled`,
+        `You have disabled ${type} access.`
+      );
+      setPermissions((prev) => ({ ...prev, [type]: false }));
     }
-  };
-
-  const requestContactsPermission = async () => {
-    try {
-      const { status } = await Contacts.requestPermissionsAsync();
-      setPermissionsStatus((prev) => ({ ...prev, contacts: status }));
-    } catch (error) {
-      Alert.alert('Error', 'Failed to request contacts permission');
-      console.error(error);
-    }
-  };
-
-  const renderPermissionStatus = (status) => {
-    return status === 'granted' ? 'Allowed' : 'Not Allowed';
   };
 
   return (
-    <View style={styles.container}>
-       {/* Back Button */}
-       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-        <Icon name="arrow-left" size={20} color="#202A44" />
-      </TouchableOpacity>
-      <Text style={styles.header}>PERMISSIONS</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDarkMode ? "#000" : "#F2f9FB" },
+      ]}
+    >
+      <View style={styles.header}>
+        {/* Back Button */}
+        <TouchableOpacity
+          onPress={() => router.push("/(tabs)/Home")}
+          style={styles.backButton}
+        >
+          <Icon name="arrow-left" size={20} color="#202A44" />
+        </TouchableOpacity>
+        <Text style={styles.headerApp}>InfraSmart</Text>
+      </View>
+      <ScrollView contentContainerStyle={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: 20,
+        paddingVertical: 20,
+        marginTop: 70,
+      }}>
+        
 
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/** Permission Sections */}
-        <View style={styles.permissionContainer}>
-          <Text style={styles.permissionText}>Location: {renderPermissionStatus(permissionsStatus.location)}</Text>
-          <TouchableOpacity style={styles.button} onPress={requestLocationPermission}>
-            <Text style={styles.buttonText}>Request Permission</Text>
-          </TouchableOpacity>
+        <View style={styles.section}>
+            <Text style={[styles.heading, { color: isDarkMode ? "#FFF" : "#202A44" }]}>
+            Security & Login
+            </Text>
+
+            <View style={styles.switchContainer}>
+            <Text
+                style={[styles.subHeading, { color: isDarkMode ? "#FFF" : "#202A44" }]}
+            >
+                Face Recognition
+            </Text>
+            <Switch
+                value={biometryEnabled.faceId}
+                onValueChange={() => toggleBiometricPreference("faceId")}
+                disabled={!biometrySupported}
+            />
+            </View>
+
+            <View style={styles.switchContainer}>
+            <Text
+                style={[styles.subHeading, { color: isDarkMode ? "#FFF" : "#202A44" }]}
+            >
+                Finger Verification
+            </Text>
+            <Switch
+                value={biometryEnabled.fingerprint}
+                onValueChange={() => toggleBiometricPreference("fingerprint")}
+                disabled={!biometrySupported}
+            />
+            </View>
         </View>
 
-        <View style={styles.permissionContainer}>
-          <Text style={styles.permissionText}>Camera: {renderPermissionStatus(permissionsStatus.camera)}</Text>
-          <TouchableOpacity style={styles.button} onPress={requestCameraPermission}>
-            <Text style={styles.buttonText}>Request Permission</Text>
-          </TouchableOpacity>
+        <View style={styles.section1}>
+            <Text style={[styles.heading, { color: isDarkMode ? "#FFF" : "#202A44" }]}>
+            Permissions
+            </Text>
+
+            {["camera", "gallery", "contacts", "notifications"].map((type) => (
+            <View key={type} style={styles.switchContainer}>
+                <Text
+                style={[
+                    styles.subHeading,
+                    { color: isDarkMode ? "#FFF" : "#202A44" },
+                ]}
+                >
+                {`${type.charAt(0).toUpperCase() + type.slice(1)} Access`}
+                </Text>
+                <Switch
+                value={permissions[type]}
+                onValueChange={(enabled) => handleTogglePermission(type, enabled)}
+                />
+            </View>
+            ))}
         </View>
 
-        <View style={styles.permissionContainer}>
-          <Text style={styles.permissionText}>Photos: {renderPermissionStatus(permissionsStatus.photos)}</Text>
-          <TouchableOpacity style={styles.button} onPress={requestPhotosPermission}>
-            <Text style={styles.buttonText}>Request Permission</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.permissionContainer}>
-          <Text style={styles.permissionText}>Contacts: {renderPermissionStatus(permissionsStatus.contacts)}</Text>
-          <TouchableOpacity style={styles.button} onPress={requestContactsPermission}>
-            <Text style={styles.buttonText}>Request Permission</Text>
-          </TouchableOpacity>
+        <View style={styles.section2}>
+            <Text style={[styles.heading, { color: isDarkMode ? "#FFF" : "#202A44" }]}>
+            Theme
+            </Text>
+            <View style={styles.switchContainer}>
+            <Text
+                style={[styles.subHeading, { color: isDarkMode ? "#FFF" : "#202A44" }]}
+            >
+                {isDarkMode ? "Dark Mode" : "Light Mode"}
+            </Text>
+            <Switch
+                value={isDarkMode}
+                onValueChange={() => toggleTheme(isDarkMode ? "light" : "dark")}
+            />
+            </View>
         </View>
       </ScrollView>
     </View>
@@ -106,62 +238,93 @@ const PermissionsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#F2f9FB',
+    backgroundColor: "#F2f9FB",
   },
-  backButton: {
-    position: 'absolute',
-    top: 70,
-    left: 20,
-    padding: 10,
-    zIndex: 1,
+  title: { fontSize: 32, fontWeight: "bold", marginBottom: 40 },
+  section: {
+    borderColor: "#202A44",
+		height: 190,
+		width: "90%",
+		marginTop: 10,
+		backgroundColor: "#fff",
+		borderRadius: 12,
+		padding: 12,
+		elevation: 5,
+		fontSize: 16,
+		shadowOffset: { width: 0, height: 3 },
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
+		shadowColor: "#202A44",
+  },
+  section1: {
+    borderColor: "#202A44",
+		height: 280,
+		width: "90%",
+		marginTop: 10,
+		backgroundColor: "#fff",
+		borderRadius: 12,
+		padding: 12,
+		elevation: 5,
+		fontSize: 16,
+		shadowOffset: { width: 0, height: 3 },
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
+		shadowColor: "#202A44",
+  },
+  section2: {
+    borderColor: "#202A44",
+		height: 120,
+		width: "90%",
+		marginTop: 10,
+		backgroundColor: "#fff",
+		borderRadius: 12,
+		padding: 12,
+		elevation: 5,
+		fontSize: 16,
+		shadowOffset: { width: 0, height: 3 },
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
+		shadowColor: "#202A44",
+  },
+  heading: {
+    fontSize: 22,
+    fontWeight: "600",
+    marginBottom: 15,
+    textAlign: "center",
+    color: "#202A44"
+  },
+  subHeading: { fontSize: 18 },
+  switchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    marginTop: 40,
-    textAlign: 'center',
-    color: "#202A44",
-    paddingVertical: 15,
-    borderRadius: 10,
-    elevation: 3, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  scrollContainer: {
-    paddingBottom: 20,
-  },
-  permissionContainer: {
-    marginBottom: 20,
-    padding: 15,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    elevation: 2,
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-  },
-  permissionText: {
-    fontSize: 18,
-    color: '#202A44',
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: '#202A44',
+    position: "absolute",
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignContent: "space-between",
+    alignItems: "flex-end",
+    padding: 20,
+    zIndex: 10,
+    backgroundColor: "#fff",
+    height: 90,
+    marginBottom: 5,
+    borderBlockEndColor: "#ccc",
+},
+backButton: {
     padding: 10,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
+    marginRight: 10,
+    marginTop: 12
+},
+headerApp: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "#202A44",
+    marginLeft: 130,
+},
 });
 
-export default PermissionsScreen;
+export default Settings;

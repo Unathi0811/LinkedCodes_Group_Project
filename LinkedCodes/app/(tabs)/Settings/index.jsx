@@ -50,7 +50,7 @@ const Settings = () => {
           />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.option}>
+        {/* <TouchableOpacity style={styles.option}>
           <Text style={styles.optionText}>Biometrics</Text>
           <Icon 
             name='fingerprint' 
@@ -58,7 +58,7 @@ const Settings = () => {
             size={22} 
             style={styles.icon}
           /> 
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
@@ -73,23 +73,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#F2f9FB",
   },
   header: {
-    fontSize: 27,
+    fontSize: 30,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 20,
+    color: '#202A44',
+    marginBottom: 15,
     textAlign: 'center',
-    backgroundColor: "#202A44",
+    backgroundColor: "#fff",
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
+    height: 33,
     paddingHorizontal: 20,
     paddingVertical: 50,
     zIndex: 1,
   },
   scrollContainer: {
     paddingBottom: 20,
-    paddingTop: 130,
+    paddingTop: 90,
   },
   option: {
     padding: 15,

@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		alignItems: "center",
 		zIndex: 10,
-		backgroundColor: "#F2f9FB",
+		backgroundColor: "#fff",
 	},
 	appName: {
 		fontSize: 24,
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
 		padding: 10,
 	},
 	contentContainer: {
-		marginTop: 90,
+		marginTop: 100,
 		paddingHorizontal: 20,
 	},
 	linkContainer: {

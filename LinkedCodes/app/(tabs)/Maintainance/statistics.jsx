@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     height: 100,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#202A44',
+    backgroundColor: '#fff',
     elevation: 4, 
     shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 }, 
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#202A44',
     marginTop: 23
   },
   scrollContent: {

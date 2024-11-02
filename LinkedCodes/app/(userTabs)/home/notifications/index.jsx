@@ -1,7 +1,4 @@
 
-
-// notificatio
-// src/screens/NotificationsScreen.js
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -67,7 +64,7 @@ const NotificationsScreen = () => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#202A44" />
       </View>
     );
   }

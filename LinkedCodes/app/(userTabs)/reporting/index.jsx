@@ -18,7 +18,6 @@ import Icon from "react-native-vector-icons/Feather";
 import React, { useState, useEffect, useRef } from "react";
 import useLocation from "../../../src/components/useLocation";
 import NetInfo from "@react-native-community/netinfo";
-import * as Notifications from 'expo-notifications';
 import { Overlay } from "@rneui/themed";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // For offline storage
 import { db, storage, auth } from "../../../firebase";
@@ -54,6 +53,7 @@ export default function Reporting() {
   const [modalVisible2, setModalVisible2] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [urgency, setUrgency] = useState("Low"); // Default urgency level
+  const [category, setCategory] = useState("Accident"); // Default category level
   const [loading, setLoading] = useState(false); // For submit button loading
   const [imageLoading, setImageLoading] = useState(true); // For image loading
   const [showAd, setShowAd] = useState(false); // Ad visibility
@@ -169,17 +169,17 @@ export default function Reporting() {
       try {
         setLoading(true);
 
-			// Determine report_type and accident_report based on selected category
-			let reportType = null;
-			let accidentReport = false;
+        // Determine report_type and accident_report based on selected category
+        let reportType = null;
+        let accidentReport = false;
 
-			if (category === "Accident") {
-				accidentReport = true; // Set to true if category is Accident
-			} else if (category === "Road") {
-				reportType = "Road"; // Set report_type to Road
-			} else if (category === "Bridge") {
-				reportType = "Bridge"; // Set report_type to Bridge
-			}
+        if (category === "Accident") {
+          accidentReport = true; // Set to true if category is Accident
+        } else if (category === "Road") {
+          reportType = "Road"; // Set report_type to Road
+        } else if (category === "Bridge") {
+          reportType = "Bridge"; // Set report_type to Bridge
+        }
 
         const newReport = {
           image, // Save the local image URI for now
@@ -196,42 +196,31 @@ export default function Reporting() {
         // Check network status
         const isOnline = await checkIfOnline();
 
-			if (isOnline) {
-				// If online, upload image and report to Firebase
-				const imageRef = ref(storage, `images/${newReport.userId}_${Date.now()}.jpg`); // Ensure a unique image filename
-				const response = await fetch(image);
-				const blob = await response.blob();
-				await uploadBytes(imageRef, blob);
+        if (isOnline) {
+          // If online, upload image and report to Firebase
+          const imageRef = ref(storage, `images/`);
+          const response = await fetch(image);
+          const blob = await response.blob();
+          await uploadBytes(imageRef, blob);
 
-				const imageUrl = await getDownloadURL(imageRef);
-				newReport.image = imageUrl; // Update image URL after upload
-        //   const imageUrl = await getDownloadURL(imageRef);
-        //   newReport.image = imageUrl; // Update image URL after upload
+          const imageUrl = await getDownloadURL(imageRef);
+          newReport.image = imageUrl; // Update image URL after upload
 
-				// Add the new report to Firestore
-				await addDoc(collection(db, "reports"), newReport);
-				await sendNotification("Your report has been submitted successfully."); // Send notification
-			} else {
-				// If offline, save the report locally using AsyncStorage
-				const storedReports = await AsyncStorage.getItem("offlineReports");
-				const reportsArray = storedReports ? JSON.parse(storedReports) : [];
-				reportsArray.push(newReport);
           // Add the new report to Firestore
           await addDoc(collection(db, "reports"), newReport);
           setLoading(false);
-        } 
-		// else {
-        //   // If offline, save the report locally using AsyncStorage
-        //   const storedReports = await AsyncStorage.getItem("offlineReports");
-        //   const reportsArray = storedReports ? JSON.parse(storedReports) : [];
-        //   reportsArray.push(newReport);
+        } else {
+          // If offline, save the report locally using AsyncStorage
+          const storedReports = await AsyncStorage.getItem("offlineReports");
+          const reportsArray = storedReports ? JSON.parse(storedReports) : [];
+          reportsArray.push(newReport);
 
-        //   await AsyncStorage.setItem(
-        //     "offlineReports",
-        //     JSON.stringify(reportsArray)
-        //   );
-        //   console.log("Report saved offline");
-        // }
+          await AsyncStorage.setItem(
+            "offlineReports",
+            JSON.stringify(reportsArray)
+          );
+          console.log("Report saved offline");
+        }
 
         // Clear input and close modal
         setImage(null);
@@ -284,34 +273,24 @@ export default function Reporting() {
         if (imageUri && userId) {
           console.log("Image URI before deletion:", imageUri);
 
-				// Construct the path based on the userId and image file
-				const userImagePath = `users/${userId}/images/${imageUri.split('/').pop()}`; // Extract the filename
+          // Construct the path based on the userId and image file
+          const userImagePath = `users/${userId}/images/${imageUri}`;
 
-				const imageRef = ref(storage, userImagePath); // Get reference to the user's image
-				await deleteObject(imageRef); // Delete the image
-				console.log("Image deleted from Firebase Storage");
-			}
+          const imageRef = ref(storage, userImagePath); // Get reference to the user's image
+          await deleteObject(imageRef); // Delete the image
+          console.log("Image deleted from Firebase Storage");
+        }
+        console.log("Report and associated image deleted from Firebase");
+      }
 
-			console.log("Report and associated image deleted from Firebase");
-			
-			// Show notification for successful deletion
-			setOverlayMessage("Report successfully deleted.");
-			showNotification("Success", "Your report has been deleted successfully.");
-		} else {
-			setOverlayMessage("You are currently offline. Unable to delete report.");
-			showNotification("Offline", "Unable to delete report, you are offline.");
-		}
-
-		setVisible(true);
-	} catch (error) {
-		console.error("Error deleting report: ", error);
-		setOverlayMessage("Error deleting report: " + error.message);
-		setVisible(true);
-		showNotification("Error", "Error deleting report: " + error.message);
-	}
-};
-
-
+      setOverlayMessage("Report successfully deleted.");
+      setVisible(true);
+    } catch (error) {
+      console.error("Error deleting report: ", error);
+      setOverlayMessage("Error deleting report: " + error.message);
+      setVisible(true);
+    }
+  };
 
   // Upload image from camera or gallery
   const uploadImage = async (mode) => {
@@ -690,7 +669,8 @@ export default function Reporting() {
                   </View>
                 </TouchableOpacity>
               )}
-              nestedScrollEnabled
+              
+			  nestedScrollEnabled
             />
           </View>
         </ScrollView>

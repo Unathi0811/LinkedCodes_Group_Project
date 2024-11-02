@@ -48,7 +48,7 @@ const Finances = () => {
       <View style={styles.card}>
         {payments.map((payment) => (
           <View key={payment.id} style={styles.paymentRow}>
-            <Text style={styles.userText}>{payment.customerEmail}</Text>
+            <Text style={styles.userText}>{user.username}</Text>
             <Text style={styles.amountText}>${payment.amount}</Text>
           </View>
         ))}

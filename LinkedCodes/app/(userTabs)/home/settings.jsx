@@ -8,9 +8,8 @@ import * as Contacts from 'expo-contacts';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { Stack } from 'expo-router'; // Import Stack for navigation
 
-const Settings = ({ toggleTheme, isDarkMode }) => {
+const Settings = () => {
     const [permissions, setPermissions] = useState({
         camera: false,
         gallery: false,
@@ -114,14 +113,14 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
     };
 
     return (
-        <View style={[styles.container, { backgroundColor: isDarkMode ? '#000' : '#EAF1FF' }]}>
-            <Text style={[styles.title, { color: isDarkMode ? '#FFF' : '#000' }]}>Settings</Text>
+        <View style={styles.container}>
+            <Text style={styles.title}>Settings</Text>
 
             <View style={styles.section}>
-                <Text style={[styles.heading, { color: isDarkMode ? '#FFF' : '#000' }]}>Security & Login</Text>
+                <Text style={styles.heading}>Security & Login</Text>
 
                 <View style={styles.switchContainer}>
-                    <Text style={[styles.subHeading, { color: isDarkMode ? '#FFF' : '#000' }]}>
+                    <Text style={styles.subHeading}>
                         Face Recognition
                     </Text>
                     <Switch
@@ -132,7 +131,7 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
                 </View>
 
                 <View style={styles.switchContainer}>
-                    <Text style={[styles.subHeading, { color: isDarkMode ? '#FFF' : '#000' }]}>
+                    <Text style={styles.subHeading}>
                         Finger Verification
                     </Text>
                     <Switch
@@ -144,11 +143,11 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
             </View>
 
             <View style={styles.section}>
-                <Text style={[styles.heading, { color: isDarkMode ? '#FFF' : '#000' }]}>Permissions</Text>
+                <Text style={styles.heading}>Permissions</Text>
 
                 {['camera', 'gallery', 'contacts', 'notifications'].map((type) => (
                     <View key={type} style={styles.switchContainer}>
-                        <Text style={[styles.subHeading, { color: isDarkMode ? '#FFF' : '#000' }]}>
+                        <Text style={styles.subHeading}>
                             {`${type.charAt(0).toUpperCase() + type.slice(1)} Access`}
                         </Text>
                         <Switch
@@ -158,28 +157,48 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
                     </View>
                 ))}
             </View>
-
-            
-            <View style={styles.section}>
-                <Text style={[styles.heading, { color: isDarkMode ? '#FFF' : '#000' }]}>Theme</Text>
-                <View style={styles.switchContainer}>
-                    <Text style={[styles.subHeading, { color: isDarkMode ? '#FFF' : '#000' }]}>
-                        {isDarkMode ? 'Dark Mode' : 'Light Mode'}
-                    </Text>
-                    <Switch value={isDarkMode} onValueChange={() => toggleTheme(isDarkMode ? 'light' : 'dark')} />
-                </View>
-            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
-    title: { fontSize: 32, fontWeight: 'bold', marginBottom: 40 },
-    section: { width: '90%', marginBottom: 30, borderRadius: 10, padding: 20, backgroundColor: 'rgba(255,255,255,0.1)' },
-    heading: { fontSize: 22, fontWeight: '600', marginBottom: 15, textAlign: 'center' },
-    subHeading: { fontSize: 18 },
-    switchContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        backgroundColor: '#EAF1FF',
+    },
+    title: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        marginBottom: 40,
+        color: '#000',
+    },
+    section: {
+        width: '90%',
+        marginBottom: 30,
+        borderRadius: 10,
+        padding: 20,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+    },
+    heading: {
+        fontSize: 22,
+        fontWeight: '600',
+        marginBottom: 15,
+        textAlign: 'center',
+        color: '#000',
+    },
+    subHeading: {
+        fontSize: 18,
+        color: '#000',
+    },
+    switchContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginVertical: 10,
+    },
 });
 
 export default Settings;

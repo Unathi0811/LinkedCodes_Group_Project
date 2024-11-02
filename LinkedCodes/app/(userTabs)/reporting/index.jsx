@@ -30,6 +30,8 @@ const [showAd, setShowAd] = useState(false); // Ad visibility
   const [isSubscribed, setIsSubscribed] = useState(false); // Subscription status
   const inactivityTimeoutRef = useRef(null)
 
+
+
  
 
   // Get the current user ID
@@ -425,21 +427,28 @@ const [showAd, setShowAd] = useState(false); // Ad visibility
 
             {/*This is for the add*/}
 			<Modal visible={showAd && !isSubscribed} transparent>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-          <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
-            <Text>wala wala wee wadiweleeeee</Text>
-            <Link href="/home/premium/" asChild>
-              <TouchableOpacity
-              >
-                <Text style={{ color: 'black', marginTop: 20 }}>Subscribe to Premuim</Text>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
+            <View style={{padding:10,}}>
+                
+                  <Text style={{fontSize:20, marginBottom:10, marginTop:5, textAlign:"center"}}>ARE YOU TIRED OF SEEING THIS AD?{"\n"}</Text>
+                  <Text style={{textAlign:"justify", fontSize:16, marginBottom:10}}>
+                    Subscribe to our Premium Package where you will have full access to our features AD FREE!
+                    This ad will continue to interrupt your workflow until you do!
+                    </Text>
+                    <Text style={{fontSize:20, marginTop:15, textAlign:"center"}}>⏰UPGRADE NOW⏰{"\n"}{"\n"}FOR JUSR R99 A YEAR!!!</Text>
+                    </View>
+              <Link href="/home/premium/" asChild>
+              <TouchableOpacity style={styles.button}>
+                <Text style={styles.buttonText}>Subscribe to Premuim</Text>
               </TouchableOpacity>
-            </Link>
-            <TouchableOpacity onPress={() => setShowAd(false)}>
-              <Text style={{ color: 'black', marginTop: 20 }}>Close Ad</Text>
-            </TouchableOpacity>
+              </Link>
+              <TouchableOpacity onPress={() => setShowAd(false)} style={styles.button}>
+                <Text style={styles.buttonText}>Close Ad</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
         {/* Modal for report details */}
         <Modal transparent={true} visible={modalVisible2} animationType="slide">

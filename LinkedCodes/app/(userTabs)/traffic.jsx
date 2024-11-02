@@ -476,14 +476,22 @@ const traffic = () => {
         <Modal visible={showAd && !isSubscribed} transparent>
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
             <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
-              <Text>wala wala wee wadiweleeeee</Text>
+            <View style={{padding:10,}}>
+                
+                  <Text style={{fontSize:20, marginBottom:10, marginTop:5, textAlign:"center"}}>ARE YOU TIRED OF SEEING THIS AD?{"\n"}</Text>
+                  <Text style={{textAlign:"justify", fontSize:15, marginBottom:10}}>
+                    Subscribe to our Premium Package where you will have full access to our features AD FREE!
+                    This ad will continue to interrupt your workflow until you do!
+                    Infrasmart: Take Control or Stay Confined!</Text>
+                    <Text style={{fontSize:20, marginTop:15, textAlign:"center"}}>⏰UPGRADE NOW⏰{"\n"}{"\n"}FOR JUSR R99 FOR A YEAR!!!</Text>
+                    </View>
               <Link href="/home/premium/" asChild>
-              <TouchableOpacity >
-                <Text style={{ color: 'black', marginTop: 20 }}>Subscribe to Premuim</Text>
+              <TouchableOpacity style={styles.button}>
+                <Text style={styles.buttonText}>Subscribe to Premuim</Text>
               </TouchableOpacity>
               </Link>
-              <TouchableOpacity onPress={() => setShowAd(false)}>
-                <Text style={{ color: 'black', marginTop: 20 }}>Close Ad</Text>
+              <TouchableOpacity onPress={() => setShowAd(false)} style={styles.button}>
+                <Text style={styles.buttonText}>Close Ad</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -561,7 +569,31 @@ const styles = StyleSheet.create({
     right:10,
     justifyContent: 'center',  
     alignItems: 'center', 
-  }
+  },
+  button: {
+    padding:12,
+    backgroundColor: "#202A44",
+    borderRadius: 12,
+    marginTop: 20,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#202A44",
+    paddingVertical: 13,
+    marginHorizontal: 20,
+    width: "90%",
+    elevation: 5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowColor: "#202A44",
+    
+  },
+  buttonText: {
+    fontSize: 18,
+    
+    color: "#fff",
+  },
 });
 
 export default traffic;

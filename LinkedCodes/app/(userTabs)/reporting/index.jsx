@@ -41,26 +41,24 @@ import Icon2 from "react-native-vector-icons/MaterialIcons";
 import Icon3 from "react-native-vector-icons/FontAwesome";
 import { Link, useRouter } from "expo-router";
 import RNPickerSelect from "react-native-picker-select";
-import BottomSheet from "react-native-bottom-sheet"
 
 export default function Reporting() {
   const { latitude, longitude } = useLocation();
   const [image, setImage] = useState(null);
   const [input, setInput] = useState("");
-  const [reports, setReports] = useState([]); 
+  const [reports, setReports] = useState([]); // Array to store reports
   const [modalVisible, setModalVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const [overlayMessage, setOverlayMessage] = useState("");
   const [modalVisible2, setModalVisible2] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
-  const [urgency, setUrgency] = useState("Low");
-  const [category, setCategory] = useState("Accident"); 
-  const [loading, setLoading] = useState(false); 
-  const [imageLoading, setImageLoading] = useState(true); 
-  const [showAd, setShowAd] = useState(false); 
-  const [isSubscribed, setIsSubscribed] = useState(false); 
+  const [urgency, setUrgency] = useState("Low"); // Default urgency level
+  const [category, setCategory] = useState("Accident"); // Default category level
+  const [loading, setLoading] = useState(false); // For submit button loading
+  const [imageLoading, setImageLoading] = useState(true); // For image loading
+  const [showAd, setShowAd] = useState(false); // Ad visibility
+  const [isSubscribed, setIsSubscribed] = useState(false); // Subscription status
   const inactivityTimeoutRef = useRef(null);
-  const bottomSheetRef = useRef(null);
 
   // Get the current user ID
   const userId = auth.currentUser ? auth.currentUser.uid : null;
@@ -133,7 +131,7 @@ export default function Reporting() {
       if (storedReports) {
         const reportsArray = JSON.parse(storedReports);
         for (const report of reportsArray) {
-          const imageRef = ref(storage, `images/${report.id}.jpg`);
+          const imageRef = ref(storage, images/${report.id}.jpg);
           const response = await fetch(report.image);
           const blob = await response.blob();
           await uploadBytes(imageRef, blob);
@@ -200,7 +198,7 @@ export default function Reporting() {
 
         if (isOnline) {
           // If online, upload image and report to Firebase
-          const imageRef = ref(storage, `images/`);
+          const imageRef = ref(storage, images/);
           const response = await fetch(image);
           const blob = await response.blob();
           await uploadBytes(imageRef, blob);
@@ -239,12 +237,11 @@ export default function Reporting() {
       setVisible(true);
     }
   };
-
   // ads
   useEffect(() => {
     const checkSubscription = async () => {
       const subscriptionStatus = await AsyncStorage.getItem(
-        `isSubscribed_${userId}`
+        isSubscribed_${userId}
       );
       if (subscriptionStatus === "true") {
         setIsSubscribed(true);
@@ -277,7 +274,7 @@ export default function Reporting() {
           console.log("Image URI before deletion:", imageUri);
 
           // Construct the path based on the userId and image file
-          const userImagePath = `users/${userId}/images/${imageUri}`;
+          const userImagePath = users/${userId}/images/${imageUri};
 
           const imageRef = ref(storage, userImagePath); // Get reference to the user's image
           await deleteObject(imageRef); // Delete the image
@@ -359,9 +356,6 @@ export default function Reporting() {
     </TouchableOpacity>
   );
   const router = useRouter();
-  const openBottomSheet = () => {
-    bottomSheetRef.current.open();
-  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -383,12 +377,15 @@ export default function Reporting() {
         </View>
         <ScrollView
           contentContainerStyle={{
+            flexGrow: 1,
             alignContent: "center",
-            alignItems: "center",            
+            alignItems: "center",
+          }}
+          style={{
+            flex: 1,
             backgroundColor: "#F2f9FB",
             marginTop: 10,
             height: "auto",
-            position: 'absolute'
           }}
         >
           {/* Modal for upload options */}
@@ -435,6 +432,7 @@ export default function Reporting() {
 
           {/* Report Submission UI */}
           <Text style={styles.imageheader}>UPLOAD IMAGE</Text>
+
           {image ? (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
               <Image
@@ -458,7 +456,7 @@ export default function Reporting() {
             placeholder="write the description here"
             numberOfLines={2}
           />
-          {/*this is the urgency dropdown*/}
+          {/this is the urgency dropdown/}
 
           <Text style={styles.urgencyLabel}>SELECT URGENCY LEVEL</Text>
           <View style={styles.urgencyDropdown}>
@@ -622,7 +620,6 @@ export default function Reporting() {
           </Modal>
           {/* Historical Reports */}
           <View style={styles.container2}>
-            <TouchableOpacity onPress={openBottomSheet}>
             <Text
               style={{
                 fontSize: 20,
@@ -635,16 +632,7 @@ export default function Reporting() {
             >
               HISTORICAL REPORTS
             </Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-
-        <BottomSheet
-        ref={bottomSheetRef}
-        height={400}
-        onClose={() => console.log('Bottom sheet closed')}
-      >
-        <FlatList
+            <FlatList
               data={reports}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
@@ -681,8 +669,11 @@ export default function Reporting() {
                   </View>
                 </TouchableOpacity>
               )}
+              
+			  nestedScrollEnabled
             />
-      </BottomSheet>
+          </View>
+        </ScrollView>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -704,7 +695,9 @@ const styles = StyleSheet.create({
   },
   input: {
     borderColor: "#000",
+
     height: 100,
+
     width: "90%",
     marginTop: 10,
     padding: 12,

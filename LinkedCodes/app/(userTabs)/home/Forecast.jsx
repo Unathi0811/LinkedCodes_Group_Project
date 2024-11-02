@@ -108,6 +108,7 @@ const Forecast = () => {
 		return <Text>Error: {error}</Text>;
 	}
 
+
 	return (
 		<>
 			<Tabs.Screen
@@ -121,6 +122,7 @@ const Forecast = () => {
 			<SafeAreaView style={{ flex: 1 }}>
 				<View style={styles.todayWeatherCard}>
 					<View style={{ alignItems: "center" }}>
+
 						<Text
 							style={{
 								fontSize: 35,
@@ -427,11 +429,12 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 	},
 	Block: {
-		backgroundColor: "white",
+		backgroundColor: "#F2f9FB",
 		alignItems: "center",
 		flexDirection: "row",
 		justifyContent: "center",
 		borderRadius: 5,
+		
 	},
 	firstBlock: {
 		fontSize: 16,
@@ -447,7 +450,7 @@ const styles = StyleSheet.create({
 	todayWeatherCard: {
 		padding: 5,
 		borderRadius: 8,
-		backgroundColor: "#EAF1FF",
+		backgroundColor: "#F2f9FB",
 		// marginBottom: 30,
 		elevation: 5,
 		width: "100%",

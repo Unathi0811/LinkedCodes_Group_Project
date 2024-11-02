@@ -227,13 +227,13 @@ const styles = StyleSheet.create({
   	modalContent: {
 		width: "80%",
 		padding: 20,
-		backgroundColor: "white",
+		backgroundColor: "#F2f9FB",
 		borderRadius: 10,
 		alignItems: "center",
 	},
   	errorText: {
 		fontSize: 18,
-		color: "red",
+		color: "#202A44",
 		textAlign: "center",
 	},
   	closeButton: {

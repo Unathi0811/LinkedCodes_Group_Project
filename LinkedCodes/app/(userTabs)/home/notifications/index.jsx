@@ -87,6 +87,7 @@ const NotificationsScreen = () => {
 					</TouchableOpacity>
 					<Text style={styles.headerApp}>InfraSmart</Text>
 				</View>
+      
       <FlatList
         data={notifications}
         keyExtractor={(item) => item.id}

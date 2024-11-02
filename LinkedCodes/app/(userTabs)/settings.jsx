@@ -142,7 +142,7 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
       <View style={styles.header}>
         {/* Back Button */}
         <TouchableOpacity
-          onPress={() => router.push("/(userTabs)/home")}
+          onPress={() => router.push("/(userTabs)/")}
           style={styles.backButton}
         >
           <Icon name="arrow-left" size={20} color="#202A44" />

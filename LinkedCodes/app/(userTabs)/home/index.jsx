@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import * as React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Link, router } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useUser } from "../../../src/cxt/user";
 import "react-native-gesture-handler";
 import { Drawer } from "react-native-drawer-layout";
@@ -26,7 +26,8 @@ const Home = () => {
   };
 
   const { setUser, user } = useUser();
-
+  const router = useRouter()
+  
   return (
     <Drawer
       open={open}

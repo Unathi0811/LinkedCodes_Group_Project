@@ -248,6 +248,22 @@ const HomeScreen = () => {
 								/>
 							</TouchableOpacity>
 						</Link>
+						<Link
+							href="/(tabs)/Profile/admin/finances"
+							asChild
+						>
+							<TouchableOpacity style={styles.actionButton}>
+								<Text style={styles.actionButtonText}>
+									Finances
+								</Text>
+								<FontAwesome
+									name="money"
+									size={19}
+									color="#202A44"
+									style={styles.icon}
+								/>
+							</TouchableOpacity>
+						</Link>
 					</View>
 				</View>
 			</ScrollView>
@@ -311,7 +327,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.6,
 		shadowRadius: 5,
 		elevation: 5,
-		height: 300,
+		height: 345,
 	},
 	adminActionsText: {
 		fontSize: 15,

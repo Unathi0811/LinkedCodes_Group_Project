@@ -9,6 +9,8 @@ import { auth } from "../firebase";
 import { Alert } from "react-native";
 import { ThemeProvider } from "../src/cxt/theme";
 import { AuditContextProvider } from "../src/cxt/audit";
+import { PaymentProvider } from "../src/cxt/pay";
+
 const Layout = () => {
   const [inactivityTimeoutCount, setInactivityTimeoutCount] = useState(0);
   const [isActive, setIsActive] = useState(true); // to manage activity state
@@ -46,6 +48,7 @@ const Layout = () => {
     >
       {/* theme provider here, for the theme */}
     <ThemeProvider>
+    <PaymentProvider>
     <AuditContextProvider>
       <ReportProvider>
         <UserProvider>
@@ -54,6 +57,7 @@ const Layout = () => {
         </UserProvider>
       </ReportProvider>
       </AuditContextProvider>
+      </PaymentProvider>
     </ThemeProvider>
     </ReactNativeInactivity>
   );

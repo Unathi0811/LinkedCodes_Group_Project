@@ -2,6 +2,7 @@ import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "rea
 import React, { useEffect, useState } from "react";
 import { Image, Pressable } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 import {
 	getStorage,
 	ref,
@@ -19,6 +20,7 @@ const Profile = () => {
 	const { setUser, user } = useUser();
 	const [image, setImage] = useState(user.profileImage);
 	const [loading, setLoading] = useState(false);
+	const {router}= useRouter();
 	useEffect(() => {
 		if (user) {
 			setImage(user.profileImage);

@@ -11,6 +11,7 @@ import {
 import { getFirestore, collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../../../src/cxt/theme'; // Import the useTheme hook
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const db = getFirestore();
 
@@ -72,6 +73,20 @@ const NotificationsScreen = () => {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.heading, { color: theme.text }]}>Notifications</Text>
+      <View style={styles.header}>
+					{/* Back Button */}
+					<TouchableOpacity
+						onPress={() => router.push("/(userTabs)/home")}
+						style={styles.backButton}
+					>
+						<Icon
+							name="arrow-left"
+							size={20}
+							color="#202A44"
+						/>
+					</TouchableOpacity>
+					<Text style={styles.headerApp}>InfraSmart</Text>
+				</View>
       <FlatList
         data={notifications}
         keyExtractor={(item) => item.id}
@@ -153,6 +168,36 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'red',
+  },
+  header: {
+		position: "absolute",
+		left: 0,
+		right: 0,
+		flexDirection: "row",
+		alignContent: "space-between",
+		alignItems: "center",
+		padding: 20,
+		zIndex: 10,
+		backgroundColor: "#fff",
+		height: 100,
+		marginBottom: 5,
+		borderBlockEndColor: "#ccc",
+	},
+	backButton: {
+		padding: 10,
+		marginRight: 10,
+	},
+	headerApp: {
+		fontSize: 25,
+		fontWeight: "bold",
+		color: "#202A44",
+		marginLeft: 130,
+	},
+  button: {
+    backgroundColor: '#202A44',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
   },
 });
 

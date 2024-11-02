@@ -9,18 +9,18 @@ import {
   Alert,
 } from "react-native";
 import { MaterialIcons, AntDesign, FontAwesome } from "@expo/vector-icons"; // Importing icons
-import Icon from "react-native-vector-icons/FontAwesome"
+import Icon from "react-native-vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
+
 const Emergency = () => {
-  // Preloaded emergency contacts including public works number
   const contacts = [
-    { id: "1", name: "Ambulance", phone: "067 139 4777" },
+    { id: "1", name: "Ambulance", phone: "0655158443" },
     { id: "2", name: "Department of Road and Traffic", phone: "0795822643" },
-    { id: "3", name: "Public Works", phone: "065 515 8443" }, // Public works number added
+    { id: "3", name: "Ambulance Services", phone: "10177" },
   ];
-  const router = useRouter()
-  // Define SOS number (South African number)
-  const sosNumber = "10111"; // South African SOS number
+
+  const router = useRouter();
+  const sosNumber = "10111"; 
 
   const handleCallPress = (phone) => {
     const formattedPhone = `tel:${phone}`;
@@ -43,6 +43,9 @@ const Emergency = () => {
       >
         <Text style={styles.contactName}>{item.name}</Text>
         <Text style={styles.contactPhone}>{item.phone}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => handleCallPress(item.phone)}>
+        <MaterialIcons name="call" size={24} color="#202A44" />
       </TouchableOpacity>
     </View>
   );
@@ -81,19 +84,14 @@ const Emergency = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-					{/* Back Button */}
-					<TouchableOpacity
-						onPress={() => router.push("/(userTabs)/home")}
-						style={styles.backButton}
-					>
-						<Icon
-							name="arrow-left"
-							size={20}
-							color="#202A44"
-						/>
-					</TouchableOpacity>
-					<Text style={styles.title}>Emergency Contacts</Text>
-				</View>
+        <TouchableOpacity
+          onPress={() => router.push("/(userTabs)/home")}
+          style={styles.backButton}
+        >
+          <Icon name="arrow-left" size={20} color="#202A44" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Emergency Contacts</Text>
+      </View>
       
       <FlatList
         data={contacts}
@@ -102,12 +100,10 @@ const Emergency = () => {
         contentContainerStyle={styles.contactList}
       />
 
-      {/* SOS Button */}
       <TouchableOpacity onPress={handleSOSPress} style={styles.sosButton}>
         <Text style={styles.sosButtonText}>SOS</Text>
       </TouchableOpacity>
 
-      {/* Contact Us Section */}
       <View style={styles.contactUsSection}>
         <Text style={styles.contactUsTitle}>Contact Us</Text>
         <TouchableOpacity
@@ -129,10 +125,7 @@ const Emergency = () => {
           style={styles.contactUsItem}
         >
           <AntDesign name="mail" size={24} color="#D44638" />
-          <Text style={styles.contactUsText}>
-            {" "}
-            Email: contact@linkedcodes.com
-          </Text>
+          <Text style={styles.contactUsText}> Email: contact@linkedcodes.com</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -217,24 +210,24 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   header: {
-		position: "absolute",
-		left: 0,
-		right: 0,
-		flexDirection: "row",
-		alignContent: "space-between",
-		alignItems: "center",
-		padding: 20,
-		zIndex: 10,
-		backgroundColor: "#fff",
-		height: 100,
-		marginBottom: 5,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    zIndex: 10,
+    backgroundColor: "#fff",
+    height: 100,
+    marginBottom: 5,
     gap: 49,
-		borderBlockEndColor: "#ccc",
-	},
-	backButton: {
-		padding: 10,
-		marginTop: 20,
-	},
+    borderBottomColor: "#ccc",
+  },
+  backButton: {
+    padding: 10,
+    marginTop: 20,
+  },
 });
 
 export default Emergency;

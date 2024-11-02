@@ -5,6 +5,7 @@ import {
 	Image,
 	TextInput,
 	TouchableOpacity,
+	ActivityIndicator, // Import ActivityIndicator
 } from "react-native";
 import React, { useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -27,49 +28,49 @@ const LoginScreen = () => {
 		}
 
 		setLoading(true);
-		signInWithEmailAndPassword(getAuth(), email, password)
-			.then((userCredential) => {
-				const user = userCredential.user;
+		// Set a delay of 1000ms for the Activity Indicator
+		setTimeout(() => {
+			signInWithEmailAndPassword(getAuth(), email, password)
+				.then((userCredential) => {
+					const user = userCredential.user;
 
-				// Update user in context
-				setUser({
-					uid: user.uid,
-					email: user.email,
-					// Add additional fields if needed
-				});
+					// Update user in context
+					setUser({
+						uid: user.uid,
+						email: user.email,
+					});
 
-				// Log audit entry
-				logAudit(
-					email,
-					null, // No error message on success
-					user.uid,
-					"login",
-					null, // No target ID
-					"N/A", // IP address
-					null, // No changes made
-					"success"
-				);
-				// Redirect to the home screen
-				// router.replace("/(tabs)/Home");
-			})
-			.catch((err) => {
-				alert(err?.message);
-				// Log audit entry for failure
-				logAudit(
-					email,
-					err?.message,
-					null, // User ID is null on failure
-					"login",
-					null, // No target ID
-					"N/A", // IP address
-					null, // No changes made
-					"failure"
-				);
-			})
-			.finally(() => setLoading(false));
+					// Log audit entry
+					logAudit(
+						email,
+						null,
+						user.uid,
+						"login",
+						null,
+						"N/A",
+						null,
+						"success"
+					);
+					// Redirect to the home screen
+					// router.replace("/(tabs)/Home");
+				})
+				.catch((err) => {
+					alert(err?.message);
+					logAudit(
+						email,
+						err?.message,
+						null,
+						"login",
+						null,
+						"N/A",
+						null,
+						"failure"
+					);
+				})
+				.finally(() => setLoading(false));
+		}, 1000); // 1000ms delay
 	};
 
-	//thif function is throwing a rejection!
 	const handleBiometricLogin = async () => {
 		const rnBiometrics = new ReactNativeBiometrics();
 
@@ -81,9 +82,7 @@ const LoginScreen = () => {
 			});
 
 			if (success) {
-				// Here, you can log the user in automatically
 				alert("Biometric authentication successful!");
-				// Redirect to the home screen
 			} else {
 				alert("Biometric authentication failed");
 			}
@@ -143,20 +142,18 @@ const LoginScreen = () => {
 			<TouchableOpacity
 				style={[
 					styles.signInButtonContainer,
-					loading
-						? {
-								opacity: 0.8,
-						  }
-						: {},
+					loading ? { opacity: 0.8 } : {},
 				]}
 				onPress={handleLogin}
+				disabled={loading}
 			>
-				<Text style={styles.signIn}>
-					{loading ? "Loading..." : "Sign In"}
-				</Text>
+				{loading ? (
+					<ActivityIndicator size="small" color="#fff" />
+				) : (
+					<Text style={styles.signIn}>Sign In</Text>
+				)}
 			</TouchableOpacity>
 
-			{/* Biometric Login Button */}
 			<TouchableOpacity
 				style={styles.biometricButton}
 				onPress={handleBiometricLogin}
@@ -164,26 +161,18 @@ const LoginScreen = () => {
 				<Text style={styles.biometricText}>Use Biometrics</Text>
 			</TouchableOpacity>
 
-			<Link
-				href="/forgot-password"
-				asChild
-			>
+			<Link href="/forgot-password" asChild>
 				<TouchableOpacity>
 					<Text style={styles.forgotPasswordText}>
-						Forgot your password?{" "}
-						<Text style={styles.createText}>Reset</Text>
+						Forgot your password? <Text style={styles.createText}>Reset</Text>
 					</Text>
 				</TouchableOpacity>
 			</Link>
 
-			<Link
-				href="/sign-up"
-				asChild
-			>
+			<Link href="/sign-up" asChild>
 				<TouchableOpacity>
 					<Text style={styles.signUp}>
-						Don't have account?{" "}
-						<Text style={styles.createText}>Create</Text>
+						Don't have account? <Text style={styles.createText}>Create</Text>
 					</Text>
 				</TouchableOpacity>
 			</Link>
@@ -314,21 +303,5 @@ const styles = StyleSheet.create({
 		margin: 10,
 		color: "#ffffff",
 		backgroundColor: "transparent",
-	},
-	topImage: {
-		width: "100%",
-		height: 120,
-		resizeMode: "cover",
-		marginBottom: 0,
-		marginLeft: -29,
-		marginTop: 0,
-	},
-
-	bottomImage: {
-		width: "100%",
-		height: 140,
-		resizeMode: "cover",
-		marginLeft: -23,
-		marginTop: 56,
 	},
 });

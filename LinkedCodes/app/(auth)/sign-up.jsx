@@ -8,6 +8,7 @@ import {
 	Alert,
 	Pressable,
 	Keyboard,
+	ActivityIndicator,
 } from "react-native";
 import { useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -77,12 +78,19 @@ const SignupScreen = () => {
 				"failure"
 			);
 		} finally {
-			setLoading(false);
+			setTimeout(() => setLoading(false), 1000); // 1000 ms delay for ActivityIndicator
 		}
 	};
 
+	const handleSocialPress = (platform) => {
+		setLoading(true);
+		setTimeout(() => {
+			console.log(`${platform} pressed`);
+			setLoading(false);
+		}, 1000); // 1000 ms delay for ActivityIndicator
+	};
+
 	return (
-		//a useContext that will take evrything heare and store them in the users profile
 		<Pressable
 			onPress={Keyboard.dismiss}
 			style={styles.container}
@@ -176,11 +184,6 @@ const SignupScreen = () => {
 				/>
 			</View>
 
-			{/* this touchabale should have 3 tasks
-      1) takes to the home screen
-      2) saves the data to the local storage
-      3) and  think use useContext to display the data in profile
-      */}
 			<TouchableOpacity
 				style={[
 					styles.signUpButtonContainer,
@@ -191,13 +194,15 @@ const SignupScreen = () => {
 						: {},
 				]}
 				onPress={handleSignUp}
+				disabled={loading}
 			>
-				<Text style={styles.signUp}>
-					{loading ? "Loading..." : "Sign In"}
-				</Text>
+				{loading ? (
+					<ActivityIndicator size="small" color="#fff" />
+				) : (
+					<Text style={styles.signUp}>Sign In</Text>
+				)}
 			</TouchableOpacity>
 
-			{/* The idea here is to allow one to be able to sign in using their facebook, google and apple ID, by face or fingerprint if one is using an android */}
 			<View style={styles.socialMediaContainer}>
 				<Text style={styles.socialText}>
 					Or create account using social media
@@ -205,21 +210,29 @@ const SignupScreen = () => {
 				<View style={styles.socialIconsContainer}>
 					<TouchableOpacity
 						style={styles.pressedSocial}
-						onPress={() => console.log("Facebook pressed")}
+						onPress={() => handleSocialPress("Facebook")}
 					>
-						<Image
-							source={require("../../assets/facebook.png")}
-							style={styles.iconImage}
-						/>
+						{loading ? (
+							<ActivityIndicator size="small" color="#202A44" />
+						) : (
+							<Image
+								source={require("../../assets/facebook.png")}
+								style={styles.iconImage}
+							/>
+						)}
 					</TouchableOpacity>
 					<TouchableOpacity
 						style={styles.pressedSocial}
-						onPress={() => console.log("google pressed")}
+						onPress={() => handleSocialPress("Google")}
 					>
-						<Image
-							source={require("../../assets/google.png")}
-							style={styles.iconImage}
-						/>
+						{loading ? (
+							<ActivityIndicator size="small" color="#202A44" />
+						) : (
+							<Image
+								source={require("../../assets/google.png")}
+								style={styles.iconImage}
+							/>
+						)}
 					</TouchableOpacity>
 				</View>
 			</View>

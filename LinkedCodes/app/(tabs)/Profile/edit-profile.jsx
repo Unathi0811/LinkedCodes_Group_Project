@@ -10,6 +10,8 @@ import {
 	ScrollView,
 	Pressable,
 	Alert,
+	Modal,
+	ActivityIndicator, // Import ActivityIndicator
 } from "react-native";
 import { useUser } from "../../../src/cxt/user";
 import { auth, db } from "../../../firebase";
@@ -43,9 +45,12 @@ const EditProfile = () => {
 	const [image, setImage] = useState(user.profileImage);
 	const [password, setPassword] = useState("");
 	const [overlayMessage, setOverlayMessage] = useState("");
+	const [loading, setLoading] = useState(false); // State for loading
+	const [visible, setVisible] = useState(false); // State for overlay visibility
 	const router = useRouter();
 
 	const handleSave = async () => {
+		setLoading(true); // Start loading
 		try {
 			const userDoc = doc(db, "user", user.uid); // Update user doc in Firestore
 
@@ -64,10 +69,15 @@ const EditProfile = () => {
 			});
 
 			console.log("Profile updated successfully");
+			setOverlayMessage("You have successfully updated your profile!"); // Set overlay message
+			setVisible(true); // Show overlay
 		} catch (error) {
 			console.error("Error updating profile:", error);
+		} finally {
+			setLoading(false); // Stop loading
 		}
 	};
+
 	// Toggle overlay for error messages
 	const toggleOverlay = () => {
 		setVisible(!visible);
@@ -248,6 +258,7 @@ const EditProfile = () => {
 						</Text>
 					</TouchableOpacity>
 
+					{/* Uncomment this section to enable delete account functionality */}
 					{/* <TouchableOpacity
 						style={{
 							alignItems: "center",
@@ -263,6 +274,22 @@ const EditProfile = () => {
 					</TouchableOpacity> */}
 				</View>
 			</ScrollView>
+
+			{/* Activity Indicator and Overlay Message */}
+			<Modal
+				transparent={true}
+				visible={visible}
+				animationType="slide"
+			>
+				<View style={styles.overlay}>
+					<ActivityIndicator size="large" color="#202A44" />
+					<Text style={styles.overlayText}>{overlayMessage}</Text>
+					<Button
+						title="Close"
+						onPress={() => setVisible(false)}
+					/>
+				</View>
+			</Modal>
 		</View>
 	);
 };
@@ -280,22 +307,25 @@ const uploadToFirebase = async (uri, name, onProgress) => {
 			(snapshot) => {
 				const progress =
 					(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-				onProgress && onProgress(progress);
+				onProgress(progress);
 			},
-			(error) => reject(error),
+			(error) => {
+				console.error("Upload failed:", error);
+				reject(error);
+			},
 			async () => {
-				const downloadUrl = await getDownloadURL(
-					uploadTask.snapshot.ref
-				);
-				resolve({ downloadUrl });
+				const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+				resolve({ downloadUrl: downloadURL });
 			}
 		);
 	});
 };
 
-const saveProfileImage = async (userId, downloadUrl) => {
-	const userDoc = doc(db, "user", userId);
-	await updateDoc(userDoc, { profileImage: downloadUrl });
+const saveProfileImage = async (uid, imageUrl) => {
+	const userDoc = doc(db, "user", uid);
+	await updateDoc(userDoc, {
+		profileImage: imageUrl,
+	});
 };
 
 const styles = StyleSheet.create({
@@ -395,24 +425,29 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 	},
 	overlay: {
-		width: "80%",
-		height: 320,
-		borderRadius: 10,
-		padding: 20,
-		backgroundColor: "#EAF1FF",
-		alignItems: "center",
-		justifyContent: "center",
+		flex: 1, // Use flex to cover the whole screen
+		justifyContent: "center", // Center the overlay vertically
+		alignItems: "center", // Center the overlay horizontally
+		backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
 	},
 	overlayContent: {
-		alignItems: "center",
-	},
-	overlayIcon: {
-		marginBottom: 15,
+		width: "80%", // Set width of overlay content
+		padding: 20,
+		backgroundColor: "#EAF1FF", // Background color of the content
+		borderRadius: 10,
+		shadowColor: "#202A44", // Shadow color
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.3,
+		shadowRadius: 6,
+		elevation: 5, // For Android shadow effect
+		alignItems: "center", // Center items inside the content
 	},
 	overlayText: {
 		fontSize: 16,
-		textAlign: "center",
+		textAlign: "center", // Center text inside overlay
+		marginBottom: 20, // Space between text and button
 	},
 });
+
 
 export default EditProfile;

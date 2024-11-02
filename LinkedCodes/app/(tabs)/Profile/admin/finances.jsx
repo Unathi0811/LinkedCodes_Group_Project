@@ -1,23 +1,54 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
-import { useUser } from '../../../../src/cxt/user';
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { useUser } from "../../../../src/cxt/user";
+import { db } from "../../../../firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const Finances = () => {
-    const {user, setUser}= useUser()
-  // Sample data for demonstration
-  const payments = [
-    { user: user.username , amount: 50 },
-  ];
+  const { user } = useUser();
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        const paymentsCollection = collection(db, "payments");
+        const paymentSnapshot = await getDocs(paymentsCollection);
+        const paymentList = paymentSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setPayments(paymentList);
+      } catch (error) {
+        console.error("Error fetching payments: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPayments();
+  }, []);
 
   // Calculate total revenue
-  const totalRevenue = payments.reduce((total, payment) => total + payment.amount, 0);
+  const totalRevenue = payments.reduce(
+    (total, payment) => total + payment.amount,
+    0
+  );
 
+  if (loading) {
+    return (
+      <>
+        <ActivityIndicator size="large" color="#202A44" />
+        <Text>Loading...</Text>;
+      </>
+    );
+  }
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {payments.map((payment, index) => (
-          <View key={index} style={styles.paymentRow}>
-            <Text style={styles.userText}>{payment.user}</Text>
+        {payments.map((payment) => (
+          <View key={payment.id} style={styles.paymentRow}>
+            <Text style={styles.userText}>{payment.customerEmail}</Text>
             <Text style={styles.amountText}>${payment.amount}</Text>
           </View>
         ))}
@@ -36,13 +67,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#F2f9FB',
+    backgroundColor: "#F2f9FB",
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
-    shadowColor: '#202A44',
+    shadowColor: "#202A44",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -52,34 +83,34 @@ const styles = StyleSheet.create({
     elevation: 3, // For Android shadow
   },
   paymentRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0', 
+    borderBottomColor: "#e0e0e0",
   },
   userText: {
     fontSize: 16,
-    color: '#202A44',
+    color: "#202A44",
   },
   amountText: {
     fontSize: 16,
-    color: '#202A44', 
+    color: "#202A44",
   },
   totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 10,
     marginTop: 10,
   },
   totalText: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#202A44', 
+    fontWeight: "bold",
+    color: "#202A44",
   },
   totalAmount: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#202A44', 
+    fontWeight: "bold",
+    color: "#202A44",
   },
 });

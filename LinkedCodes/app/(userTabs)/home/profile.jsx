@@ -2,7 +2,6 @@ import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "rea
 import React, { useEffect, useState } from "react";
 import { Image, Pressable } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
 import {
 	getStorage,
 	ref,
@@ -26,7 +25,6 @@ const Profile = () => {
 			setImage(user.profileImage);
 		}
 	}, [user]);
-	const router = useRouter()
 	const pickImage = async () => {
 		try {
 			const result = await ImagePicker.launchImageLibraryAsync({

@@ -91,6 +91,9 @@ const CurrentDay = () => {
 				<ActivityIndicator
 					size="large"
 					color="#202A44"
+					style={{
+						flex: 1
+					}}
 				/>
 			</View>
 		);

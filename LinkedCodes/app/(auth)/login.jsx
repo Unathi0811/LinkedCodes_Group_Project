@@ -79,6 +79,7 @@ const LoginScreen = () => {
       cancelLabel: "Cancel",
     });
 
+
     if (biometricAuth.success) {
       // Retrieve the last logged-in user's email from SecureStore
       const storedEmail = await SecureStore.getItemAsync("user_email");

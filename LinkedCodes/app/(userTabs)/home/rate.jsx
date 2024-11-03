@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, TextInput, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, TextInput, Alert,Modal,Button } from 'react-native';
 import { db, auth } from '../../../firebase'; // Adjust these imports based on your directory structure
 import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { LogBox } from 'react-native';
@@ -10,6 +10,7 @@ LogBox.ignoreLogs([
 ]);
 import { useRouter } from 'expo-router';
 import Icon from "react-native-vector-icons/FontAwesome"
+
 const RateUs = ({ isDarkMode }) => {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({
@@ -20,6 +21,9 @@ const RateUs = ({ isDarkMode }) => {
   });
   const router = useRouter()  
   const { user } = useUser(); // Use the user context
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
 
   useEffect(() => {
     const fetchUserReviews = async () => {
@@ -42,7 +46,10 @@ const RateUs = ({ isDarkMode }) => {
     const trimmedComment = newReview.comment.trim();
 
     if (reviews.length >= 2) {
-      Alert.alert('Error', 'You can only submit up to 2 comments.');
+      // Alert.alert('Error', 'You can only submit up to 2 comments.');
+      setModalTitle('Error');
+      setModalMessage('You can only submit up to 2 comments.');
+      setModalVisible(true);
       return;
     }
 
@@ -65,11 +72,21 @@ const RateUs = ({ isDarkMode }) => {
         });
       } catch (error) {
         console.error('Error adding review:', error);
-        Alert.alert('Error', 'Could not add review. Please try again.');
+        // Alert.alert('Error', 'Could not add review. Please try again.');
+        setModalTitle('Error');
+        setModalMessage('Could not add review. Please try again.');
+        setModalVisible(true);
       }
     } else {
-      Alert.alert('Error', 'Please provide a rating and a non-empty comment.');
+      // Alert.alert('Error', 'Please provide a rating and a non-empty comment.');
+      setModalTitle('Error');
+      setModalMessage('Please provide a rating and a non-empty comment.');
+      setModalVisible(true);
     }
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
   };
 
   const renderReview = ({ item }) => (
@@ -137,6 +154,31 @@ const RateUs = ({ isDarkMode }) => {
           <Text style={styles.buttonText}>Submit Review</Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        transparent
+        visible={modalVisible}
+        animationType="slide"
+      >
+        <View style={styles.overlay}>
+          <View style={styles.modalContent}>
+          <Icon
+							name="exclamation"
+							size={30}
+							color="#202A44"
+              style={{marginBottom:30}}
+						/>
+            <Text style={styles.message}>{modalMessage}</Text>
+            {/* <Button title="OK" onPress={handleCloseModal} /> */}
+            <TouchableOpacity
+                style={styles.OKButton}
+                onPress={handleCloseModal}
+              >
+              <Text style={styles.btnText}> OK </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -225,6 +267,43 @@ const styles = StyleSheet.create({
 		color: "#202A44",
 		marginLeft: 130,
 	},
+
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: '#F2f9FB',
+    borderRadius: 10,
+    alignItems: 'center',
+    height:300,
+    justifyContent:'center'
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  message: {
+    marginBottom: 50,
+    fontSize: 20,
+  },
+  btnText: {
+    color: '#F2f9FB',
+    fontWeight: 'bold',
+    fontSize:20,
+  },
+  OKButton:{
+    padding: 10,
+    alignItems: 'center',
+    backgroundColor: '#202A44',
+    borderRadius: 5,
+    marginLeft: 5,
+  }
 });
 
 export default RateUs;

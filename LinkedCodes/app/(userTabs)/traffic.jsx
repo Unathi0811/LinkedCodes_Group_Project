@@ -296,7 +296,7 @@ const centerMapOnCurrentLocation = () => {
   if (!location) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        {warningMsg ? <Text>{warningMsg}</Text> : <ActivityIndicator size="large" color="#0000ff" />}
+        {warningMsg ? <Text>{warningMsg}</Text> : <ActivityIndicator size="large" color="#202A44" />}
       </View>
     );
   };

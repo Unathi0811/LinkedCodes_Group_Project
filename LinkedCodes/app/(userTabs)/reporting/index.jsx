@@ -131,7 +131,7 @@ export default function Reporting() {
       if (storedReports) {
         const reportsArray = JSON.parse(storedReports);
         for (const report of reportsArray) {
-          const imageRef = ref(storage, images/${report.id}.jpg);
+          const imageRef = ref(storage, images/`${report.id}`.jpg);
           const response = await fetch(report.image);
           const blob = await response.blob();
           await uploadBytes(imageRef, blob);
@@ -198,7 +198,7 @@ export default function Reporting() {
 
         if (isOnline) {
           // If online, upload image and report to Firebase
-          const imageRef = ref(storage, images/);
+          const imageRef = ref(storage, images);
           const response = await fetch(image);
           const blob = await response.blob();
           await uploadBytes(imageRef, blob);
@@ -241,7 +241,7 @@ export default function Reporting() {
   useEffect(() => {
     const checkSubscription = async () => {
       const subscriptionStatus = await AsyncStorage.getItem(
-        isSubscribed_${userId}
+        isSubscribed_`${userId}`
       );
       if (subscriptionStatus === "true") {
         setIsSubscribed(true);
@@ -274,7 +274,7 @@ export default function Reporting() {
           console.log("Image URI before deletion:", imageUri);
 
           // Construct the path based on the userId and image file
-          const userImagePath = users/${userId}/images/${imageUri};
+          const userImagePath = users/`${userId}/images/${imageUri}`;
 
           const imageRef = ref(storage, userImagePath); // Get reference to the user's image
           await deleteObject(imageRef); // Delete the image
@@ -282,7 +282,6 @@ export default function Reporting() {
         }
         console.log("Report and associated image deleted from Firebase");
       }
-
       setOverlayMessage("Report successfully deleted.");
       setVisible(true);
     } catch (error) {
@@ -618,61 +617,7 @@ export default function Reporting() {
               </TouchableOpacity>
             </TouchableOpacity>
           </Modal>
-          {/* Historical Reports */}
-          <View style={styles.container2}>
-            <Text
-              style={{
-                fontSize: 20,
-                marginTop: 10,
-                marginRight: 95,
-                marginBottom: 15,
-                color: "#202A44",
-                fontWeight: "bold",
-              }}
-            >
-              HISTORICAL REPORTS
-            </Text>
-            <FlatList
-              data={reports}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => openReportDetails(item)}>
-                  <View style={styles.reportItem}>
-                    <Image
-                      source={{
-                        uri: item.image,
-                        cache: "force-cache",
-                      }}
-                      style={styles.imageThumbnail}
-                    />
-                    <View style={styles.textContainer}>
-                      <Text style={styles.description}>{item.description}</Text>
-                      <Text style={styles.timestamp}>
-                        {item.timestamp.toDate().toLocaleString()}
-                      </Text>
-                      <Text style={styles.urgency}>
-                        Urgency: {item.urgency}
-                      </Text>
-                      <Text style={styles.category}>
-                        Report Type: {item.report_type}
-                      </Text>
-                      <Text style={styles.accidentReport}>
-                        Accident Report: {item.accident_report ? "Yes" : "No"}
-                        {/* Display accident report status */}
-                      </Text>
-                    </View>
-                    <TouchableOpacity
-                      onPress={() => deleteReport(item.id, item.image)}
-                    >
-                      <Icon name="trash" size={24} color="#000" />
-                    </TouchableOpacity>
-                  </View>
-                </TouchableOpacity>
-              )}
-              
-			  nestedScrollEnabled
-            />
-          </View>
+
         </ScrollView>
       </View>
     </TouchableWithoutFeedback>

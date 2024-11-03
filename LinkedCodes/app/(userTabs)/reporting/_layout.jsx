@@ -1,13 +1,13 @@
-import { Stack } from "expo-router";
+import { StatusBar } from 'expo-status-bar'
+import { Stack } from 'expo-router'
 
-const ReportingLayout = () => {
-  return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    />
-  );
-};
+const Layout = () => {
+    return (
+        <>
+            <StatusBar style="dark" />
+            <Stack screenOptions={{ headerShown: false }} />
+        </>
+    )
+}
 
-export default ReportingLayout;
+export default Layout

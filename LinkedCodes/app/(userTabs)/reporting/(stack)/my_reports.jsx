@@ -20,9 +20,9 @@ import {
 	where,
 } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
-import { auth, db } from "../../../firebase";
-import { checkIfOnline } from "../../../services/network";
-import { router, Stack } from "expo-router";
+import { auth, db } from "../../../../firebase";
+import { checkIfOnline } from "../../../../services/network";
+import { router, Stack, Tabs } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
 const deleteReport = async (reportId, imageUri) => {
@@ -116,9 +116,9 @@ const HistoricalReportsScreen = () => {
 					<Text style={styles.description}>
 						{item.description?.trim()}
 					</Text>
-					{/* <Text style={styles.timestamp}>
+					<Text style={styles.timestamp}>
 						{item.timestamp.toDate().toLocaleString()}
-					</Text> */}
+					</Text>
 					<Text style={styles.urgency}>Urgency: {item.urgency}</Text>
 					<Text style={styles.urgency}>
 						Category: {item.category}

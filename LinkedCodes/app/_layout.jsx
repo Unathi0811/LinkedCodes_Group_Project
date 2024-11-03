@@ -45,8 +45,6 @@ const Layout = () => {
       restartTimerOnActivityAfterExpiration={false}
       loop={loop}
     >
-      {/* theme provider here, for the theme */}
-    
     <PaymentProvider>
     <AuditContextProvider>
       <ReportProvider>

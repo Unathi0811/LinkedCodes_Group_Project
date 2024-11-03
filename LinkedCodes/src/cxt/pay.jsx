@@ -7,7 +7,6 @@ const PaymentContext = createContext();
 export const PaymentProvider = ({ children }) => {
   const [payments, setPayments] = useState([]);
 
-
   const fetchPayments = async () => {
     try {
       const snapshot = await getDocs(collection(db, 'payments')); 

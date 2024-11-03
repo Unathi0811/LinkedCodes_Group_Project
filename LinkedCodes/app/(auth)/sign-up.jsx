@@ -88,7 +88,7 @@ const SignupScreen = () => {
 
 	const handleCloseModal = () => {
 		setModalVisible(false);
-	  };
+	};
 
 	return (
 		//a useContext that will take evrything heare and store them in the users profile
@@ -185,20 +185,9 @@ const SignupScreen = () => {
 				/>
 			</View>
 
-			{/* this touchabale should have 3 tasks
-      1) takes to the home screen
-      2) saves the data to the local storage
-      3) and  think use useContext to display the data in profile
-      */}
 			<TouchableOpacity
-				style={[
-					styles.signUpButtonContainer,
-					loading
-						? {
-								opacity: 0.8,
-						  }
-						: {},
-				]}
+				style={
+					styles.signUpButtonContainer}
 				onPress={handleSignUp}
 			>
 				<Text style={styles.signUp}>

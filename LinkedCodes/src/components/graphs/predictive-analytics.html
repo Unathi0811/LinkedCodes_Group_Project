@@ -1,0 +1,49 @@
+<html>
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load ('current', {'packages':['gantt']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function daysToMilliseconds(days) {
+      return days * 24 * 60 * 60 * 1000;
+    }
+
+    function drawChart() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Task ID');
+      data.addColumn('string', 'Task Name');
+      data.addColumn('date', 'Start Date');
+      data.addColumn('date', 'End Date');
+      data.addColumn('number', 'Duration');
+      data.addColumn('number', 'Percent Complete');
+      data.addColumn('string', 'Dependencies');
+
+      data.addRows([
+        ['Inspection and Data Collections', 'Assign Maintainance Personnel to inspect, collect data on the condition of the task, input data into the app for analysis',
+         new Date(2015, 0, 1), new Date(2015, 0, 5), null,  100,  null],
+        ['Scheduling', 'Schedule tasks based on agency',
+         null, new Date(2015, 0, 9), daysToMilliseconds(3), 25, 'schedule'],
+        ['Maintainance teams perform tasks(repairs, replacements or cleaning)', 'update task in app, completed, rejected, in-progress or delayed',
+         null, new Date(2015, 0, 7), daysToMilliseconds(1), 20, 'maintainance'],
+        ['Quality Control', 'testing, visual inspections',
+         null, new Date(2015, 0, 10), daysToMilliseconds(1), 0, 'control'],
+        ['review and optimization', 'review maintainance history',
+         null, new Date(2015, 0, 6), daysToMilliseconds(1), 100, 'reviews']
+      ]);
+
+      var options = {
+        height: 275
+      };
+
+      var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+    }
+  </script>
+</head>
+<body>
+  <div id="chart_div"></div>
+</body>
+</html>

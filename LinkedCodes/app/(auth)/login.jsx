@@ -78,6 +78,7 @@ const LoginScreen = () => {
         cancelLabel: "Cancel",
     });
 
+
     if (biometricAuth.success) {
         // Retrieve the last logged-in user's email from SecureStore
         const storedEmail = await SecureStore.getItemAsync("user_email");
@@ -221,6 +222,29 @@ const LoginScreen = () => {
 					</Text>
 				</TouchableOpacity>
 			</Link>
+			<Modal
+				transparent
+				visible={modalVisible}
+				animationType="slide"
+			>
+				<View style={styles.overlay}>
+				<View style={styles.modalContent}>
+				<Icon
+					name="exclamation"
+					size={30}
+					color="#202A44"
+					style={{marginBottom:30}}
+				/>
+					<Text style={styles.message}>{modalMessage}</Text>
+					<TouchableOpacity
+						style={styles.OKButton}
+						onPress={handleCloseModal}
+					>
+					<Text style={styles.btnText}> OK </Text>
+					</TouchableOpacity>
+				</View>
+				</View>
+			</Modal>
 		</View>
 	);
 };
@@ -358,7 +382,6 @@ const styles = StyleSheet.create({
 		marginLeft: -29,
 		marginTop: 0,
 	},
-
 	bottomImage: {
 		width: "100%",
 		height: 140,
@@ -366,4 +389,41 @@ const styles = StyleSheet.create({
 		marginLeft: -23,
 		marginTop: 56,
 	},
+
+	overlay: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+	  },
+	  modalContent: {
+		width: 300,
+		padding: 20,
+		backgroundColor: '#F2f9FB',
+		borderRadius: 10,
+		alignItems: 'center',
+		height:250,
+		justifyContent:'center'
+	  },
+	  title: {
+		fontSize: 18,
+		fontWeight: 'bold',
+		marginBottom: 10,
+	  },
+	  message: {
+		marginBottom: 50,
+		fontSize: 20,
+	  },
+	  btnText: {
+		color: '#F2f9FB',
+		fontWeight: 'bold',
+		fontSize:20,
+	  },
+	  OKButton:{
+		padding: 10,
+		alignItems: 'center',
+		backgroundColor: '#202A44',
+		borderRadius: 5,
+		marginLeft: 5,
+	  },
 });

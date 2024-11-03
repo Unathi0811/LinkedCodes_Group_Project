@@ -7,13 +7,12 @@ import { useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Alert } from "react-native";
-
 import { AuditContextProvider } from "../src/cxt/audit";
 import { PaymentProvider } from "../src/cxt/pay";
 
 const Layout = () => {
   const [inactivityTimeoutCount, setInactivityTimeoutCount] = useState(0);
-  const [isActive, setIsActive] = useState(true); // to manage activity state
+  const [isActive, setIsActive] = useState(true); 
   const [loop] = useState(true);
 
   // What to do when user is inactive
@@ -58,7 +57,6 @@ const Layout = () => {
       </ReportProvider>
       </AuditContextProvider>
       </PaymentProvider>
-   
     </ReactNativeInactivity>
   );
 };

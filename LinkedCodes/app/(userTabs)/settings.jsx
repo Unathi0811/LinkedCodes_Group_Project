@@ -10,7 +10,7 @@ import Icon from "react-native-vector-icons/FontAwesome"
 import { useRouter } from "expo-router";
 import { ScrollView } from "react-native";
 
-const Settings = ({ toggleTheme, isDarkMode }) => {
+const Settings = () => {
   const [permissions, setPermissions] = useState({
     camera: false,
     gallery: false,
@@ -134,10 +134,9 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
 
   return (
     <View
-      style={[
-        styles.container,
-        { backgroundColor: isDarkMode ? "#000" : "#F2f9FB" },
-      ]}
+      style={
+        styles.container
+      }
     >
       <View style={styles.header}>
         {/* Back Button */}
@@ -160,13 +159,13 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
         
 
         <View style={styles.section}>
-            <Text style={[styles.heading, { color: isDarkMode ? "#FFF" : "#202A44" }]}>
+            <Text style={styles.heading}>
             Security & Login
             </Text>
 
             <View style={styles.switchContainer}>
             <Text
-                style={[styles.subHeading, { color: isDarkMode ? "#FFF" : "#202A44" }]}
+                style={styles.subHeading}
             >
                 Face Recognition
             </Text>
@@ -179,7 +178,7 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
 
             <View style={styles.switchContainer}>
             <Text
-                style={[styles.subHeading, { color: isDarkMode ? "#FFF" : "#202A44" }]}
+                style={styles.subHeading}
             >
                 Finger Verification
             </Text>
@@ -192,7 +191,7 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
         </View>
 
         <View style={styles.section1}>
-            <Text style={[styles.heading, { color: isDarkMode ? "#FFF" : "#202A44" }]}>
+            <Text style={styles.heading}>
             Permissions
             </Text>
 
@@ -201,7 +200,6 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
                 <Text
                 style={[
                     styles.subHeading,
-                    { color: isDarkMode ? "#FFF" : "#202A44" },
                 ]}
                 >
                 {`${type.charAt(0).toUpperCase() + type.slice(1)} Access`}
@@ -214,22 +212,6 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
             ))}
         </View>
 
-        <View style={styles.section2}>
-            <Text style={[styles.heading, { color: isDarkMode ? "#FFF" : "#202A44" }]}>
-            Theme
-            </Text>
-            <View style={styles.switchContainer}>
-            <Text
-                style={[styles.subHeading, { color: isDarkMode ? "#FFF" : "#202A44" }]}
-            >
-                {isDarkMode ? "Dark Mode" : "Light Mode"}
-            </Text>
-            <Switch
-                value={isDarkMode}
-                onValueChange={() => toggleTheme(isDarkMode ? "light" : "dark")}
-            />
-            </View>
-        </View>
       </ScrollView>
     </View>
   );

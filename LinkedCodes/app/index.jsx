@@ -50,7 +50,6 @@ const Layout = () => {
       color="#202A44" 
       />
       <Text>Loading...</Text>
-      {/* <Link href="/(userTabs)/traffic">user</Link> */}
     </View>
   );
 };

@@ -46,7 +46,7 @@ export default function Reporting() {
   const { latitude, longitude } = useLocation();
   const [image, setImage] = useState(null);
   const [input, setInput] = useState("");
-  const [reports, setReports] = useState([]); // Array to store reports
+  const [reports, setReports] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [visible, setVisible] = useState(false);
   const [overlayMessage, setOverlayMessage] = useState("");
@@ -58,11 +58,7 @@ export default function Reporting() {
   const [imageLoading, setImageLoading] = useState(true); // For image loading
   const [showAd, setShowAd] = useState(false); // Ad visibility
   const [isSubscribed, setIsSubscribed] = useState(false); // Subscription status
-  const inactivityTimeoutRef = useRef(null)
-
-
-
- 
+  const inactivityTimeoutRef = useRef(null);
 
   // Get the current user ID
   const userId = auth.currentUser ? auth.currentUser.uid : null;
@@ -81,7 +77,6 @@ export default function Reporting() {
   // Load reports from Firestore in real-time (if online) or from AsyncStorage (if offline)
   const loadReportsFromFirestore = () => {
     if (!userId) return; // Exit if no user is authenticated
-
     // const q = collection(db, "reports"); // Query the reports collection
     const q = query(collection(db, "reports"), where("userId", "==", userId));
     const unsubscribe = onSnapshot(
@@ -135,17 +130,15 @@ export default function Reporting() {
       if (storedReports) {
         const reportsArray = JSON.parse(storedReports);
         for (const report of reportsArray) {
-          const imageRef = ref(storage, images/`${report.id}`.jpg);
+          const imageRef = ref(storage, images / `${report.id}`.jpg);
           const response = await fetch(report.image);
           const blob = await response.blob();
           await uploadBytes(imageRef, blob);
           const imageUrl = await getDownloadURL(imageRef);
-
           // Update the report with the correct image URL
           const updatedReport = { ...report, image: imageUrl };
           await setDoc(doc(firestore, "reports", report.id), updatedReport);
         }
-
         // Clear offline reports after successful sync
         await AsyncStorage.removeItem("offlineReports");
         console.log("Offline reports synced to Firebase");
@@ -163,7 +156,6 @@ export default function Reporting() {
         await syncOfflineReports();
       }
     });
-
     return () => unsubscribe(); // Cleanup network listener on unmount
   }, []);
 
@@ -172,17 +164,15 @@ export default function Reporting() {
     if (image && input && userId && urgency) {
       try {
         setLoading(true);
-
         // Determine report_type and accident_report based on selected category
         let reportType = null;
         let accidentReport = false;
-
         if (category === "Accident") {
-          accidentReport = true; // Set to true if category is Accident
+          accidentReport = true;
         } else if (category === "Road") {
-          reportType = "Road"; // Set report_type to Road
+          reportType = "Road";
         } else if (category === "Bridge") {
-          reportType = "Bridge"; // Set report_type to Bridge
+          reportType = "Bridge";
         }
 
         const newReport = {
@@ -191,28 +181,29 @@ export default function Reporting() {
           timestamp: new Date(),
           latitude,
           longitude,
-          userId, // Include the authenticated user's ID
+          userId,
           urgency,
-          report_type: reportType, // Set report_type based on selected category
-          accident_report: accidentReport, // Set accident_report based on selected category
+          report_type: reportType,
+          accident_report: accidentReport,
         };
 
-        // Check network status
         const isOnline = await checkIfOnline();
-
         if (isOnline) {
           // If online, upload image and report to Firebase
-          const imageRef = ref(storage, images);
+          const imageRef = ref(
+            storage,
+            `images/${newReport.userId}/${newReport.timestamp.getTime()}.jpg`
+          );
+          
           const response = await fetch(image);
           const blob = await response.blob();
           await uploadBytes(imageRef, blob);
-
           const imageUrl = await getDownloadURL(imageRef);
           newReport.image = imageUrl; // Update image URL after upload
 
           // Add the new report to Firestore
           await addDoc(collection(db, "reports"), newReport);
-          setLoading(false);
+          console.log("Report submitted successfully.");
         } else {
           // If offline, save the report locally using AsyncStorage
           const storedReports = await AsyncStorage.getItem("offlineReports");
@@ -231,8 +222,11 @@ export default function Reporting() {
         setInput("");
         setModalVisible(false);
       } catch (error) {
+        console.error("Error submitting report: ", error); // Log the error
         setOverlayMessage("Error submitting report: " + error.message);
         setVisible(true);
+      } finally {
+        setLoading(false); // Always set loading to false after the operation
       }
     } else {
       setOverlayMessage(
@@ -245,7 +239,7 @@ export default function Reporting() {
   useEffect(() => {
     const checkSubscription = async () => {
       const subscriptionStatus = await AsyncStorage.getItem(
-        isSubscribed_`${userId}`
+        isSubscribed`${userId}`
       );
       if (subscriptionStatus === "true") {
         setIsSubscribed(true);
@@ -278,7 +272,7 @@ export default function Reporting() {
           console.log("Image URI before deletion:", imageUri);
 
           // Construct the path based on the userId and image file
-          const userImagePath = users/`${userId}/images/${imageUri}`;
+          const userImagePath = `users/${userId}/images/${imageUri}`;
 
           const imageRef = ref(storage, userImagePath); // Get reference to the user's image
           await deleteObject(imageRef); // Delete the image
@@ -341,34 +335,30 @@ export default function Reporting() {
   };
 
   // Close report details modal
-  const closeReportDetails = () => {
-    setSelectedReport(null);
-    setModalVisible2(false);
-  };
+  // const closeReportDetails = () => {
+  //   setSelectedReport(null);
+  //   setModalVisible2(false);
+  // };
 
   // Render individual report item in the list
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => openReportDetails(item)}
-      style={styles.cardContainer}
-    >
-      <View style={styles.card}>
-        <Text>{item.description}</Text>
-        <Text>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  // const renderItem = ({ item }) => (
+  //   <TouchableOpacity
+  //     onPress={() => openReportDetails(item)}
+  //     style={styles.cardContainer}
+  //   >
+  //     <View style={styles.card}>
+  //       <Text>{item.description}</Text>
+  //       <Text>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</Text>
+  //     </View>
+  //   </TouchableOpacity>
+  // );
+
   const router = useRouter();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "#F2f9FB",
-        }}
-      >
-        <View style={styles.header}>
+      <>
+      <View style={styles.header}>
           {/* Back Button */}
           <TouchableOpacity
             onPress={() => router.push("/(userTabs)/home")}
@@ -378,13 +368,18 @@ export default function Reporting() {
           </TouchableOpacity>
           <Text style={styles.headerApp}>InfraSmart</Text>
         </View>
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor: "#F2f9FB",
+          paddingBottom: 34,
+        }}
+      >
+        
+        <View
+          style={{
             alignContent: "center",
             alignItems: "center",
-          }}
-          style={{
             flex: 1,
             backgroundColor: "#F2f9FB",
             marginTop: 10,
@@ -459,7 +454,6 @@ export default function Reporting() {
             placeholder="write the description here"
             numberOfLines={2}
           />
-          {/this is the urgency dropdown/}
 
           <Text style={styles.urgencyLabel}>SELECT URGENCY LEVEL</Text>
           <View style={styles.urgencyDropdown}>
@@ -555,7 +549,7 @@ export default function Reporting() {
 
           <TouchableOpacity style={styles.button} onPress={submitReport}>
             {loading ? (
-              <ActivityIndicator size="small" color="#EAF1FF" />
+              <ActivityIndicator size="small" color="#202A44" />
             ) : (
               <Text>
                 <Text style={styles.buttonText}>Submit Report</Text>
@@ -567,6 +561,17 @@ export default function Reporting() {
               <Text style={styles.buttonText}>User Chat</Text>
             </TouchableOpacity>
           </Link>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              router.push({
+                pathname: "/(userTabs)/reporting/my_reports",
+                params: { reports, deleteReport },
+              })
+            }
+          >
+            <Text style={styles.buttonText}>View Historical Reports</Text>
+          </TouchableOpacity>
           {/* Overlay for error messages */}
           <Overlay
             isVisible={visible}
@@ -621,9 +626,9 @@ export default function Reporting() {
               </TouchableOpacity>
             </TouchableOpacity>
           </Modal>
-
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
+      </>
     </TouchableWithoutFeedback>
   );
 }
@@ -663,7 +668,7 @@ const styles = StyleSheet.create({
     shadowColor: "#202A44",
   },
   container2: {
-    flex: 2,
+    flex: 3,
     width: "100%",
     backgroundColor: "#EAF1FF",
   },
@@ -806,25 +811,15 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     borderRadius: 5,
   }),
-
   urgencyLabel: {
     marginTop: 10,
     marginBottom: 5,
   },
-
   urgencyDropdown: {
     flexDirection: "row",
     justifyContent: "space-evenly",
     width: "100%",
   },
-  // container: {
-  // flex: 1,
-  // backgroundColor: "#F2f9FB",
-  // alignContent: "center",
-  // alignItems: "center",
-  // marginTop: 10,
-  // height: "auto",
-  // },
   header: {
     position: "absolute",
     left: 0,
@@ -1061,8 +1056,5 @@ const styles = StyleSheet.create({
   iconContainer: {
     top: 10, // Adjust the position of the arrow icon
     right: 10, // Align to the right
-  },
-  container2: {
-    marginTop: 10,
   },
 });

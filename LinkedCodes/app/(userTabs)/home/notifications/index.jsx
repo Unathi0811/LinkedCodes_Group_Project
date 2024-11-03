@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { getFirestore, collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../../../src/cxt/theme'; // Import the useTheme hook
 
 const db = getFirestore();
 
@@ -18,7 +17,6 @@ const NotificationsScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigation = useNavigation();
-  const { theme } = useTheme(); // Access the theme context
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'notifications'), (snapshot) => {
@@ -70,23 +68,22 @@ const NotificationsScreen = () => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.heading, { color: theme.text }]}>Notifications</Text>
-      
+    <View style={styles.container}>
+      <Text style={styles.heading}>Notifications</Text>
       <FlatList
         data={notifications}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={[styles.notificationCard, { backgroundColor: theme.card }]}>
+          <View style={styles.notificationCard}>
             <TouchableOpacity onPress={() => handleNotificationPress(item.reportId)}>
-              <Text style={[styles.notificationTitle, { color: theme.text }]}>{item.title}</Text>
-              <Text style={[styles.notificationBody, { color: theme.text }]}>
+              <Text style={styles.notificationTitle}>{item.title}</Text>
+              <Text style={styles.notificationBody}>
                 {item.body}
               </Text>
-              <Text style={[styles.notificationStatus, { color: theme.subText }]}>
+              <Text style={styles.notificationStatus}>
                 {`Status: ${item.status} (Report ID: ${item.reportId || "N/A"})`}
               </Text>
-              <Text style={[styles.notificationTimestamp, { color: theme.subText }]}>
+              <Text style={styles.notificationTimestamp}>
                 {new Date(item.timestamp?.toDate()).toLocaleString()}
               </Text>
             </TouchableOpacity>

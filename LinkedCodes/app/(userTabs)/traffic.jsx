@@ -78,6 +78,7 @@ const traffic = () => {
       };
     })();
   }, []);
+  
 // to center the map to the current location of the user 
 const centerMapOnCurrentLocation = () => {
   if (location) {
@@ -560,7 +561,7 @@ const IncidentItem = ({ item }) => {
               <TouchableOpacity  
               style={styles.currentLocationButton}  
               onPress={centerMapOnCurrentLocation}>  
-              <Ionicons name="locate" size={24} color="#fff" />
+              <Ionicons name="locate" size={24} color="#F2f9FB" />
             </TouchableOpacity>
 
               {/* button to show the traffic data in the map  */}
@@ -572,8 +573,8 @@ const IncidentItem = ({ item }) => {
                 fetchTrafficData(); 
               }}
             >
-              <MaterialIcons name="speed" size={30} color="red" />
-              <Text style={{ color: '#EAF1FF',fontWeight: 'bold',}}>Traffic</Text>
+              <MaterialIcons name="speed" size={30} color="#F2f9FB" />
+              <Text style={{ color: '#F2f9FB',fontWeight: 'bold',}}>Traffic</Text>
             </TouchableOpacity>
 
             {/*  touchable for displaing the the traffic incident data */}
@@ -581,8 +582,8 @@ const IncidentItem = ({ item }) => {
               style={styles.incidentButton}
               onPress={() => setIncidentModalVisible(true)}
             >
-              <MaterialIcons name="traffic" size={30} color="red" />
-              <Text style={{ color: '#EAF1FF',fontWeight: 'bold',}}>Update</Text>
+              <MaterialIcons name="traffic" size={30} color="#F2f9FB" />
+              <Text style={{ color: '#F2f9FB',fontWeight: 'bold',}}>Update</Text>
             </TouchableOpacity>
 
 
@@ -615,7 +616,7 @@ const IncidentItem = ({ item }) => {
                     onPress={() => handleSuggestionPress(item.place_id)}
                     style={styles.suggestionItem}
                   >
-                    <Text style={styles.suggestionsText}><Ionicons name="location" size={15} color="#EAF1FF" /> {item.description}</Text>
+                    <Text style={styles.suggestionsText}><Ionicons name="location" size={15} color="#F2f9FB" /> {item.description}</Text>
                   </TouchableOpacity>
                 )}
               />
@@ -628,7 +629,7 @@ const IncidentItem = ({ item }) => {
                     <ActivityIndicator size="large" color="#007bff" />
                   ) : trafficData ? (
                     <View>
-                      <Text style={{ fontSize: 20,color:'#EAF1FF' }}>
+                      <Text style={{ fontSize: 20,color:'#F2f9FB' }}>
                         Traffic  Updates for: {destination}
                       </Text>
                       {trafficData && (
@@ -650,10 +651,10 @@ const IncidentItem = ({ item }) => {
 
                     </View>
                   ) : (
-                    <Text style={{fontSize: 20,color:'red'}}>No traffic data available.</Text>
+                    <Text style={{fontSize: 20,color:'#F2f9FB'}}>No traffic data available.</Text>
                   )}
                   <TouchableOpacity
-                    style={{width:'20%',height:25,backgroundColor:'#EAF1FF',borderRadius: 5,alignItems: 'center',justifyContent: 'center', }}
+                    style={{width:'20%',height:25,backgroundColor:'#F2f9FB',borderRadius: 5,alignItems: 'center',justifyContent: 'center', }}
                     onPress={() => setShowTrafficModal(false)}
                   >
                     <Text style={styles.closeButtonText}>Close</Text>
@@ -665,11 +666,11 @@ const IncidentItem = ({ item }) => {
             {incidentModalVisible && (
               <View style={styles.floatingIncidentModal}>
                   <View style={{flexDirection:'row', width:'95%',marginBottom: 10,}}> 
-                      <Text style={{fontSize:30 ,color:'#EAF1FF',marginLeft: 50}}>Incidents</Text>
+                      <Text style={{fontSize:30 ,color:'#F2f9FB',marginLeft: 50}}>Incidents</Text>
 
                       {/* button to close the view */}
                       <TouchableOpacity
-                        style={{position:'absolute', right:0,width:'16%',height:25,backgroundColor:'#EAF1FF',borderRadius: 5,alignItems: 'center',justifyContent: 'center',}}
+                        style={{position:'absolute', right:0,width:'16%',height:25,backgroundColor:'#F2f9FB',borderRadius: 5,alignItems: 'center',justifyContent: 'center',}}
                         onPress={() => setIncidentModalVisible(false)}
                       >
                         <Text style={styles.buttonText}>Close</Text>
@@ -683,7 +684,7 @@ const IncidentItem = ({ item }) => {
                       renderItem={({ item }) => <IncidentItem item={item} />}
                     />
                   ) : (
-                    <Text style={{fontSize: 20,color:'red'}}>No incidents available</Text>
+                    <Text style={{fontSize: 20,color:'#F2f9FB'}}>No incidents available</Text>
                   )}
 
               </View>
@@ -754,8 +755,8 @@ const styles = StyleSheet.create({
     borderRightWidth:1,
     marginRight:5,
     paddingRight:5,
-    borderColor:'#EAF1FF',
-    color:'#EAF1FF' 
+    borderColor:'#F2f9FB',
+    color:'#F2f9FB' 
   },
   currentLocationButton: {  
     position: 'absolute',  
@@ -837,7 +838,7 @@ const styles = StyleSheet.create({
     borderRadius:20,
     height:46,
     position:'absolute',
-    backgroundColor: '#EAF1FF',
+    backgroundColor: '#F2f9FB',
     paddingHorizontal:10,
     right:9,
     justifyContent: 'center',  

@@ -8,14 +8,19 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  Button,
+  Modal,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { Stack, Tabs } from "expo-router";
+import Icon from "react-native-vector-icons/FontAwesome"
 
 const ChatBot = () => {
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const API_KEY = "AIzaSyARHJ5rNKWC_b9f56ZCUBPa9oVW9JVCc34";
 
@@ -55,7 +60,8 @@ const ChatBot = () => {
       const text = response.text();
       setMessages((prevMessages) => [...prevMessages, { text, user: false }]);
     } catch (error) {
-      console.error("Error generating response:", error);
+      setErrorMessage("Failed to generate response. Please try again.");
+      setModalVisible(true); 
     } finally {
       setLoading(false);
       setUserInput("");
@@ -72,6 +78,9 @@ const ChatBot = () => {
       <Text style={{ fontSize: 16 }}>{item.text}</Text>
     </View>
   );
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
 
   return (
     <>
@@ -137,6 +146,31 @@ const ChatBot = () => {
           </TouchableOpacity>
 
         </View>
+
+      <Modal
+        transparent
+        visible={modalVisible}
+        animationType="slide"
+      >
+        <View style={styles.overlay}>
+          <View style={styles.modalContent}>
+          <Icon
+							name="exclamation"
+							size={30}
+							color="#F2f9FB"
+              style={{marginBottom:30}}
+						/>
+            <Text style={styles.message}>{errorMessage}</Text>
+            {/* <Button title="OK" onPress={handleCloseModal} /> */}
+            <TouchableOpacity
+                style={styles.OKButton}
+                onPress={handleCloseModal}
+              >
+              <Text style={styles.btnText}> OK </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       </View>
     </>
   );
@@ -153,5 +187,39 @@ const styles = StyleSheet.create({
     backgroundColor: "#e2e3e5",
     alignSelf: "flex-start",
   },
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: '#202A44',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  message: {
+    marginBottom: 20,
+    color:'#F2f9FB',
+    fontSize: 18,
+  },
+  btnText: {
+    color: '#202A44',
+    fontWeight: 'bold',
+    fontSize:20,
+  },
+  OKButton:{
+    padding: 10,
+    alignItems: 'center',
+    backgroundColor: '#F2f9FB',
+    borderRadius: 5,
+    marginLeft: 5,
+  }
 });
 export default ChatBot;

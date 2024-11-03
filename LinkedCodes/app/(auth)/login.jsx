@@ -5,6 +5,8 @@ import {
 	Image,
 	TextInput,
 	TouchableOpacity,
+	Modal,
+	Button 
 } from "react-native";
 import React, { useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -19,10 +21,13 @@ const LoginScreen = () => {
 	const [password, setPassword] = React.useState("");
 	const [loading, setLoading] = useState(false);
 	const { setUser } = useUser();
+	const [modalVisible, setModalVisible] = useState(false);
+	const [modalMessage, setModalMessage] = useState('');
 
 	const handleLogin = () => {
 		if (email === "" || password === "") {
-			alert("Please fill in all fields");
+			setModalMessage('Please fill in all fields.');
+			setModalVisible(true);
 			return;
 		}
 
@@ -91,6 +96,10 @@ const LoginScreen = () => {
 			alert("Biometric authentication not available");
 		}
 	};
+
+	const handleCloseModal = () => {
+		setModalVisible(false);
+	  };
 
 	return (
 		<View style={styles.container}>
@@ -187,6 +196,29 @@ const LoginScreen = () => {
 					</Text>
 				</TouchableOpacity>
 			</Link>
+			<Modal
+				transparent
+				visible={modalVisible}
+				animationType="slide"
+			>
+				<View style={styles.overlay}>
+				<View style={styles.modalContent}>
+				<Icon
+					name="exclamation"
+					size={30}
+					color="#202A44"
+					style={{marginBottom:30}}
+				/>
+					<Text style={styles.message}>{modalMessage}</Text>
+					<TouchableOpacity
+						style={styles.OKButton}
+						onPress={handleCloseModal}
+					>
+					<Text style={styles.btnText}> OK </Text>
+					</TouchableOpacity>
+				</View>
+				</View>
+			</Modal>
 		</View>
 	);
 };
@@ -323,7 +355,6 @@ const styles = StyleSheet.create({
 		marginLeft: -29,
 		marginTop: 0,
 	},
-
 	bottomImage: {
 		width: "100%",
 		height: 140,
@@ -331,4 +362,41 @@ const styles = StyleSheet.create({
 		marginLeft: -23,
 		marginTop: 56,
 	},
+
+	overlay: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+	  },
+	  modalContent: {
+		width: 300,
+		padding: 20,
+		backgroundColor: '#F2f9FB',
+		borderRadius: 10,
+		alignItems: 'center',
+		height:250,
+		justifyContent:'center'
+	  },
+	  title: {
+		fontSize: 18,
+		fontWeight: 'bold',
+		marginBottom: 10,
+	  },
+	  message: {
+		marginBottom: 50,
+		fontSize: 20,
+	  },
+	  btnText: {
+		color: '#F2f9FB',
+		fontWeight: 'bold',
+		fontSize:20,
+	  },
+	  OKButton:{
+		padding: 10,
+		alignItems: 'center',
+		backgroundColor: '#202A44',
+		borderRadius: 5,
+		marginLeft: 5,
+	  },
 });

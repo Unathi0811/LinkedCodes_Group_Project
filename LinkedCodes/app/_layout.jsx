@@ -7,7 +7,7 @@ import { useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Alert } from "react-native";
-import { ThemeProvider } from "../src/cxt/theme";
+
 import { AuditContextProvider } from "../src/cxt/audit";
 import { PaymentProvider } from "../src/cxt/pay";
 
@@ -47,7 +47,7 @@ const Layout = () => {
       loop={loop}
     >
       {/* theme provider here, for the theme */}
-    <ThemeProvider>
+    
     <PaymentProvider>
     <AuditContextProvider>
       <ReportProvider>
@@ -58,7 +58,7 @@ const Layout = () => {
       </ReportProvider>
       </AuditContextProvider>
       </PaymentProvider>
-    </ThemeProvider>
+   
     </ReactNativeInactivity>
   );
 };

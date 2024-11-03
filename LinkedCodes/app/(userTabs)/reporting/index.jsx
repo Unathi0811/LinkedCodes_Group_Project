@@ -58,7 +58,11 @@ export default function Reporting() {
   const [imageLoading, setImageLoading] = useState(true); // For image loading
   const [showAd, setShowAd] = useState(false); // Ad visibility
   const [isSubscribed, setIsSubscribed] = useState(false); // Subscription status
-  const inactivityTimeoutRef = useRef(null);
+  const inactivityTimeoutRef = useRef(null)
+
+
+
+ 
 
   // Get the current user ID
   const userId = auth.currentUser ? auth.currentUser.uid : null;

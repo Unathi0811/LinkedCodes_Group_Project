@@ -7,8 +7,9 @@ import {
 	Image,
 	ScrollView,
 	Alert,
+	Modal
 } from "react-native";
-import * as React from "react";
+// import * as React from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Link, router } from "expo-router";
 import { useUser } from "../../../src/cxt/user";
@@ -17,15 +18,22 @@ import { Drawer } from "react-native-drawer-layout";
 import Icon2 from "react-native-vector-icons/MaterialIcons";
 import { auth } from "../../../firebase";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import React, { useState } from "react";
 
 const Home = () => {
 	const [open, setOpen] = React.useState(false);
+	const [modalVisible, setModalVisible] = useState(false);
 
 	const handleMenuPress = () => {
 		setOpen(!open);
 	};
 
 	const { setUser, user } = useUser();
+
+	const handleLogout = () => {
+		signOut(auth);
+		setModalVisible(false); 
+	  };
 
 	return (
 		<Drawer
@@ -123,39 +131,40 @@ const Home = () => {
 
 							<TouchableOpacity
 								style={styles.drawerItem}
-								onPress={() => {
-									Alert.alert(
-										"Logout",
-										"Are you sure you want to logout?",
-										[
-											{
-												text: "Cancel",
-												onPress: () =>
-													console.log(
-														"Logout canceled"
-													),
-												style: "cancel",
-											},
-											{
-												text: "Logout",
-												onPress: () => signOut(auth),
-												style: "destructive",
-											},
-										],
-										{ cancelable: true }
-									);
-								}}
+								onPress={() => setModalVisible(true)}
 							>
-								<Text style={styles.drawerItemText}>
-									Logout
-								</Text>
-								<Icon
-									name="sign-out"
-									size={20}
-									color="#fff"
-									style={styles.drawerIcon}
-								/>
+								<Text style={styles.drawerItemText}>Logout</Text>
+								<Icon name="sign-out" size={20} color="#fff" style={styles.drawerIcon} />
 							</TouchableOpacity>
+
+						<Modal
+								transparent={true}
+								animationType="slide"
+								visible={modalVisible}
+								onRequestClose={() => setModalVisible(false)}
+							>
+								<View style={styles.modalOverlay}>
+								<View style={styles.modalContent}>
+									<Icon name="sign-out" size={40} color="#202A44" style={styles.logoutIcon} />
+									<Text style={styles.modalMessage}>Are you sure you want to logout?</Text>
+									<View style={styles.modalButtons}>
+									<TouchableOpacity
+										style={styles.cancelButton}
+										onPress={() => setModalVisible(false)}
+									>
+										<Text style={styles.cancelText}>Cancel</Text>
+									</TouchableOpacity>
+
+									<TouchableOpacity
+										style={styles.logoutButton}
+										onPress={handleLogout}
+									>
+										<Text style={styles.buttonText}>Logout</Text>
+									</TouchableOpacity>
+									</View>
+								</View>
+								</View>
+							</Modal>
 						</View>
 					</View>
 				);
@@ -498,4 +507,64 @@ const styles = StyleSheet.create({
 	drawerIcon: {
 		marginLeft: 23,
 	},
+
+	
+	modalOverlay: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+	  },
+	  modalContent: {
+		width: 300,
+		padding: 20,
+		backgroundColor: '#F2f9FB',
+		borderRadius: 10,
+		alignItems: 'center',
+		height:350,
+		justifyContent:'center'
+	  },
+	  modalTitle: {
+		fontSize: 18,
+		fontWeight: 'bold',
+	  },
+	  modalMessage: {
+		marginVertical: 10,
+		textAlign: 'center',
+		marginBottom:40,
+		fontSize:20
+	  },
+	  modalButtons: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		width: '100%',
+		
+	  },
+	  cancelButton: {
+		flex: 1,
+		padding: 10,
+		alignItems: 'center',
+		backgroundColor: '#ddd',
+		borderRadius: 5,
+		marginRight: 5,
+	  },
+	  logoutButton: {
+		flex: 1,
+		padding: 10,
+		alignItems: 'center',
+		backgroundColor: '#202A44',
+		borderRadius: 5,
+		marginLeft: 5,
+	  },
+	  buttonText: {
+		color: '#F2f9FB',
+		fontWeight: 'bold',
+	  },
+	  cancelText: {
+		color: '#202A44',
+		fontWeight: 'bold',
+	  },
+	  logoutIcon:{
+		marginBottom:40
+	  }
 });

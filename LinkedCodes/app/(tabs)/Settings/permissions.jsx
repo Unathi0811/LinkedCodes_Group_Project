@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Switch, Alert, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Switch, Alert, StyleSheet, TouchableOpacity,Modal } from "react-native";
 import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as Contacts from "expo-contacts";
@@ -17,6 +17,9 @@ const Settings = () => {
     contacts: false,
     notifications: false,
   });
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
 
   const router = useRouter()
 
@@ -68,12 +71,9 @@ const Settings = () => {
       "biometricEnabled",
       JSON.stringify(updatedBiometry)
     );
-    Alert.alert(
-      newValue ? `${type} Enabled` : `${type} Disabled`,
-      `You have ${
-        newValue ? "enabled" : "disabled"
-      } ${type.toLowerCase()} authentication.`
-    );
+    setModalTitle(newValue ? `${type} Enabled` : `${type} Disabled`);
+    setModalMessage(`You have ${newValue ? "enabled" : "disabled"} ${type.toLowerCase()} authentication.`);
+    setModalVisible(true);
   };
 
   const loadPermissions = async () => {
@@ -110,26 +110,29 @@ const Settings = () => {
     }
 
     if (status === "granted") {
-      Alert.alert("Permission Granted", `${type} access has been enabled.`);
+      setModalTitle("Permission Granted");
+      setModalMessage(`${type} access has been enabled.`);
       setPermissions((prev) => ({ ...prev, [type]: true }));
     } else {
-      Alert.alert(
-        "Permission Denied",
-        `${type} access is required for this feature.`
-      );
+      setModalTitle("Permission Denied");
+      setModalMessage(`${type} access is required for this feature.`);
     }
+    setModalVisible(true);
   };
 
   const handleTogglePermission = (type, enabled) => {
     if (enabled) {
       requestPermission(type);
     } else {
-      Alert.alert(
-        `${type} Access Disabled`,
-        `You have disabled ${type} access.`
-      );
+      setModalTitle(`${type} Access Disabled`);
+      setModalMessage(`You have disabled ${type} access.`);
       setPermissions((prev) => ({ ...prev, [type]: false }));
+      setModalVisible(true);
     }
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
   };
 
   return (
@@ -147,6 +150,26 @@ const Settings = () => {
         </TouchableOpacity>
         <Text style={styles.headerApp}>InfraSmart</Text>
       </View>
+
+      <Modal
+        transparent
+        visible={modalVisible}
+        animationType="slide"
+      >
+        <View style={styles.overlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.title}>{modalTitle}</Text>
+            <Text style={styles.message}>{modalMessage}</Text>
+            <TouchableOpacity
+                style={styles.OKButton}
+                onPress={handleCloseModal}
+              >
+              <Text style={styles.btnText}> OK </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        </Modal>
+
       <ScrollView contentContainerStyle={{
         flex: 1,
         justifyContent: "center",
@@ -321,6 +344,46 @@ headerApp: {
     color: "#202A44",
     marginLeft: 130,
 },
+
+overlay: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+},
+modalContent: {
+  width: 300,
+  padding: 20,
+  backgroundColor: '#F2f9FB',
+  borderRadius: 10,
+  alignItems: 'center',
+  height:300,
+  justifyContent:'center'
+},
+title: {
+  fontSize: 25,
+  fontWeight: 'bold',
+  marginBottom: 10,
+  marginBottom: 20,
+  color: '#202A44',
+},
+message: {
+  marginBottom: 50,
+  fontSize: 18,
+  color: '#202A44',
+},
+btnText: {
+  color: '#F2f9FB',
+  fontWeight: 'bold',
+  fontSize:20,
+},
+OKButton:{
+  padding: 10,
+  alignItems: 'center',
+  backgroundColor: '#202A44',
+  borderRadius: 5,
+  marginLeft: 5,
+}
 });
 
 export default Settings;

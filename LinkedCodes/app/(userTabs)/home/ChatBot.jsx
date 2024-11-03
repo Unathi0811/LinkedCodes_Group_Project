@@ -23,7 +23,7 @@ const ChatBot = () => {
     const startChat = async () => {
       const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(API_KEY);
       const model = genAI.getGenerativeModel({
-        model: "tunedModels/linked-sfiswuck2nye",
+        model: "gemini-1.5-flash",
       });
       const prompt = "Hi";
       const result = await model.generateContent(prompt);
@@ -45,7 +45,7 @@ const ChatBot = () => {
 
     const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "tunedModels/linked-sfiswuck2nye",
+      model: "gemini-1.5-flash",
     });
     const prompt = userMessage.text;
 
@@ -82,9 +82,10 @@ const ChatBot = () => {
           headerStyle: { fontSize: 25 },
           headerBackTitle: "Home",
           // headerBackTitleStyle:{}
-          headerTintColor: "red",
+          headerTintColor: "#202A44",
           headerTitleStyle:{
-            color: "blue"
+            color: "#202A44",
+            fontSize: 24
           }
         }}
       />
@@ -96,8 +97,7 @@ const ChatBot = () => {
           },
         }}
       />
-      <View style={{ flex: 1, backgroundColor: "#EAF1FF", padding: 10 }}>
-        {/* <Text style={{fontSize:25, alignItems:'center', justifyContent:'center',marginTop: 10,marginBottom: 20}}> Chat</Text> */}
+      <View style={{ flex: 1, backgroundColor: "#F2f9FB", padding: 10 }}>
         <FlatList
           data={messages}
           renderItem={renderMessage}
@@ -123,7 +123,7 @@ const ChatBot = () => {
           <TouchableOpacity
             style={{
               padding: 10,
-              backgroundColor: "#EAF1FF",
+              backgroundColor: "#F2f9FB",
               borderRadius: 25,
               height: 50,
               width: 50,
@@ -135,7 +135,7 @@ const ChatBot = () => {
           >
             <FontAwesome name="send" size={24} color="#202A44" />
           </TouchableOpacity>
-          {/* {loading && <ActivityIndicator size="small" color="black" />} */}
+
         </View>
       </View>
     </>

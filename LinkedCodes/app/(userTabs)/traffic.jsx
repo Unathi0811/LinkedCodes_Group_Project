@@ -1,13 +1,25 @@
-import { View, Text, ActivityIndicator, TextInput, TouchableOpacity, Linking, StyleSheet, FlatList, Modal} from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import MapView, {Marker,Polyline} from 'react-native-maps';
-import { auth } from '../../firebase';
+import { View, 
+         Text, 
+         ActivityIndicator,
+         TextInput,
+         TouchableOpacity, 
+         Linking, StyleSheet, 
+         FlatList, 
+         Modal,
+         KeyboardAvoidingView,
+         Platform
+        } from 'react-native';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import axios from 'axios';
+import { auth } from '../../firebase';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialIcons from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
+
 
 const GOOGLE_API_KEY = 'AIzaSyAQ6VsdSIFTQYmic060gIGuGQQd2TW4jsw';  // Google API Key
 const TOMTOM_API_KEY = 'EErTrgCfI6nmg4kR8fboWoe2LJdDDs4E';  // TomTom API Key
@@ -23,10 +35,19 @@ const traffic = () => {
   const [loading, setLoading] = useState(false);
   const [mapRegion, setMapRegion] = useState(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState(null); // For destination marker
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [showTrafficModal, setShowTrafficModal] = useState(false); 
+  const [incidentModalVisible, setIncidentModalVisible] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
   const [showAd, setShowAd] = useState(false); // Ad visibility
   const [isSubscribed, setIsSubscribed] = useState(false); // Subscription status
   const inactivityTimeoutRef = useRef(null)
   const userId = auth.currentUser ? auth.currentUser.uid : null;
+  const router = useRouter()
+
+
   // ask for permission to use the location
   useEffect(() => {
     (async () => {
@@ -58,16 +79,16 @@ const traffic = () => {
     })();
   }, []);
 // to center the map to the current location of the user 
-  const centerMapOnCurrentLocation = () => {
-    if (location) {
-      setMapRegion({
-        latitude: location.latitude,
-        longitude: location.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      });
-    }
-  };
+const centerMapOnCurrentLocation = () => {
+  if (location) {
+    setMapRegion({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    });
+  }
+};
 
   // code for keep on updating the traffic every minutes 
   useEffect(() => {
@@ -83,7 +104,8 @@ const traffic = () => {
     return () => clearInterval(interval);
   }, [directions]);
 
-  const fetchDirections = async () => {
+
+ const fetchDirections = async () => {
     if (!location || !destination) return;
 
     const origin = `${location.latitude},${location.longitude}`;
@@ -126,12 +148,14 @@ const traffic = () => {
 
     } catch (error) {
       console.error(error);
-      setWarningMsg('Failed to fetch directions or traffic data');
+      setErrorMsg('Failed to fetch directions, Please Try again later');
     } finally {
       setLoading(false);
     }
   };
 
+
+// for displaying the ads
   useEffect(() => {
     const checkSubscription = async () => {
       const subscriptionStatus = await AsyncStorage.getItem(`isSubscribed_${userId}`);
@@ -145,7 +169,7 @@ const traffic = () => {
     if (userId) checkSubscription();
   }, [userId]);
 
-  const handleActivity = () => {
+    const handleActivity = () => {
     clearTimeout(inactivityTimeoutRef.current);
     if (!isSubscribed) {
       inactivityTimeoutRef.current = setTimeout(() => setShowAd(true), 5000); // Show ad only if not subscribed
@@ -165,14 +189,17 @@ const traffic = () => {
       const location = response.data.results[0]?.geometry.location;
       return location ? { latitude: location.lat, longitude: location.lng } : null;
     } catch (error) {
-      console.error('Error fetching destination coordinates:', error);
+      setErrorMsg('Error fetching destination coordinates:', error);
       return null;
     }
   };
  
   // fetching traffic data from the tom tom end point  using coordinate 
   const fetchTrafficData = async (points) => {
-    if (!points.length) return null;
+    if (!points || !points.length) 
+      {
+        return null;
+      }
 
     const point = `${points[0].latitude},${points[0].longitude}`; // Use starting point for traffic data
     try {
@@ -182,12 +209,13 @@ const traffic = () => {
       return response.data;
       
     } catch (error) {
-      console.error('Error fetching traffic data:', error.response?.data || error.message);
+      setErrorMsg('Error fetching traffic data:', error.response?.data || error.message)
       return null;
     }
   };
+
    // for fetching the traffic incident using the coordinates 
-  const fetchTrafficIncidents = async (points) => {
+   const fetchTrafficIncidents = async (points) => {
     if (!points.length) return [];
 
     const { latitude: lat1, longitude: lng1 } = points[0];
@@ -206,10 +234,15 @@ const traffic = () => {
       const response = await axios.get(url, { params });
       return response.data.incidents || [];
     } catch (error) {
-      console.error("Fetch incidents error:", error.message);
+
+      if (error.response?.status === 400) {
+        setErrorMessage('The place is out side the province. We recommand the use of traffic within a province, or continue without updated traffic information ?');
+        setIsErrorModalVisible(true);
+      }
       return [];
     }
   };
+
   //for the use of navigation but for now it uses the google navigation to navigate.
   const startNavigation = () => {
     if (!location || !destination) return;
@@ -228,7 +261,8 @@ const traffic = () => {
     });
     return points;
   };
-  // a decoding of the polyline to navigate route by route until it reaches the destination
+
+  // a decoding of the polyline to navigate route by the use of polyline (blue line in the map) until it reaches the destination
   const decode = (t) => {
     let coordinates = [];
     let index = 0, lat = 0, lng = 0;
@@ -258,10 +292,11 @@ const traffic = () => {
     return coordinates;
   };
 
+
   if (!location) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        {warningMsg ? <Text>{warningMsg}</Text> : <ActivityIndicator size="large" color="#202A44" />}
+        {warningMsg ? <Text>{warningMsg}</Text> : <ActivityIndicator size="large" color="#0000ff" />}
       </View>
     );
   };
@@ -278,12 +313,61 @@ const traffic = () => {
       const address = response.data.results[0]?.formatted_address;
       return address || 'Address not found';
     } catch (error) {
-      console.error('Error fetching address:', error);
+      setErrorMsg('Error fetching address:', error)
       return 'Address not found';
     }
   };
+
+  // Fetch suggestions based on user input
+  const fetchSuggestions = async (input) => {
+    if (!input) {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json',
+        {
+          params: {
+            input,
+            key: GOOGLE_API_KEY,
+            location: `${location.latitude},${location.longitude}`,
+            radius: 10000, // Radius in meters to focus on nearby places
+          },
+        }
+      );
+      setSuggestions(response.data.predictions);
+    } catch (error) {
+    }
+  };
+
+    // Handle suggestion selection
+  const handleSuggestionPress = async (placeId) => {
+    try {
+      const response = await axios.get(
+        'https://maps.googleapis.com/maps/api/place/details/json',
+        {
+          params: {
+            place_id: placeId,
+            key: GOOGLE_API_KEY,
+          },
+        }
+      );
+      const location = response.data.result.geometry.location;
+      setDestination(response.data.result.name);
+      setDestinationCoordinates({
+        latitude: location.lat,
+        longitude: location.lng,
+      });
+      setSuggestions([]); // Clear suggestions after selection
+    } catch (error) {
+    }
+  };
+
+
 // icons to use for the following incident on the map
-  const ICON_CATEGORY_MAP = {
+const ICON_CATEGORY_MAP = {
     1: 'Accident',
     6: 'Traffic Jam',
     7: 'Lane closed',
@@ -291,16 +375,16 @@ const traffic = () => {
     14: 'Broken Down Vehicle',
   };
   // icons to use for the following incident on the update
-  const ICON_CATEGORY = {
+const ICON_CATEGORY = {
     1: { name: 'car-crash', color: '#ff0000' }, 
-    6: { name: 'car', color: '#ffcc00' }, 
+    6: { name: 'car', color: '#ff3300' }, 
     7: { name: 'warning', color: '#ff9900' }, 
-    9: { name: 'road', color: '#ff3300' }, 
+    9: { name: 'warning', color: 'orange' }, 
     14: { name: 'warning', color: '#ff6600' }, 
   };
 
 // after extracting the coordinate now it time to get the actual address from them
-  const IncidentItem = ({ item }) => {
+const IncidentItem = ({ item }) => {
     const [address, setAddress] = useState(null);
   
     useEffect(() => {
@@ -315,13 +399,39 @@ const traffic = () => {
       fetchAddress();
     }, [item]);
     // display the address after converting the coordinate 
-    const categoryName = ICON_CATEGORY_MAP[item.properties.iconCategory] || 'Unknown';
+  const categoryName = ICON_CATEGORY_MAP[item.properties.iconCategory] || 'Unknown';
+  const categoryIcon = ICON_CATEGORY[item.properties.iconCategory] || { name: 'question', color: '#000' };
   
+  let textColor;
+  switch (item.properties.iconCategory) {
+    case 6: // Traffic Jam
+        textColor = 'red';
+        break;
+    case 9: // Road Works
+        textColor = 'orange';
+        break;
+    case 1: // Accident
+        textColor = 'darkred';
+        break;
+    case 14: // Broken Down Vehicle
+        textColor = 'yellow'; 
+        break;
+    default:
+        textColor = '#EAF1FF'; 
+        break;
+}
     return (
-      <View style={{ marginBottom: 10, padding: 5, backgroundColor: '#fff', borderRadius: 5 }}>
-        <Text>Category: {item.properties.iconCategory || 'N/A'}</Text>
-        <Text style={{color:'red'}}>          {categoryName}</Text>
-        <Text>Location: {address || 'Fetching address...'}</Text>
+      <View style={{ marginBottom: 10, padding: 5, backgroundColor: '#202A44', borderRadius: 5, borderBottomWidth:1 }}>
+        
+        <Text style={{ color: '#EAF1FF', fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>
+          Category: {item.properties.iconCategory } 
+           {item.iconCategory } 
+          {categoryIcon && (
+            <FontAwesome name={categoryIcon.name} size={20} color={categoryIcon.color} style={{ marginLeft:25 }} />
+          )}
+        </Text>
+        <Text style={{color:textColor,fontSize:18}}>             {categoryName}</Text>
+        <Text style={{color:'#EAF1FF',}}><Ionicons name="location" size={20} color="#EAF1FF" /> {address || 'Fetching address...'}</Text>
       </View>
     );
   };
@@ -339,7 +449,8 @@ const traffic = () => {
     }
     return null;
   };
-  // only show the incident coordinate that are on the polyline 
+
+  // only show the incident coordinate that are on the polyline ( compare the current distance with the prev to fine the points that are the nearest)
   const snapToPolyline = (point) => {
     const closestPoint = directions.reduce((prev, curr) => {
       const prevDistance = getDistance(prev, point);
@@ -348,7 +459,8 @@ const traffic = () => {
     });
     return closestPoint;
   };
-  // for calculating the distance
+
+  // function used for calculating the distance
   const getDistance = (coord1, coord2) => {
     const lat1 = coord1.latitude;
     const lon1 = coord1.longitude;
@@ -377,7 +489,7 @@ const traffic = () => {
         const coordinates = extractCoordinates(item.geometry?.coordinates);
         if (!coordinates) return null;
         const snappedCoordinates = snapToPolyline(coordinates);
-        const categoryName = ICON_CATEGORY_MAP[item.properties.iconCategory] || 'Unknown';
+        const categoryName = ICON_CATEGORY_MAP[item.properties?.iconCategory] || 'Unknown';
         const categoryIcon = ICON_CATEGORY[item.properties.iconCategory] || { name: 'question', color: '#000' };
 
         return (
@@ -388,17 +500,35 @@ const traffic = () => {
             description={`Category: ${item.properties.iconCategory},${categoryName}`}
             pinColor="yellow"
           >
-             <MaterialIcons name={categoryIcon.name} size={15} color={categoryIcon.color} />
+             <FontAwesome name={categoryIcon.name} size={15} color={categoryIcon.color} />
           </Marker>
         );
       })}
     </>
   );
 
+  const ErrorModal = ({ visible, message, onClose }) => (
+    <Modal visible={visible} transparent>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+        <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
+          <Text style={{ color: 'red', fontWeight: 'bold' }}>Error</Text>
+          <Text>{message}</Text>
+          <TouchableOpacity onPress={onClose} style={{ marginTop: 20 }}>
+            <Text style={{ color: 'blue' }}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
 
   return (
+    <KeyboardAvoidingView  
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}  
+    style={{  }}  
+    >
       <View  style={{height:'100%',}} >
-            <MapView
+        <MapView
               style={{ width: '100%', height: '100%', borderRadius: 5 }}
               region={mapRegion}
               showsTraffic
@@ -419,58 +549,152 @@ const traffic = () => {
               )}
 
           </MapView>
-            <TouchableOpacity
+
+            {/* <TouchableOpacity
             style={styles.NavigationButton}
               onPress={startNavigation}>
                 <Ionicons name="navigate" size={24} color="#fff" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
-            <TouchableOpacity  
+              {/* button for centering the map (back to the current user's location) */}
+              <TouchableOpacity  
               style={styles.currentLocationButton}  
               onPress={centerMapOnCurrentLocation}>  
               <Ionicons name="locate" size={24} color="#fff" />
             </TouchableOpacity>
 
+              {/* button to show the traffic data in the map  */}
+            <TouchableOpacity
+              style={styles.trafficButton}
+              onPress={() => {
+                setShowTrafficModal(true);
+                //use it to fetch the traffic data when the model opens
+                fetchTrafficData(); 
+              }}
+            >
+              <MaterialIcons name="speed" size={30} color="red" />
+              <Text style={{ color: '#EAF1FF',fontWeight: 'bold',}}>Traffic</Text>
+            </TouchableOpacity>
+
+            {/*  touchable for displaing the the traffic incident data */}
+            <TouchableOpacity
+              style={styles.incidentButton}
+              onPress={() => setIncidentModalVisible(true)}
+            >
+              <MaterialIcons name="traffic" size={30} color="red" />
+              <Text style={{ color: '#EAF1FF',fontWeight: 'bold',}}>Update</Text>
+            </TouchableOpacity>
+
+
+              {/*  a search view  */}
           <View style={styles.searchView} > 
               <TextInput
                 placeholder="Enter destination"
                 value={destination}
-                onChangeText={setDestination}
+                onChangeText={(text) => {
+                  setDestination(text);
+                  fetchSuggestions(text);
+                  }}
+
                 style={{ padding: 5, width: '95%',}}
               />
               <TouchableOpacity style={{ padding: 5, height: 35, position: 'absolute', right: '1%', alignItems: 'center', width: '20%', padding: 5, }}
                 onPress={fetchDirections}>
                   <Ionicons name="search" size={24} color="#202A44" />
               </TouchableOpacity>
-          </View >
-
-          <View style={styles.trafficSpeed}>
-                  {trafficData && (
-                      <View style={styles.trafficInfo}>
-                        <Text style ={{fontSize:25}} > Traffic </Text>
-                        <Text style={styles.trafficText}><Ionicons name="speedometer" size={20} color="blue" />: {trafficData.flowSegmentData.currentSpeed} km/h</Text>
-                        <Text style={styles.trafficText}><Ionicons name="time" size={20} color="navy" />: {trafficData.flowSegmentData.currentTravelTime} sec</Text>
-                        <Text style={styles.trafficText}><Ionicons name="speedometer" size={20} color="orange" />: {trafficData.flowSegmentData.freeFlowSpeed} km/h</Text>
-                        {/* <Text style={styles.trafficText}>Free Flow Travel Time: {trafficData.flowSegmentData.freeFlowTravelTime} sec</Text> */}
-                        <Text style={styles.trafficText}><Ionicons name="remove-circle" size={20} color="red" />: {trafficData.flowSegmentData.roadClosure ? "Yes" : "No"}</Text>  
-
-                      </View>
-                    )}
-           </View>
-
-         <View style={styles.trafficUpdate}>
-
-                    {trafficIncidents.length > 0 && (
-                      <View >
-                        <Text style ={{fontSize:25}} > Updates</Text>
-                        <FlatList
-                          data={trafficIncidents}
-                          keyExtractor={(item, index) => index.toString()}
-                          renderItem={({ item }) => <IncidentItem item={item} />}
-                        />
-                      </View>
-                    )}
           </View>
+
+              {/* Suggestions List */}
+              {suggestions.length > 0 && (
+              <FlatList
+                style={styles.suggestionsList}
+                data={suggestions}
+                keyExtractor={(item) => item.place_id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => handleSuggestionPress(item.place_id)}
+                    style={styles.suggestionItem}
+                  >
+                    <Text style={styles.suggestionsText}><Ionicons name="location" size={15} color="#EAF1FF" /> {item.description}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            )}
+
+            {/* a modal display for the traffic data  */}
+            {showTrafficModal && (
+              <View style={styles.floatingModal}>
+                  {loading ? (
+                    <ActivityIndicator size="large" color="#007bff" />
+                  ) : trafficData ? (
+                    <View>
+                      <Text style={{ fontSize: 20,color:'#EAF1FF' }}>
+                        Traffic  Updates for: {destination}
+                      </Text>
+                      {trafficData && (
+                        <View style={styles.trafficInfo}>
+                          <Text style={styles.trafficText}>
+                            <Ionicons name="speedometer" size={20} color="blue" />: {trafficData.flowSegmentData.currentSpeed} km/h
+                          </Text>
+                          <Text style={styles.trafficText}>
+                            <Ionicons name="time" size={20} color="white" />: {trafficData.flowSegmentData.currentTravelTime} sec
+                          </Text>
+                          <Text style={styles.trafficText}>
+                            <Ionicons name="speedometer" size={20} color="orange" />: {trafficData.flowSegmentData.freeFlowSpeed} km/h
+                          </Text>
+                          <Text style={styles.trafficText}>
+                            <Ionicons name="remove-circle" size={20} color="red" />: {trafficData.flowSegmentData.roadClosure ? "Yes" : "No"}
+                          </Text>
+                        </View>
+                      )}
+
+                    </View>
+                  ) : (
+                    <Text style={{fontSize: 20,color:'red'}}>No traffic data available.</Text>
+                  )}
+                  <TouchableOpacity
+                    style={{width:'20%',height:25,backgroundColor:'#EAF1FF',borderRadius: 5,alignItems: 'center',justifyContent: 'center', }}
+                    onPress={() => setShowTrafficModal(false)}
+                  >
+                    <Text style={styles.closeButtonText}>Close</Text>
+                  </TouchableOpacity>
+              </View>
+            )}
+
+            {/* traffic incident display  */}
+            {incidentModalVisible && (
+              <View style={styles.floatingIncidentModal}>
+                  <View style={{flexDirection:'row', width:'95%',marginBottom: 10,}}> 
+                      <Text style={{fontSize:30 ,color:'#EAF1FF',marginLeft: 50}}>Incidents</Text>
+
+                      {/* button to close the view */}
+                      <TouchableOpacity
+                        style={{position:'absolute', right:0,width:'16%',height:25,backgroundColor:'#EAF1FF',borderRadius: 5,alignItems: 'center',justifyContent: 'center',}}
+                        onPress={() => setIncidentModalVisible(false)}
+                      >
+                        <Text style={styles.buttonText}>Close</Text>
+                      </TouchableOpacity>
+                  </View>
+
+                  {trafficIncidents.length > 0 ? (
+                    <FlatList
+                      data={trafficIncidents}
+                      keyExtractor={(item, index) => index.toString()}
+                      renderItem={({ item }) => <IncidentItem item={item} />}
+                    />
+                  ) : (
+                    <Text style={{fontSize: 20,color:'red'}}>No incidents available</Text>
+                  )}
+
+              </View>
+            )}
+
+          <ErrorModal 
+            visible={!!errorMsg} 
+            message={errorMsg} 
+            onClose={() => setErrorMsg(null)} 
+          />
+
         {/*This is for the add*/}
         <Modal visible={showAd && !isSubscribed} transparent>
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
@@ -495,19 +719,51 @@ const traffic = () => {
             </View>
           </View>
         </Modal>
+
+        {/* modal display for exceeding the search range */}
+        <Modal
+              transparent={true} visible={isErrorModalVisible}
+              animationType="slide"
+              onRequestClose={() => setIsErrorModalVisible(false)}
+          >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+
+                  <Ionicons name="alert-outline" size={34} color="red" />
+                  <Text style={styles.modalTitle}>Destination</Text>
+
+                  <Text style={styles.modalMessage}>{errorMessage}</Text>
+
+                  <TouchableOpacity style={{width:'35%',height:25,backgroundColor:'#EAF1FF',marginLeft:150,borderRadius: 5,alignItems: 'center', }}
+                  onPress={() => setIsErrorModalVisible(false)}>
+                    <Text style={{color:'#202A44', fontSize:20, }}> Continue </Text>
+                  </TouchableOpacity>
+
+                </View>
+              </View>
+        </Modal>
+
       </View>
+      </KeyboardAvoidingView> 
   );
 };
 
 const styles = StyleSheet.create({
   trafficInfo: {
     padding: 10,
-    backgroundColor: '#F2f9FB',
+    backgroundColor: '#202A44',
     borderRadius: 5,
+    flexDirection:'row',
+    
   },
   trafficText: {
     marginBottom: 5,
-    fontSize:15
+    fontSize:15,
+    borderRightWidth:1,
+    marginRight:5,
+    paddingRight:5,
+    borderColor:'#EAF1FF',
+    color:'#EAF1FF' 
   },
   currentLocationButton: {  
     position: 'absolute',  
@@ -532,6 +788,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',  
     alignItems: 'center',  
     elevation: 5,          
+  },
+  trafficButton:{
+    position: 'absolute',
+    bottom: 300,
+    left: 15,
+    backgroundColor: '#202A44',
+    padding: 10,
+    borderRadius: 50,
+    alignItems: 'center',
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  incidentButton:{
+    position: 'absolute',
+    bottom: 165,
+    left: 15,
+    backgroundColor: '#202A44',
+    padding: 10,
+    borderRadius: 50,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   trafficUpdate:{
     flexDirection: 'row' ,
@@ -561,11 +843,11 @@ const styles = StyleSheet.create({
     top: '5%',
     padding:5,
     borderRadius:20,
-    height:'6%',
+    height:46,
     position:'absolute',
     backgroundColor: '#EAF1FF',
     paddingHorizontal:10,
-    right:10,
+    right:9,
     justifyContent: 'center',  
     alignItems: 'center', 
   },

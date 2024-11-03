@@ -7,15 +7,20 @@ export const NewsFromGoogleSerpApi = async () => {
   try {
     const response = await axios.get(BASE_URL, {
       params: {
-        q: 'traffic OR road OR incident AND South Africa',
+        q: 'traffic OR incident OR crush OR road OR roads AND South Africa',
         api_key: API_KEY,
         engine: 'google_news',
         num: 100,
+        Location:'south africa'
       },
     });
+
+      // Check for rate limit error
+    if (response.status === 429) {
+      throw new Error('Rate limit exceeded. Please try again later.');
+    }
     return response.data.news_results || []; 
   } catch (error) {
-    console.error('Error fetching news data:', error);
-    return [];
+    throw error; 
   }
 };

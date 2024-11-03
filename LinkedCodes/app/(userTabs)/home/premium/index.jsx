@@ -56,7 +56,7 @@ const Index = () => {
 			
 
 			{/* Plan Renewal Card */}
-			<View className="bg-white p-4 rounded-xl shadow-md mb-6 mt-24">
+			<View className="bg-white p-4 rounded-xl shadow-md mb-6 mt-28">
 				<Text className="text-lg font-semibold text-[#202A44]">
 					Your plan will automatically renew on {formattedDate}.
 				</Text>

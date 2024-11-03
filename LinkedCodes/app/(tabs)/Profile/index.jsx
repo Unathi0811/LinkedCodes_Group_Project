@@ -76,7 +76,9 @@ const Profile = () => {
 						{loading ? ( // Show ActivityIndicator if loading
 							<ActivityIndicator
 								size="small"
-								color="#fff"
+								color="#202A44" style={{
+									flex: 1
+								  }}
 							/>
 						) : (
 							<Image

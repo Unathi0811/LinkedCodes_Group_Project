@@ -76,19 +76,29 @@ export default function Chat() {
 
   return (
     <SafeAreaView style={styles.container}>
-      
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+         <View style={styles.header}>
+        {/* Back Button */}
+        <TouchableOpacity
+          onPress={() => router.push("/(tabs)/Home")}
+          style={styles.backButton}
+        >
           <Icon name="arrow-left" size={20} color="#202A44" />
         </TouchableOpacity>
+        <Text style={styles.headerApp}>ALL CHATS</Text>
+      </View>
+
 
       {loadingChat ? (
-        <ActivityIndicator size="large" color="#202A44" />
+        <ActivityIndicator size="large" color="#202A44" style={{
+          flex: 1
+        }}/>
       ) : (
         <FlatList
           data={messages}
           renderItem={renderMessage}
           keyExtractor={(item) => item._id}
           inverted // Display latest message at the bottom
+          style={styles.list}
         />
       )}
     </SafeAreaView>
@@ -101,7 +111,6 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#F2f9FB',
   },
-
   messageContainer: {
     marginVertical: 5,
     padding: 10,
@@ -111,7 +120,10 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: '#D3D3D3', 
   },
-
+  list: {
+    flex: 1,
+    marginTop: 55
+  },
   username: {
     fontWeight: 'bold',
     color: '#FFD700',
@@ -126,7 +138,29 @@ const styles = StyleSheet.create({
     color: '#ccc',
     textAlign: 'right'
   },
-  backButton:{
-    marginTop:30
-  }
+  header: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignContent: "space-between",
+    alignItems: "flex-end",
+    padding: 20,
+    zIndex: 10,
+    backgroundColor: "#fff",
+    height: 90,
+    marginBottom: 5,
+    borderBlockEndColor: "#ccc",
+},
+backButton: {
+    padding: 10,
+    marginRight: 10,
+    marginTop: 12
+},
+headerApp: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "#202A44",
+    marginLeft: 130,
+},
 });

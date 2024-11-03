@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		alignItems: "center",
 		zIndex: 10,
-		backgroundColor: "#F2f9FB",
+		backgroundColor: "#fff",
 		elevation: 5,
 		marginBottom: 1,
 	},

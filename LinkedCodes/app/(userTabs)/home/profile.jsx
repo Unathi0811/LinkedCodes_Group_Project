@@ -8,7 +8,7 @@ import {
 	uploadBytesResumable,
 	getDownloadURL,
 } from "firebase/storage";
-import { Link } from "expo-router";
+import { Link , useRouter} from "expo-router";
 import { doc, updateDoc } from "firebase/firestore";
 import { useUser } from "../../../src/cxt/user";
 import { db, auth } from "../../../firebase";
@@ -24,7 +24,7 @@ const Profile = () => {
 			setImage(user.profileImage);
 		}
 	}, [user]);
-
+	const router = useRouter()
 	const pickImage = async () => {
 		try {
 			const result = await ImagePicker.launchImageLibraryAsync({

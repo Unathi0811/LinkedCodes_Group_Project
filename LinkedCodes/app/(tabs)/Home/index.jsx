@@ -302,7 +302,7 @@ const Home = () => {
 						</TouchableOpacity>
 					</Link>
 
-					<TouchableOpacity style={styles.viewAllButton}>
+					{/* <TouchableOpacity style={styles.viewAllButton}>
 						<Text style={styles.viewAllText}>View All Updates</Text>
 					</TouchableOpacity>
 
@@ -311,7 +311,7 @@ const Home = () => {
 							Learn about the latest maintenance practices and
 							reporting tools.
 						</Text>
-					</View>
+					</View> */}
 				</ScrollView>
 			</View>
 		</Drawer>
@@ -325,12 +325,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#F2f9FB",
 	},
-	username: {
-		fontSize: 20,
-		color: "#202A44",
-		fontWeight: "bold",
-		marginBottom: 34,
-	},
 	headerContainer: {
 		position: "absolute",
 		top: 0,
@@ -341,7 +335,7 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		alignItems: "center",
 		zIndex: 10,
-		backgroundColor: "#F2f9FB",
+		backgroundColor: "#fff",
 	},
 	hamburgerButton: {
 		padding: 10,

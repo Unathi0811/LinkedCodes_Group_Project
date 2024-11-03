@@ -1,102 +1,134 @@
 import {
-	StyleSheet,
-	Text,
-	View,
-	Image,
-	TextInput,
-	TouchableOpacity,
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  Platform,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Link, router } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import * as LocalAuthentication from "expo-local-authentication";
+import * as SecureStore from "expo-secure-store"; // Import SecureStore
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import ReactNativeBiometrics from "react-native-biometrics";
 import { useUser } from "../../src/cxt/user";
 import logAudit from "../../services/auditlogFunction";
 
 const LoginScreen = () => {
-	const [email, setEmail] = React.useState("");
-	const [password, setPassword] = React.useState("");
-	const [loading, setLoading] = useState(false);
-	const { setUser } = useUser();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isBiometricSupported, setBiometricSupported] = useState(false);
+  const router = useRouter();
+  const [userSession, setUserSession] = useState(null); 
 
-	const handleLogin = () => {
-		if (email === "" || password === "") {
-			alert("Please fill in all fields");
-			return;
-		}
+  const fallBackToDefaultAuth = () => {
+    console.log("Fallback to password authentication");
+  };
 
-		setLoading(true);
-		signInWithEmailAndPassword(getAuth(), email, password)
-			.then((userCredential) => {
-				const user = userCredential.user;
+  const alertComponent = (title, message, btnText, btnFunc) => {
+    Alert.alert(title, message, [
+      {
+        text: btnText,
+        onPress: btnFunc,
+      },
+    ]);
+  };
 
-				// Update user in context
-				setUser({
-					uid: user.uid,
-					email: user.email,
-					// Add additional fields if needed
-				});
+  const handleBiometricAuth = async () => {
+    const isBiometricAvailable = await LocalAuthentication.hasHardwareAsync();
+    if (!isBiometricAvailable) {
+        return alertComponent(
+            "Biometric Authentication Not Supported",
+            "Please login with your password.",
+            "OK",
+            fallBackToDefaultAuth
+        );
+    }
 
-				// Log audit entry
-				logAudit(
-					email,
-					null, // No error message on success
-					user.uid,
-					"login",
-					null, // No target ID
-					"N/A", // IP address
-					null, // No changes made
-					"success"
-				);
-				// Redirect to the home screen
-				// router.replace("/(tabs)/Home");
-			})
-			.catch((err) => {
-				alert(err?.message);
-				// Log audit entry for failure
-				logAudit(
-					email,
-					err?.message,
-					null, // User ID is null on failure
-					"login",
-					null, // No target ID
-					"N/A", // IP address
-					null, // No changes made
-					"failure"
-				);
-			})
-			.finally(() => setLoading(false));
-	};
+    const isBiometricEnrolled = await LocalAuthentication.isEnrolledAsync();
+    if (!isBiometricEnrolled) {
+        return alertComponent(
+            "No Biometric Record Found",
+            "Please login with your password.",
+            "OK",
+            fallBackToDefaultAuth
+        );
+    }
 
-	//thif function is throwing a rejection!
-	const handleBiometricLogin = async () => {
-		const rnBiometrics = new ReactNativeBiometrics();
+    // Check if biometric authentication is enabled in settings
+    const biometricEnabled = await AsyncStorage.getItem('biometricEnabled');
+    const parsedBiometricEnabled = biometricEnabled ? JSON.parse(biometricEnabled) : { faceId: false, fingerprint: false };
 
-		const { available, biometryType } =
-			await rnBiometrics.isBiometricAvailable();
-		if (available) {
-			const { success, error } = await rnBiometrics.simplePrompt({
-				promptMessage: "Confirm fingerprint",
-			});
+    // Check if any biometric type is enabled
+    if (!parsedBiometricEnabled.faceId && !parsedBiometricEnabled.fingerprint) {
+        return alertComponent(
+            "Biometric Authentication Disabled",
+            "Please enable biometric authentication in settings.",
+            "OK",
+            fallBackToDefaultAuth
+        );
+    }
 
-			if (success) {
-				// Here, you can log the user in automatically
-				alert("Biometric authentication successful!");
-				// Redirect to the home screen
-			} else {
-				alert("Biometric authentication failed");
-			}
-		} else {
-			alert("Biometric authentication not available");
-		}
-	};
+    const biometricAuth = await LocalAuthentication.authenticateAsync({
+        promptMessage: "Login using Biometrics",
+        cancelLabel: "Cancel",
+    });
 
-	return (
-		<View style={styles.container}>
-			<View style={styles.helloContainer}>
-				<Text style={styles.hello}>Hello </Text>
-			</View>
+    if (biometricAuth.success) {
+        // Retrieve the last logged-in user's email from SecureStore
+        const storedEmail = await SecureStore.getItemAsync("user_email");
+        const storedPassword = await SecureStore.getItemAsync("user_password"); 
+
+        if (storedEmail && storedPassword) {
+            signInWithEmailAndPassword(getAuth(), storedEmail, storedPassword)
+                .then(() => {
+                    router.push("/(userTabs)/home");
+                })
+                .catch((err) => {
+                    Alert.alert(err?.message);
+                });
+        } else {
+            alertComponent("Biometric authentication not set up", "Please log in using your password, and set up biometrics", "OK", fallBackToDefaultAuth);
+        }
+    } else {
+        alertComponent("Authentication Failed", "Please try again or login with your password.", "OK", fallBackToDefaultAuth);
+    }
+};
+  useEffect(() => {
+    (async () => {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      setBiometricSupported(compatible);
+    })();
+  }, []);
+
+  const handleLogin = async () => {
+    if (email === "" || password === "") {
+      Alert.alert("Please fill in all fields");
+      return;
+    }
+    signInWithEmailAndPassword(getAuth(), email, password)
+      .then(async (userCredential) => {
+        // Store the user's email and password securely
+        await SecureStore.setItemAsync("user_email", email);
+        await SecureStore.setItemAsync("user_password", password); // Use securely, or consider using a token
+
+        // Redirect to the home screen
+        router.push("/(userTabs)/home");
+      })
+      .catch((err) => {
+        Alert.alert(err?.message);
+      });
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.helloContainer}>
+        <Text style={styles.hello}>Hello</Text>
+      </View>
 
 			<View>
 				<Text style={styles.loginText}>Sign in to your account</Text>
@@ -156,13 +188,15 @@ const LoginScreen = () => {
 				</Text>
 			</TouchableOpacity>
 
-			{/* Biometric Login Button */}
-			<TouchableOpacity
-				style={styles.biometricButton}
-				onPress={handleBiometricLogin}
-			>
-				<Text style={styles.biometricText}>Use Biometrics</Text>
-			</TouchableOpacity>
+      {/* Biometric Login Button */}
+      {isBiometricSupported && (
+        <TouchableOpacity
+          style={styles.biometricButton}
+          onPress={handleBiometricAuth}
+        >
+          <Text style={styles.biometricText}>Use Biometrics</Text>
+        </TouchableOpacity>
+      )}
 
 			<Link
 				href="/forgot-password"
@@ -192,6 +226,7 @@ const LoginScreen = () => {
 };
 
 export default LoginScreen;
+
 
 const styles = StyleSheet.create({
 	container: {

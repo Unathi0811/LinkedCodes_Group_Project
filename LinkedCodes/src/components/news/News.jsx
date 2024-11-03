@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_KEY = '98be89b47590252be5d9082fa0b35df3778f2a35a74e56d0d8b3ab1fa42f189a'; 
+const API_KEY = '44d6680aa0fa0bd1fe0d36d1930c8c771b0eb72817fb09a8a791892614081e1f'; 
 const BASE_URL = 'https://serpapi.com/search.json';
 
 export const NewsFromGoogleSerpApi = async () => {

@@ -29,6 +29,8 @@ const [showAd, setShowAd] = useState(false); // Ad visibility
   const [isSubscribed, setIsSubscribed] = useState(false); // Subscription status
   const inactivityTimeoutRef = useRef(null)
 
+
+
  
 
 	// Get the current user ID
@@ -485,153 +487,88 @@ const [showAd, setShowAd] = useState(false); // Ad visibility
 					/>
 					{/*this is the urgency dropdown*/}
 
-					<Text style={styles.urgencyLabel}>
-						SELECT URGENCY LEVEL
-					</Text>
-					<View style={styles.urgencyDropdown}>
-						<RNPickerSelect
-							onValueChange={(value, index) => setUrgency(value)}
-							items={[
-								{
-									label: "Low",
-									value: "Low",
-									key: "Low",
-									color: "#00FF00",
-								},
-								{
-									label: "Medium",
-									value: "Medium",
-									key: "Medium",
-									color: "#FFFF00",
-								},
-								{
-									label: "High",
-									value: "High",
-									key: "High",
-									color: "#FF0000",
-								},
-							]}
-							placeholder={{
-								label: "Select urgency...",
-								value: null,
-							}}
-							style={{
-								inputIOS: styles.pickerInput,
-								inputAndroid: styles.pickerInput,
-								iconContainer: styles.iconContainer,
-								done: {
-									color: "#202A44",
-								},
-							}}
-							useNativeAndroidPickerStyle={false}
-							Icon={() => {
-								return (
-									<Icon2
-										name="arrow-drop-down"
-										size={24}
-										color="#202A44"
-									/>
-								);
-							}}
-							itemKey="key"
-						/>
-					</View>
+          <Text style={styles.urgencyLabel}>Select Urgency Level:</Text>
+  <View style={styles.urgencyDropdown}>
+    <TouchableOpacity onPress={() => setUrgency("Low")} style={styles.urgencyOption(urgency === "Low")}>
+      <Text>Low</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => setUrgency("Medium")} style={styles.urgencyOption(urgency === "Medium")}>
+      <Text>Medium</Text>
+    </TouchableOpacity>
+    <TouchableOpacity onPress={() => setUrgency("High")} style={styles.urgencyOption(urgency === "High")}>
+      <Text>High</Text>
+    </TouchableOpacity>
+  </View>
+        <TouchableOpacity style={styles.button} onPress={submitReport}>
+        {loading ? (
+        <ActivityIndicator size="small" color="#EAF1FF" />
+      ) : (
+        <Text><Text style={styles.buttonText}>Submit Report</Text></Text>
+      )}
+        </TouchableOpacity>
+        <Link href="/(userTabs)/reporting/userChat" asChild>
+    <TouchableOpacity>
+      <Text>User Chat</Text>
+    </TouchableOpacity>
+  </Link>
 
-					<Text style={styles.categoryLabel}>
-						SELECT REPORT CATEGORY
-					</Text>
-					<View style={styles.urgencyDropdown}>
-						<RNPickerSelect
-							onValueChange={(value, index) => setCategory(value)}
-							items={[
-								{
-									label: "Accident",
-									value: "Accident",
-									key: "Accident",
-									color: "#202A44",
-								},
-								{
-									label: "Road",
-									value: "Road",
-									key: "Road",
-									color: "#202A44",
-								},
-								{
-									label: "Bridge",
-									value: "Bridge",
-									key: "Bridge",
-									color: "#202A44",
-								},
-							]}
-							placeholder={{
-								label: "Select a category...",
-								value: null,
-							}}
-							style={{
-								inputIOS: styles.pickerInput,
-								inputAndroid: styles.pickerInput,
-								iconContainer: styles.iconContainer,
-								done: {
-									color: "#202A44",
-								},
-							}}
-							useNativeAndroidPickerStyle={false}
-							Icon={() => {
-								return (
-									<Icon2
-										name="arrow-drop-down"
-										size={24}
-										color="#202A44"
-									/>
-								);
-							}}
-							itemKey="key"
-						/>
-					</View>
+        {/* Historical Reports */}
+        <View style={styles.container2}>
+          <Text style={styles.Heading2}>Historical Reports</Text>
+          <FlatList
+            data={reports}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => openReportDetails(item)}>
+                <View style={styles.reportItem}>
+                <Image source={{ uri: item.image }} style={styles.imageThumbnail} />
+                  <View style={styles.textContainer}>
+                    <Text style={styles.description}>{item.description}</Text>
+                    <Text style={styles.timestamp}>{item.timestamp.toDate().toLocaleString()}</Text>
+                    <Text style={styles.urgency}>Urgency: {item.urgency}</Text> 
+                  </View>
+                  <TouchableOpacity onPress={() => deleteReport(item.id, item.image)}>
+                    <Icon name="trash" size={24} color="#000" />
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
 
-					<TouchableOpacity
-						style={styles.button}
-						onPress={submitReport}
-					>
-						{loading ? (
-							<ActivityIndicator
-								size="small"
-								color="#EAF1FF"
-							/>
-						) : (
-							<Text>
-								<Text style={styles.buttonText}>
-									Submit Report
-								</Text>
-							</Text>
-						)}
-					</TouchableOpacity>
-					<Link
-						href="/(userTabs)/reporting/userChat"
-						asChild
-					>
-						<TouchableOpacity style={styles.button}>
-							<Text style={styles.buttonText}>User Chat</Text>
-						</TouchableOpacity>
-					</Link>
-					{/* Overlay for error messages */}
-					<Overlay
-						isVisible={visible}
-						onBackdropPress={toggleOverlay}
-						overlayStyle={styles.overlay}
-					>
-						<View style={styles.overlayContent}>
-							<Icon
-								name="info"
-								size={50}
-								color="#000"
-								style={styles.overlayIcon}
-							/>
-							<Text style={styles.overlayText}>
-								{overlayMessage}
-							</Text>
-						</View>
-					</Overlay>
+        {/* Overlay for error messages */}
+
+        <Overlay isVisible={visible} onBackdropPress={toggleOverlay} overlayStyle={styles.overlay}>
+          <View style={styles.overlayContent}>
+            <Icon name="info" size={50} color="#000" style={styles.overlayIcon} />
+            <Text style={styles.overlayText}>{overlayMessage}</Text>
+          </View>
+        </Overlay>
+
+            {/*This is for the add*/}
+			<Modal visible={showAd && !isSubscribed} transparent>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+            <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
+            <View style={{padding:10,}}>
+                
+                  <Text style={{fontSize:20, marginBottom:10, marginTop:5, textAlign:"center"}}>ARE YOU TIRED OF SEEING THIS AD?{"\n"}</Text>
+                  <Text style={{textAlign:"justify", fontSize:16, marginBottom:10}}>
+                    Subscribe to our Premium Package where you will have full access to our features AD FREE!
+                    This ad will continue to interrupt your workflow until you do!
+                    </Text>
+                    <Text style={{fontSize:20, marginTop:15, textAlign:"center"}}>⏰UPGRADE NOW⏰{"\n"}{"\n"}FOR JUSR R99 A YEAR!!!</Text>
+                    </View>
+              <Link href="/home/premium/" asChild>
+              <TouchableOpacity style={styles.button}>
+                <Text style={styles.buttonText}>Subscribe to Premuim</Text>
+              </TouchableOpacity>
+              </Link>
+              <TouchableOpacity onPress={() => setShowAd(false)} style={styles.button}>
+                <Text style={styles.buttonText}>Close Ad</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
 					{/* Modal for report details */}
 					<Modal

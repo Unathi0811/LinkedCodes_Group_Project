@@ -50,12 +50,12 @@ const Settings = () => {
             console.error(error);
         }
     };
-
+    
     const toggleBiometricPreference = async (type) => {
         const newValue = !biometryEnabled[type];
         const updatedBiometry = { ...biometryEnabled, [type]: newValue };
         setBiometryEnabled(updatedBiometry);
-
+    
         await AsyncStorage.setItem('biometricEnabled', JSON.stringify(updatedBiometry));
         Alert.alert(
             newValue ? `${type} Enabled` : `${type} Disabled`,

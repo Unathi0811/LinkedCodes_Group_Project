@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { getFirestore, collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../../../src/cxt/theme'; // Import the useTheme hook
+
 
 const db = getFirestore();
 
@@ -18,7 +18,7 @@ const NotificationsScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigation = useNavigation();
-  const { theme } = useTheme(); // Access the theme context
+
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'notifications'), (snapshot) => {
@@ -82,7 +82,7 @@ const NotificationsScreen = () => {
               <Text style={[styles.notificationBody, { color: theme.text }]}>
                 {item.body}
               </Text>
-              <Text style={[styles.notificationStatus, { color: theme.subText }]}>
+              <Text style={[styles.notificationStatus]}>
                 {`Status: ${item.status} (Report ID: ${item.reportId || "N/A"})`}
               </Text>
               <Text style={[styles.notificationTimestamp, { color: theme.subText }]}>

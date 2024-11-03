@@ -24,6 +24,7 @@ const LoginScreen = () => {
   const [isBiometricSupported, setBiometricSupported] = useState(false);
   const router = useRouter();
   const [userSession, setUserSession] = useState(null); 
+  const [loading, setLoading] = useState(false);
 
   const fallBackToDefaultAuth = () => {
     console.log("Fallback to password authentication");

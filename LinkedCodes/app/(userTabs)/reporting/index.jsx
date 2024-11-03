@@ -60,10 +60,6 @@ export default function Reporting() {
   const [isSubscribed, setIsSubscribed] = useState(false); // Subscription status
   const inactivityTimeoutRef = useRef(null)
 
-
-
- 
-
   // Get the current user ID
   const userId = auth.currentUser ? auth.currentUser.uid : null;
 

@@ -6,11 +6,11 @@ import * as Contacts from "expo-contacts";
 import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as LocalAuthentication from "expo-local-authentication";
-import Icon from "react-native-vector-icons/FontAwesome"
+import Icon from "react-native-vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import { ScrollView } from "react-native";
 
-const Settings = ({ toggleTheme, isDarkMode }) => {
+const Settings = () => {
   const [permissions, setPermissions] = useState({
     camera: false,
     gallery: false,
@@ -18,7 +18,7 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
     notifications: false,
   });
 
-  const router = useRouter()
+  const router = useRouter();
 
   const [biometryEnabled, setBiometryEnabled] = useState({
     faceId: false,
@@ -35,8 +35,7 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
 
   const checkBiometryAvailability = async () => {
     const hasBiometrics = await LocalAuthentication.isEnrolledAsync();
-    const supportedBiometrics =
-      await LocalAuthentication.supportedAuthenticationTypesAsync();
+    const supportedBiometrics = await LocalAuthentication.supportedAuthenticationTypesAsync();
 
     setBiometrySupported(hasBiometrics && supportedBiometrics.length > 0);
 
@@ -70,16 +69,13 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
     );
     Alert.alert(
       newValue ? `${type} Enabled` : `${type} Disabled`,
-      `You have ${
-        newValue ? "enabled" : "disabled"
-      } ${type.toLowerCase()} authentication.`
+      `You have ${newValue ? "enabled" : "disabled"} ${type.toLowerCase()} authentication.`
     );
   };
 
   const loadPermissions = async () => {
     const cameraPermission = await Camera.getCameraPermissionsAsync();
-    const galleryPermission =
-      await ImagePicker.getMediaLibraryPermissionsAsync();
+    const galleryPermission = await ImagePicker.getMediaLibraryPermissionsAsync();
     const contactsPermission = await Contacts.getPermissionsAsync();
     const notificationPermission = await Notifications.getPermissionsAsync();
 
@@ -133,14 +129,8 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: isDarkMode ? "#000" : "#F2f9FB" },
-      ]}
-    >
+    <View style={styles.container}>
       <View style={styles.header}>
-        {/* Back Button */}
         <TouchableOpacity
           onPress={() => router.push("/(userTabs)/")}
           style={styles.backButton}
@@ -149,86 +139,43 @@ const Settings = ({ toggleTheme, isDarkMode }) => {
         </TouchableOpacity>
         <Text style={styles.headerApp}>InfraSmart</Text>
       </View>
-      <ScrollView contentContainerStyle={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingHorizontal: 20,
-        paddingVertical: 20,
-        marginTop: 70,
-      }}>
-        
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <View style={styles.section}>
+          <Text style={styles.heading}>Security & Login</Text>
+
+          <View style={styles.switchContainer}>
+            <Text style={styles.subHeading}>Face Recognition</Text>
+            <Switch
+              value={biometryEnabled.faceId}
+              onValueChange={() => toggleBiometricPreference("faceId")}
+              disabled={!biometrySupported}
+            />
+          </View>
+
+          <View style={styles.switchContainer}>
+            <Text style={styles.subHeading}>Finger Verification</Text>
+            <Switch
+              value={biometryEnabled.fingerprint}
+              onValueChange={() => toggleBiometricPreference("fingerprint")}
+              disabled={!biometrySupported}
+            />
+          </View>
+        </View>
 
         <View style={styles.section}>
-            <Text style={[styles.heading, { color: isDarkMode ? "#FFF" : "#202A44" }]}>
-            Security & Login
-            </Text>
+          <Text style={styles.heading}>Permissions</Text>
 
-            <View style={styles.switchContainer}>
-            <Text
-                style={[styles.subHeading, { color: isDarkMode ? "#FFF" : "#202A44" }]}
-            >
-                Face Recognition
-            </Text>
-            <Switch
-                value={biometryEnabled.faceId}
-                onValueChange={() => toggleBiometricPreference("faceId")}
-                disabled={!biometrySupported}
-            />
-            </View>
-
-            <View style={styles.switchContainer}>
-            <Text
-                style={[styles.subHeading, { color: isDarkMode ? "#FFF" : "#202A44" }]}
-            >
-                Finger Verification
-            </Text>
-            <Switch
-                value={biometryEnabled.fingerprint}
-                onValueChange={() => toggleBiometricPreference("fingerprint")}
-                disabled={!biometrySupported}
-            />
-            </View>
-        </View>
-
-        <View style={styles.section1}>
-            <Text style={[styles.heading, { color: isDarkMode ? "#FFF" : "#202A44" }]}>
-            Permissions
-            </Text>
-
-            {["camera", "gallery", "contacts", "notifications"].map((type) => (
+          {["camera", "gallery", "contacts", "notifications"].map((type) => (
             <View key={type} style={styles.switchContainer}>
-                <Text
-                style={[
-                    styles.subHeading,
-                    { color: isDarkMode ? "#FFF" : "#202A44" },
-                ]}
-                >
+              <Text style={styles.subHeading}>
                 {`${type.charAt(0).toUpperCase() + type.slice(1)} Access`}
-                </Text>
-                <Switch
+              </Text>
+              <Switch
                 value={permissions[type]}
                 onValueChange={(enabled) => handleTogglePermission(type, enabled)}
-                />
+              />
             </View>
-            ))}
-        </View>
-
-        <View style={styles.section2}>
-            <Text style={[styles.heading, { color: isDarkMode ? "#FFF" : "#202A44" }]}>
-            Theme
-            </Text>
-            <View style={styles.switchContainer}>
-            <Text
-                style={[styles.subHeading, { color: isDarkMode ? "#FFF" : "#202A44" }]}
-            >
-                {isDarkMode ? "Dark Mode" : "Light Mode"}
-            </Text>
-            <Switch
-                value={isDarkMode}
-                onValueChange={() => toggleTheme(isDarkMode ? "light" : "dark")}
-            />
-            </View>
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -240,58 +187,35 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F2f9FB",
   },
-  title: { fontSize: 32, fontWeight: "bold", marginBottom: 40 },
+  scrollViewContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    marginTop: 70,
+  },
   section: {
     borderColor: "#202A44",
-		height: 190,
-		width: "90%",
-		marginTop: 10,
-		backgroundColor: "#fff",
-		borderRadius: 12,
-		padding: 12,
-		elevation: 5,
-		fontSize: 16,
-		shadowOffset: { width: 0, height: 3 },
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
-		shadowColor: "#202A44",
-  },
-  section1: {
-    borderColor: "#202A44",
-		height: 280,
-		width: "90%",
-		marginTop: 10,
-		backgroundColor: "#fff",
-		borderRadius: 12,
-		padding: 12,
-		elevation: 5,
-		fontSize: 16,
-		shadowOffset: { width: 0, height: 3 },
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
-		shadowColor: "#202A44",
-  },
-  section2: {
-    borderColor: "#202A44",
-		height: 120,
-		width: "90%",
-		marginTop: 10,
-		backgroundColor: "#fff",
-		borderRadius: 12,
-		padding: 12,
-		elevation: 5,
-		fontSize: 16,
-		shadowOffset: { width: 0, height: 3 },
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
-		shadowColor: "#202A44",
+    height: 190,
+    width: "90%",
+    marginTop: 10,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 12,
+    elevation: 5,
+    fontSize: 16,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowColor: "#202A44",
   },
   heading: {
     fontSize: 22,
     fontWeight: "600",
     marginBottom: 15,
     textAlign: "center",
-    color: "#202A44"
+    color: "#202A44",
   },
   subHeading: { fontSize: 18 },
   switchContainer: {
@@ -312,19 +236,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     height: 90,
     marginBottom: 5,
-    borderBlockEndColor: "#ccc",
-},
-backButton: {
+    borderBottomColor: "#ccc",
+  },
+  backButton: {
     padding: 10,
     marginRight: 10,
-    marginTop: 12
-},
-headerApp: {
+    marginTop: 12,
+  },
+  headerApp: {
     fontSize: 25,
     fontWeight: "bold",
     color: "#202A44",
     marginLeft: 130,
-},
+  },
 });
 
 export default Settings;

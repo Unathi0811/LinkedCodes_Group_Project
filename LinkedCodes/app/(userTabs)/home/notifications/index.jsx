@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { getFirestore, collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '../../../../src/cxt/theme'; // Import the useTheme hook
+
 
 const db = getFirestore();
 
@@ -70,8 +70,8 @@ const NotificationsScreen = () => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.heading, { color: theme.text }]}>Notifications</Text>
+    <View style={[styles.container,]}>
+      <Text style={[styles.heading]}>Notifications</Text>
       
       <FlatList
         data={notifications}
@@ -79,14 +79,14 @@ const NotificationsScreen = () => {
         renderItem={({ item }) => (
           <View style={[styles.notificationCard, { backgroundColor: theme.card }]}>
             <TouchableOpacity onPress={() => handleNotificationPress(item.reportId)}>
-              <Text style={[styles.notificationTitle, { color: theme.text }]}>{item.title}</Text>
-              <Text style={[styles.notificationBody, { color: theme.text }]}>
+              <Text style={[styles.notificationTitle]}>{item.title}</Text>
+              <Text style={[styles.notificationBody]}>
                 {item.body}
               </Text>
-              <Text style={[styles.notificationStatus, { color: theme.subText }]}>
+              <Text style={[styles.notificationStatus]}>
                 {`Status: ${item.status} (Report ID: ${item.reportId || "N/A"})`}
               </Text>
-              <Text style={[styles.notificationTimestamp, { color: theme.subText }]}>
+              <Text style={[styles.notificationTimestamp]}>
                 {new Date(item.timestamp?.toDate()).toLocaleString()}
               </Text>
             </TouchableOpacity>

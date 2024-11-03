@@ -286,7 +286,8 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 15,
 		color: "#202A44",
-		marginLeft: 56,
+		marginLeft: 40, // Align with inputContainer
+		marginBottom: 5, // Optional: add some space below the title
 	},
 	textInput: {
 		flex: 1,
@@ -353,35 +354,30 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-	  },
-	  modalContent: {
+	},
+	modalContent: {
 		width: 300,
 		padding: 20,
 		backgroundColor: '#F2f9FB',
 		borderRadius: 10,
 		alignItems: 'center',
-		height:250,
-		justifyContent:'center'
-	  },
-	  title: {
-		fontSize: 18,
-		fontWeight: 'bold',
-		marginBottom: 10,
-	  },
-	  message: {
+		height: 250,
+		justifyContent: 'center'
+	},
+	message: {
 		marginBottom: 50,
 		fontSize: 20,
-	  },
-	  btnText: {
+	},
+	btnText: {
 		color: '#F2f9FB',
 		fontWeight: 'bold',
-		fontSize:20,
-	  },
-	  OKButton:{
+		fontSize: 20,
+	},
+	OKButton: {
 		padding: 10,
 		alignItems: 'center',
 		backgroundColor: '#202A44',
 		borderRadius: 5,
 		marginLeft: 5,
-	  },
+	},
 });

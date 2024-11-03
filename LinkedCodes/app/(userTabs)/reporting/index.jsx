@@ -509,21 +509,21 @@ export default function Reporting() {
 							onValueChange={(value, index) => setCategory(value)}
 							items={[
 								{
-									label: "Accident",
-									value: "Accident",
-									key: "Accident",
+									label: "accident",
+									value: "accident",
+									key: "accident",
 									color: "#202A44",
 								},
 								{
-									label: "Road",
-									value: "Road",
-									key: "Road",
+									label: "road",
+									value: "road",
+									key: "road",
 									color: "#202A44",
 								},
 								{
-									label: "Bridge",
-									value: "Bridge",
-									key: "Bridge",
+									label: "bridge",
+									value: "bridge",
+									key: "bridge",
 									color: "#202A44",
 								},
 							]}

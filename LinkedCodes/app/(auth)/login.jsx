@@ -14,8 +14,6 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import * as LocalAuthentication from "expo-local-authentication";
 import * as SecureStore from "expo-secure-store"; // Import SecureStore
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ReactNativeBiometrics from "react-native-biometrics";
-import { useUser } from "../../src/cxt/user";
 import logAudit from "../../services/auditlogFunction";
 
 const LoginScreen = () => {
@@ -23,8 +21,8 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [isBiometricSupported, setBiometricSupported] = useState(false);
   const router = useRouter();
-  const [userSession, setUserSession] = useState(null); 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Add loading state
+  const [userSession, setUserSession] = useState(null);
 
   const fallBackToDefaultAuth = () => {
     console.log("Fallback to password authentication");
@@ -42,63 +40,78 @@ const LoginScreen = () => {
   const handleBiometricAuth = async () => {
     const isBiometricAvailable = await LocalAuthentication.hasHardwareAsync();
     if (!isBiometricAvailable) {
-        return alertComponent(
-            "Biometric Authentication Not Supported",
-            "Please login with your password.",
-            "OK",
-            fallBackToDefaultAuth
-        );
+      return alertComponent(
+        "Biometric Authentication Not Supported",
+        "Please login with your password.",
+        "OK",
+        fallBackToDefaultAuth
+      );
     }
 
     const isBiometricEnrolled = await LocalAuthentication.isEnrolledAsync();
     if (!isBiometricEnrolled) {
-        return alertComponent(
-            "No Biometric Record Found",
-            "Please login with your password.",
-            "OK",
-            fallBackToDefaultAuth
-        );
+      return alertComponent(
+        "No Biometric Record Found",
+        "Please login with your password.",
+        "OK",
+        fallBackToDefaultAuth
+      );
     }
 
     // Check if biometric authentication is enabled in settings
-    const biometricEnabled = await AsyncStorage.getItem('biometricEnabled');
-    const parsedBiometricEnabled = biometricEnabled ? JSON.parse(biometricEnabled) : { faceId: false, fingerprint: false };
+    const biometricEnabled = await AsyncStorage.getItem("biometricEnabled");
+    const parsedBiometricEnabled = biometricEnabled
+      ? JSON.parse(biometricEnabled)
+      : { faceId: false, fingerprint: false };
 
     // Check if any biometric type is enabled
     if (!parsedBiometricEnabled.faceId && !parsedBiometricEnabled.fingerprint) {
-        return alertComponent(
-            "Biometric Authentication Disabled",
-            "Please enable biometric authentication in settings.",
-            "OK",
-            fallBackToDefaultAuth
-        );
+      return alertComponent(
+        "Biometric Authentication Disabled",
+        "Please enable biometric authentication in settings.",
+        "OK",
+        fallBackToDefaultAuth
+      );
     }
 
     const biometricAuth = await LocalAuthentication.authenticateAsync({
-        promptMessage: "Login using Biometrics",
-        cancelLabel: "Cancel",
+      promptMessage: "Login using Biometrics",
+      cancelLabel: "Cancel",
     });
 
-    if (biometricAuth.success) {
-        // Retrieve the last logged-in user's email from SecureStore
-        const storedEmail = await SecureStore.getItemAsync("user_email");
-        const storedPassword = await SecureStore.getItemAsync("user_password"); 
 
-        if (storedEmail && storedPassword) {
-            signInWithEmailAndPassword(getAuth(), storedEmail, storedPassword)
-                .then(() => {
-                    router.push("/(userTabs)/home");
-                })
-                .catch((err) => {
-                    Alert.alert(err?.message);
-                });
-        } else {
-            alertComponent("Biometric authentication not set up", "Please log in using your password, and set up biometrics", "OK", fallBackToDefaultAuth);
-        }
+    if (biometricAuth.success) {
+      // Retrieve the last logged-in user's email from SecureStore
+      const storedEmail = await SecureStore.getItemAsync("user_email");
+      const storedPassword = await SecureStore.getItemAsync("user_password");
+
+      if (storedEmail && storedPassword) {
+        signInWithEmailAndPassword(getAuth(), storedEmail, storedPassword)
+          .then(() => {
+            router.push("/(userTabs)/home");
+          })
+          .catch((err) => {
+            Alert.alert(err?.message);
+          });
+      } else {
+        alertComponent(
+          "Biometric authentication not set up",
+          "Please log in using your password, and set up biometrics",
+          "OK",
+          fallBackToDefaultAuth
+        );
+
+
+      }
     } else {
-        alertComponent("Authentication Failed", "Please try again or login with your password.", "OK", fallBackToDefaultAuth);
+      alertComponent(
+        "Authentication Failed",
+        "Please try again or login with your password.",
+        "OK",
+        fallBackToDefaultAuth
+      );
     }
-};
+  };
   useEffect(() => {
     (async () => {
       const compatible = await LocalAuthentication.hasHardwareAsync();
@@ -108,22 +121,47 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     if (email === "" || password === "") {
-      Alert.alert("Please fill in all fields");
-      return;
+        Alert.alert("Please fill in all fields");
+        return;
     }
-    signInWithEmailAndPassword(getAuth(), email, password)
-      .then(async (userCredential) => {
-        // Store the user's email and password securely
-        await SecureStore.setItemAsync("user_email", email);
-        await SecureStore.setItemAsync("user_password", password); // Use securely, or consider using a token
+    setLoading(true); // Start loading
+    try {
+        const userCredential = await signInWithEmailAndPassword(getAuth(), email, password);
+        const user = userCredential.user;
+
+        // Log the login action in the audit logs
+        logAudit(
+            email, // Email of the user
+            null, // No error message
+            user.uid, // User ID
+            "User  Login",
+            user.uid, // User ID again for consistency
+            "127.0.0.1", // Example IP, replace with actual if available
+            "User  logged in successfully",
+            "success" // Status of the action
+        );
 
         // Redirect to the home screen
-        router.push("/(userTabs)/home");
-      })
-      .catch((err) => {
-        Alert.alert(err?.message);
-      });
-  };
+        // router.push("/(userTabs)/home");
+    } catch (error) {
+        console.error("Error logging in user: ", error);
+        Alert.alert(error.message);
+
+        // Log the error in the audit logs
+        logAudit(
+            email, // Email of the user
+            error.message, // Error message
+            null, // No user ID since login failed
+            "User  Login Failed",
+            null, // No user ID since login failed
+            "127.0.0.1", // Example IP, replace with actual if available
+            "Failed login attempt",
+            "failure" // Status of the action
+        );
+    } finally {
+        setLoading(false); // Stop loading
+    }
+};
 
   return (
     <View style={styles.container}>
@@ -131,63 +169,44 @@ const LoginScreen = () => {
         <Text style={styles.hello}>Hello</Text>
       </View>
 
-			<View>
-				<Text style={styles.loginText}>Sign in to your account</Text>
-			</View>
+      <View>
+        <Text style={styles.loginText}>Sign in to your account</Text>
+      </View>
 
-			<Text style={styles.labelText}>Email</Text>
-			<View style={styles.inputContainer}>
-				<Icon
-					name={"user"}
-					size={24}
-					color={"#ccc"}
-					style={styles.inputIcon}
-				/>
-				<TextInput
-					style={styles.textInput}
-					placeholder="email"
-					onChangeText={(text) => setEmail(text)}
-					value={email}
-					autoComplete="email"
-					placeholderTextColor={"#ccc"}
-					keyboardType="email-address"
-				/>
-			</View>
+      <Text style={styles.labelText}>Email</Text>
+      <View style={styles.inputContainer}>
+        <Icon name={"user"} size={24} color={"#ccc"} style={styles.inputIcon} />
+        <TextInput
+          style={styles.textInput}
+          placeholder="email"
+          onChangeText={(text) => setEmail(text)}
+          value={email}
+          autoComplete="email"
+          placeholderTextColor={"#ccc"}
+          keyboardType="email-address"
+        />
+      </View>
 
-			<Text style={styles.labelText}>Password</Text>
-			<View style={styles.inputContainer}>
-				<Icon
-					name={"lock"}
-					size={24}
-					color={"#ccc"}
-					style={styles.inputIcon}
-				/>
-				<TextInput
-					onChangeText={(text) => setPassword(text)}
-					value={password}
-					autoComplete="password"
-					style={styles.textInput}
-					placeholderTextColor={"#ccc"}
-					placeholder="password"
-					secureTextEntry={true}
-				/>
-			</View>
+      <Text style={styles.labelText}>Password</Text>
+      <View style={styles.inputContainer}>
+        <Icon name={"lock"} size={24} color={"#ccc"} style={styles.inputIcon} />
+        <TextInput
+          onChangeText={(text) => setPassword(text)}
+          value={password}
+          autoComplete="password"
+          style={styles.textInput}
+          placeholderTextColor={"#ccc"}
+          placeholder="password"
+          secureTextEntry={true}
+        />
+      </View>
 
-			<TouchableOpacity
-				style={[
-					styles.signInButtonContainer,
-					loading
-						? {
-								opacity: 0.8,
-						  }
-						: {},
-				]}
-				onPress={handleLogin}
-			>
-				<Text style={styles.signIn}>
-					{loading ? "Loading..." : "Sign In"}
-				</Text>
-			</TouchableOpacity>
+      <TouchableOpacity
+        style={styles.signInButtonContainer}
+        onPress={handleLogin}
+      >
+        <Text style={styles.signIn}>{loading ? "Loading..." : "Sign In"}</Text>
+      </TouchableOpacity>
 
       {/* Biometric Login Button */}
       {isBiometricSupported && (
@@ -199,172 +218,164 @@ const LoginScreen = () => {
         </TouchableOpacity>
       )}
 
-			<Link
-				href="/forgot-password"
-				asChild
-			>
-				<TouchableOpacity>
-					<Text style={styles.forgotPasswordText}>
-						Forgot your password?{" "}
-						<Text style={styles.createText}>Reset</Text>
-					</Text>
-				</TouchableOpacity>
-			</Link>
+      <Link href="/forgot-password" asChild>
+        <TouchableOpacity>
+          <Text style={styles.forgotPasswordText}>
+            Forgot your password? <Text style={styles.createText}>Reset</Text>
+          </Text>
+        </TouchableOpacity>
+      </Link>
 
-			<Link
-				href="/sign-up"
-				asChild
-			>
-				<TouchableOpacity>
-					<Text style={styles.signUp}>
-						Don't have account?{" "}
-						<Text style={styles.createText}>Create</Text>
-					</Text>
-				</TouchableOpacity>
-			</Link>
-		</View>
-	);
+      <Link href="/sign-up" asChild>
+        <TouchableOpacity>
+          <Text style={styles.signUp}>
+            Don't have account?
+            <Text style={styles.createText}>Create</Text>
+          </Text>
+        </TouchableOpacity>
+      </Link>
+    </View>
+  );
 };
 
 export default LoginScreen;
 
-
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		color: "#F5F5F5",
-		backgroundColor: "#fff",
-		position: "relative",
-	},
-	labelText: {
-		marginLeft: 50,
-		color: "#202A44",
-	},
-	helloContainer: {
-		marginTop: 120,
-		marginBottom: 0,
-	},
-	hello: {
-		textAlign: "center",
-		fontSize: 50,
-		fontWeight: "400",
-		color: "#202A44",
-	},
-	loginText: {
-		textAlign: "center",
-		fontSize: 18,
-		color: "#202A44",
-		fontWeight: "200",
-		marginBottom: 70,
-	},
-	inputContainer: {
-		backgroundColor: "#ffffff",
-		flexDirection: "row",
-		borderRadius: 10,
-		marginHorizontal: 40,
-		elevation: 10,
-		marginVertical: 10,
-		borderColor: "#ccc",
-		height: 50,
-		borderWidth: 1,
-		alignItems: "center",
-		shadowOffset: { width: 4, height: 10 },
-		shadowOpacity: 0.1,
-		shadowColor: "#202A44",
-		gap: 10,
-		paddingHorizontal: 10,
-	},
-	textInput: {
-		flex: 1,
-	},
-	inputIcon: {
-		marginLeft: 10,
-		marginRight: 5,
-	},
-	biometricButton: {
-		backgroundColor: "#202A44",
-		borderRadius: 10,
-		marginHorizontal: 40,
-		elevation: 10,
-		marginVertical: 20,
-		height: 50,
-		justifyContent: "center",
-		alignItems: "center",
-		shadowOffset: { width: 3, height: 10 },
-		shadowOpacity: 0.2,
-		shadowColor: "#202A44",
-	},
-	biometricText: {
-		color: "#fff",
-		fontSize: 18,
-		fontWeight: "bold",
-		textAlign: "center",
-	},
-	forgotPasswordText: {
-		color: "#BEBEBE",
-		textAlign: "right",
-		fontSize: 15,
-		width: "87%",
-		marginTop: 23,
-	},
-	signInButtonContainer: {
-		backgroundColor: "#202A44",
-		flexDirection: "row",
-		borderRadius: 10,
-		marginHorizontal: 40,
-		elevation: 10,
-		marginVertical: 20,
-		height: 50,
-		justifyContent: "center",
-		alignItems: "center",
-		shadowOffset: { width: 3, height: 10 },
-		shadowOpacity: 0.2,
-		shadowColor: "#202A44",
-	},
-	signIn: {
-		color: "#fff",
-		fontSize: 18,
-		fontWeight: "bold",
-		textAlign: "center",
-	},
-	signUp: {
-		color: "#BEBEBE",
-		textAlign: "right",
-		fontSize: 15,
-		width: "87%",
-		marginTop: 23,
-	},
-	createText: {
-		textDecorationLine: "underline",
-	},
-	linearGradient: {
-		flex: 1,
-		paddingLeft: 15,
-		paddingRight: 15,
-		borderRadius: 5,
-	},
-	buttonText: {
-		fontSize: 18,
-		fontFamily: "Gill Sans",
-		textAlign: "center",
-		margin: 10,
-		color: "#ffffff",
-		backgroundColor: "transparent",
-	},
-	topImage: {
-		width: "100%",
-		height: 120,
-		resizeMode: "cover",
-		marginBottom: 0,
-		marginLeft: -29,
-		marginTop: 0,
-	},
+  container: {
+    flex: 1,
+    color: "#F5F5F5",
+    backgroundColor: "#fff",
+    position: "relative",
+  },
+  labelText: {
+    marginLeft: 50,
+    color: "#202A44",
+  },
+  helloContainer: {
+    marginTop: 120,
+    marginBottom: 0,
+  },
+  hello: {
+    textAlign: "center",
+    fontSize: 50,
+    fontWeight: "400",
+    color: "#202A44",
+  },
+  loginText: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "#202A44",
+    fontWeight: "200",
+    marginBottom: 70,
+  },
+  inputContainer: {
+    backgroundColor: "#ffffff",
+    flexDirection: "row",
+    borderRadius: 10,
+    marginHorizontal: 40,
+    elevation: 10,
+    marginVertical: 10,
+    borderColor: "#ccc",
+    height: 50,
+    borderWidth: 1,
+    alignItems: "center",
+    shadowOffset: { width: 4, height: 10 },
+    shadowOpacity: 0.1,
+    shadowColor: "#202A44",
+    gap: 10,
+    paddingHorizontal: 10,
+  },
+  textInput: {
+    flex: 1,
+  },
+  inputIcon: {
+    marginLeft: 10,
+    marginRight: 5,
+  },
+  biometricButton: {
+    backgroundColor: "#202A44",
+    borderRadius: 10,
+    marginHorizontal: 40,
+    elevation: 10,
+    marginVertical: 20,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowOffset: { width: 3, height: 10 },
+    shadowOpacity: 0.2,
+    shadowColor: "#202A44",
+  },
+  biometricText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  forgotPasswordText: {
+    color: "#BEBEBE",
+    textAlign: "right",
+    fontSize: 15,
+    width: "87%",
+    marginTop: 23,
+  },
+  signInButtonContainer: {
+    backgroundColor: "#202A44",
+    flexDirection: "row",
+    borderRadius: 10,
+    marginHorizontal: 40,
+    elevation: 10,
+    marginVertical: 20,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowOffset: { width: 3, height: 10 },
+    shadowOpacity: 0.2,
+    shadowColor: "#202A44",
+  },
+  signIn: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  signUp: {
+    color: "#BEBEBE",
+    textAlign: "right",
+    fontSize: 15,
+    width: "87%",
+    marginTop: 23,
+  },
+  createText: {
+    textDecorationLine: "underline",
+  },
+  linearGradient: {
+    flex: 1,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 5,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontFamily: "Gill Sans",
+    textAlign: "center",
+    margin: 10,
+    color: "#ffffff",
+    backgroundColor: "transparent",
+  },
+  topImage: {
+    width: "100%",
+    height: 120,
+    resizeMode: "cover",
+    marginBottom: 0,
+    marginLeft: -29,
+    marginTop: 0,
+  },
 
-	bottomImage: {
-		width: "100%",
-		height: 140,
-		resizeMode: "cover",
-		marginLeft: -23,
-		marginTop: 56,
-	},
+  bottomImage: {
+    width: "100%",
+    height: 140,
+    resizeMode: "cover",
+    marginLeft: -23,
+    marginTop: 56,
+  },
 });

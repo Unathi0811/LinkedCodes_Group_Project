@@ -1,4 +1,13 @@
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+	Alert,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+	Modal,
+	ActivityIndicator,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { Image, Pressable } from "react-native";
 import * as ImagePicker from "expo-image-picker";
@@ -8,23 +17,26 @@ import {
 	uploadBytesResumable,
 	getDownloadURL,
 } from "firebase/storage";
-import { Link , useRouter} from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { doc, updateDoc } from "firebase/firestore";
 import { useUser } from "../../../src/cxt/user";
 import { db, auth } from "../../../firebase";
 import { signOut } from "firebase/auth";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Icon2 from "react-native-vector-icons/MaterialIcons";
 
 const Profile = () => {
 	const { setUser, user } = useUser();
 	const [image, setImage] = useState(user.profileImage);
 	const [loading, setLoading] = useState(false);
+	const [modalVisible, setModalVisible] = useState(false);
+
 	useEffect(() => {
 		if (user) {
 			setImage(user.profileImage);
 		}
 	}, [user]);
-	const router = useRouter()
+	const router = useRouter();
 	const pickImage = async () => {
 		try {
 			const result = await ImagePicker.launchImageLibraryAsync({
@@ -56,20 +68,25 @@ const Profile = () => {
 		}
 	};
 
+	const handleLogout = () => {
+		signOut(auth);
+		setModalVisible(false);
+	};
+
 	return (
 		<View style={styles.container}>
 			{/* Fixed header with profile details */}
 			<View style={styles.headerContainer}>
-			<TouchableOpacity
-						onPress={() => router.push("/(userTabs)/home")}
-						style={styles.backButton}
-					>
-						<Icon
-							name="arrow-left"
-							size={20}
-							color="#fff"
-						/>
-					</TouchableOpacity>
+				<TouchableOpacity
+					onPress={() => router.push("/(userTabs)/home")}
+					style={styles.backButton}
+				>
+					<Icon
+						name="arrow-left"
+						size={20}
+						color="#fff"
+					/>
+				</TouchableOpacity>
 				<View style={styles.header}>
 					<Pressable onPress={pickImage}>
 						{loading ? ( // Show ActivityIndicator if loading
@@ -135,37 +152,58 @@ const Profile = () => {
 					)}
 
 					{/* Logout button */}
-					<Pressable
+					<TouchableOpacity
 						style={styles.card}
-						onPress={() => {
-							Alert.alert(
-								"Logout",
-								"Are you sure you want to logout?",
-								[
-									{
-										text: "Cancel",
-										onPress: () =>
-											console.log("Logout canceled"),
-										style: "cancel",
-									},
-									{
-										text: "Logout",
-										onPress: () => signOut(auth),
-										style: "destructive",
-									},
-								],
-								{ cancelable: true }
-							);
-						}}
+						onPress={() => setModalVisible(true)}
 					>
 						<Text style={styles.cardText}>Logout</Text>
 						<Icon
 							name="sign-out"
-							size={25}
+							size={20}
 							color="#fff"
 							style={styles.icon}
 						/>
-					</Pressable>
+					</TouchableOpacity>
+
+					<Modal
+						transparent={true}
+						animationType="slide"
+						visible={modalVisible}
+						onRequestClose={() => setModalVisible(false)}
+					>
+						<View style={styles.modalOverlay}>
+							<View style={styles.modalContent}>
+								<Icon
+									name="sign-out"
+									size={40}
+									color="#202A44"
+									style={styles.logoutIcon}
+								/>
+								<Text style={styles.modalMessage}>
+									Are you sure you want to logout?
+								</Text>
+								<View style={styles.modalButtons}>
+									<TouchableOpacity
+										style={styles.cancelButton}
+										onPress={() => setModalVisible(false)}
+									>
+										<Text style={styles.cancelText}>
+											Cancel
+										</Text>
+									</TouchableOpacity>
+
+									<TouchableOpacity
+										style={styles.logoutButton}
+										onPress={handleLogout}
+									>
+										<Text style={styles.buttonText}>
+											Logout
+										</Text>
+									</TouchableOpacity>
+								</View>
+							</View>
+						</View>
+					</Modal>
 				</View>
 			</View>
 		</View>
@@ -245,6 +283,64 @@ const styles = StyleSheet.create({
 		padding: 10,
 		marginRight: 10,
 		color: "#fff",
+	},
+
+	modalOverlay: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "rgba(0, 0, 0, 0.5)",
+	},
+	modalContent: {
+		width: 300,
+		padding: 20,
+		backgroundColor: "#F2f9FB",
+		borderRadius: 10,
+		alignItems: "center",
+		height: 350,
+		justifyContent: "center",
+	},
+	modalTitle: {
+		fontSize: 18,
+		fontWeight: "bold",
+	},
+	modalMessage: {
+		marginVertical: 10,
+		textAlign: "center",
+		marginBottom: 40,
+		fontSize: 20,
+	},
+	modalButtons: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		width: "100%",
+	},
+	cancelButton: {
+		flex: 1,
+		padding: 10,
+		alignItems: "center",
+		backgroundColor: "#ddd",
+		borderRadius: 5,
+		marginRight: 5,
+	},
+	logoutButton: {
+		flex: 1,
+		padding: 10,
+		alignItems: "center",
+		backgroundColor: "#202A44",
+		borderRadius: 5,
+		marginLeft: 5,
+	},
+	buttonText: {
+		color: "#F2f9FB",
+		fontWeight: "bold",
+	},
+	cancelText: {
+		color: "#202A44",
+		fontWeight: "bold",
+	},
+	logoutIcon: {
+		marginBottom: 40,
 	},
 });
 

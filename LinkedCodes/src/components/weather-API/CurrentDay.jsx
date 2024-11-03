@@ -195,7 +195,7 @@ const CurrentDay = () => {
 					<View
 						style={{
 							width: "58%",
-							backgroundColor: "#EAF1FF",
+							backgroundColor: "#F2f9FB",
 							padding: 8,
 							borderRadius: 12,
 							borderRightWidth: 1,

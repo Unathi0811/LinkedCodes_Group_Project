@@ -20,6 +20,7 @@ const Profile = () => {
 	const [image, setImage] = useState(user.profileImage);
 	const [loading, setLoading] = useState(false);
 	const router = useRouter()
+	
 	useEffect(() => {
 		if (user) {
 			setImage(user.profileImage);

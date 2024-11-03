@@ -8,6 +8,8 @@ import {
 	Alert,
 	Pressable,
 	Keyboard,
+	Modal,
+	Button 
 } from "react-native";
 import { useState } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -24,11 +26,14 @@ const SignupScreen = () => {
 		email: "",
 		mobile: "",
 	});
+	const [modalVisible, setModalVisible] = useState(false);
+	const [modalMessage, setModalMessage] = useState('');
 
 	const handleSignUp = async () => {
 		const { username, password, email, mobile } = userData;
 		if (!username || !password || !email || !mobile) {
-			Alert.alert("Please fill in all fields");
+			setModalMessage('Please fill in all fields.');
+			setModalVisible(true);
 			return;
 		}
 		setLoading(true);
@@ -79,6 +84,10 @@ const SignupScreen = () => {
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const handleCloseModal = () => {
+		setModalVisible(false);
 	};
 
 	return (
@@ -176,20 +185,9 @@ const SignupScreen = () => {
 				/>
 			</View>
 
-			{/* this touchabale should have 3 tasks
-      1) takes to the home screen
-      2) saves the data to the local storage
-      3) and  think use useContext to display the data in profile
-      */}
 			<TouchableOpacity
-				style={[
-					styles.signUpButtonContainer,
-					loading
-						? {
-								opacity: 0.8,
-						  }
-						: {},
-				]}
+				style={
+					styles.signUpButtonContainer}
 				onPress={handleSignUp}
 			>
 				<Text style={styles.signUp}>
@@ -223,6 +221,30 @@ const SignupScreen = () => {
 					</TouchableOpacity>
 				</View>
 			</View>
+
+			<Modal
+				transparent
+				visible={modalVisible}
+				animationType="slide"
+			>
+				<View style={styles.overlay}>
+				<View style={styles.modalContent}>
+					<Icon
+						name="exclamation"
+						size={30}
+						color="#202A44"
+					style={{marginBottom:30}}
+					/>
+					<Text style={styles.message}>{modalMessage}</Text>
+					<TouchableOpacity
+						style={styles.OKButton}
+						onPress={handleCloseModal}
+					>
+					<Text style={styles.btnText}> OK </Text>
+					</TouchableOpacity>
+				</View>
+				</View>
+			</Modal>
 		</Pressable>
 	);
 };
@@ -325,4 +347,41 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		marginHorizontal: 10,
 	},
+
+	overlay: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+	  },
+	  modalContent: {
+		width: 300,
+		padding: 20,
+		backgroundColor: '#F2f9FB',
+		borderRadius: 10,
+		alignItems: 'center',
+		height:250,
+		justifyContent:'center'
+	  },
+	  title: {
+		fontSize: 18,
+		fontWeight: 'bold',
+		marginBottom: 10,
+	  },
+	  message: {
+		marginBottom: 50,
+		fontSize: 20,
+	  },
+	  btnText: {
+		color: '#F2f9FB',
+		fontWeight: 'bold',
+		fontSize:20,
+	  },
+	  OKButton:{
+		padding: 10,
+		alignItems: 'center',
+		backgroundColor: '#202A44',
+		borderRadius: 5,
+		marginLeft: 5,
+	  },
 });

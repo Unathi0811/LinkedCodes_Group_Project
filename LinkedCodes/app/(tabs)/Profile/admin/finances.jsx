@@ -1,33 +1,11 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
-import { useUser } from "../../../../src/cxt/user";
-import { db } from "../../../../firebase";
-import { collection, getDocs } from "firebase/firestore";
+import React from "react";
+import { useUser  } from "../../../../src/cxt/user";
+import { usePayments } from "../../../../src/cxt/pay"; // Adjust the import path accordingly
 
 const Finances = () => {
-  const { user } = useUser();
-  const [payments, setPayments] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchPayments = async () => {
-      try {
-        const paymentsCollection = collection(db, "payments");
-        const paymentSnapshot = await getDocs(paymentsCollection);
-        const paymentList = paymentSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setPayments(paymentList);
-      } catch (error) {
-        console.error("Error fetching payments: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPayments();
-  }, []);
+  const { user } = useUser ();
+  const { payments, loading } = usePayments(); // Use the context to get payments and loading state
 
   // Calculate total revenue
   const totalRevenue = payments.reduce(
@@ -44,6 +22,7 @@ const Finances = () => {
       </>
     );
   }
+  
   return (
     <View style={styles.container}>
       <View style={styles.card}>

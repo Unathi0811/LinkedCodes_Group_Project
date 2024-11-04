@@ -17,6 +17,22 @@ import * as SecureStore from "expo-secure-store"; // Import SecureStore
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import logAudit from "../../services/auditlogFunction";
 
+const AlertModal = ({ visible, title, message, buttonText, onButtonPress }) => {
+  return (
+    <Modal transparent={true} visible={visible}>
+      <View style={styles.BioContainer}>
+        <View style={styles.BioContent}>
+          <Text style={styles.BioTitle}>{title}</Text>
+          <Text style={styles.BioMessage}>{message}</Text>
+          <TouchableOpacity onPress={onButtonPress} style={styles.BioButton}>
+            <Text style={styles.BioText}>{buttonText}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,24 +42,23 @@ const LoginScreen = () => {
   const [userSession, setUserSession] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 	const [modalMessage, setModalMessage] = useState('');
+  const [modalBioVisible, setModalBioVisible] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: '', message: '', buttonText: '', onButtonPress: () => {} });
+
 
   const fallBackToDefaultAuth = () => {
     console.log("Fallback to password authentication");
   };
 
-  const alertComponent = (title, message, btnText, btnFunc) => {
-    Alert.alert(title, message, [
-      {
-        text: btnText,
-        onPress: btnFunc,
-      },
-    ]);
+  const showModal = (title, message, buttonText, onButtonPress) => {
+    setModalContent({ title, message, buttonText, onButtonPress });
+    setModalBioVisible(true);
   };
 
   const handleBiometricAuth = async () => {
     const isBiometricAvailable = await LocalAuthentication.hasHardwareAsync();
     if (!isBiometricAvailable) {
-      return alertComponent(
+      return showModal(
         "Biometric Authentication Not Supported",
         "Please login with your password.",
         "OK",
@@ -53,7 +68,7 @@ const LoginScreen = () => {
 
     const isBiometricEnrolled = await LocalAuthentication.isEnrolledAsync();
     if (!isBiometricEnrolled) {
-      return alertComponent(
+      return showModal(
         "No Biometric Record Found",
         "Please login with your password.",
         "OK",
@@ -69,7 +84,7 @@ const LoginScreen = () => {
 
     // Check if any biometric type is enabled
     if (!parsedBiometricEnabled.faceId && !parsedBiometricEnabled.fingerprint) {
-      return alertComponent(
+      return showModal(
         "Biometric Authentication Disabled",
         "Please enable biometric authentication in settings.",
         "OK",
@@ -97,7 +112,7 @@ const LoginScreen = () => {
             Alert.alert(err?.message);
           });
       } else {
-        alertComponent(
+        showModal(
           "Biometric authentication not set up",
           "Please log in using your password, and set up biometrics",
           "OK",
@@ -107,7 +122,7 @@ const LoginScreen = () => {
 
       }
     } else {
-      alertComponent(
+      showModal(
         "Authentication Failed",
         "Please try again or login with your password.",
         "OK",
@@ -176,6 +191,17 @@ const handleCloseModal = () => {
       <View style={styles.helloContainer}>
         <Text style={styles.hello}>Hello</Text>
       </View>
+
+      <AlertModal
+        visible={modalBioVisible}
+        title={modalContent.title}
+        message={modalContent.message}
+        buttonText={modalContent.buttonText}
+        onButtonPress={() => {
+          modalContent.onButtonPress();
+          setModalBioVisible(false);
+        }}
+      />
 
       <View>
         <Text style={styles.loginText}>Sign in to your account</Text>
@@ -425,7 +451,8 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		alignItems: 'center',
 		height: 250,
-		justifyContent: 'center'
+		justifyContent: 'center',
+    alignItems: 'center',
 	},
 	message: {
 		marginBottom: 50,
@@ -443,4 +470,43 @@ const styles = StyleSheet.create({
 		borderRadius: 5,
 		marginLeft: 5,
 	},
+
+  // Biomatrics 
+  BioContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  BioContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: '#F2f9FB',
+    borderRadius: 10,
+    height: 250,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  BioTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  BioMessage: {
+    textAlign: 'center',
+    marginBottom: 50,
+    marginBottom: 20,
+  },
+  BioButton: {
+    padding: 10,
+		alignItems: 'center',
+		backgroundColor: '#202A44',
+		borderRadius: 5,
+		marginLeft: 5,
+  },
+  BioText: {
+    color: '#F2f9FB',
+		fontWeight: 'bold',
+		fontSize: 20,
+  },
 });

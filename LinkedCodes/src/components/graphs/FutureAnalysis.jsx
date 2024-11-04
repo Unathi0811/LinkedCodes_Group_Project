@@ -56,7 +56,6 @@ const FutureAnalysis = () => {
 					data[index].value += 1;
 				}
 			});
-
 			setData(data);
 
 			// Calculate the average daily change over the last few days

@@ -88,7 +88,7 @@ const LoginScreen = () => {
       if (storedEmail && storedPassword) {
         signInWithEmailAndPassword(getAuth(), storedEmail, storedPassword)
           .then(() => {
-            router.push("/(userTabs)/home");
+            // router.push("/(userTabs)/home");
           })
           .catch((err) => {
             Alert.alert(err?.message);
@@ -100,8 +100,6 @@ const LoginScreen = () => {
           "OK",
           fallBackToDefaultAuth
         );
-
-
       }
     } else {
       alertComponent(
@@ -128,6 +126,9 @@ const LoginScreen = () => {
     try {
         const userCredential = await signInWithEmailAndPassword(getAuth(), email, password);
         const user = userCredential.user;
+
+        await SecureStore.setItemAsync("user_email", email)
+        await SecureStore.setItemAsync("user_password", password);
 
         // Log the login action in the audit logs
         logAudit(

@@ -34,10 +34,10 @@ import RNPickerSelect from "react-native-picker-select";
 import { checkIfOnline } from "../../../services/network";
 import useLocation from "../../../src/components/useLocation";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Notifications from "expo-notifications"
 
 export default function Reporting() {
 	const { latitude, longitude } = useLocation();
-
 	const [image, setImage] = useState(null);
 	const [input, setInput] = useState("");
 	const [modalVisible, setModalVisible] = useState(false);
@@ -140,6 +140,8 @@ export default function Reporting() {
 
 					// Add the new report to Firestore
 					await addDoc(collection(db, "reports"), newReport);
+
+					
 					console.log("Report submitted successfully.");
 				} else {
 					// If offline, save the report locally using AsyncStorage

@@ -71,22 +71,35 @@ export default function Chat() {
     return () => unsubscribe(); // Cleanup on component unmount
   }, [chatId, userAvatars]);
 
-  const onSend = useCallback((messages = []) => {
+  const onSend = useCallback( async (messages = []) => {
+    const currentUserId = auth.currentUser.uid
+    const reportCreatorId = selectedReport.userId
+    const chatId = [reportCreatorId, currentUserId].sort().join("_")
+
+    //append the message to the local state
+    setMessages((prevMessages) => 
+      GiftedChat.append(prevMessages, messages)
+    );
+
     const { _id, createdAt, text } = messages[0];
+      //add the message to the chats collection
+      await addDoc(collection(db, "chats"), {
+        chatId,
+        text,
+        createdAt,
+        _id,
+        user
+      })
 
-    addDoc(collection(db, 'chats'), {
-      _id,
-      createdAt,
-      text,
-      user: {
-        _id: currentUserId,
-        avatar: userAvatars[currentUserId] || "https://via.placeholder.com/60",
-      },
-      chatId,
-    });
-
-    setMessages((previousMessages) => GiftedChat.append(previousMessages, messages));
-  }, [chatId, currentUserId, userAvatars]);
+      //send a notification to teh notifications screen 
+      await addDoc(collection(db, "notifications"), {
+        userId: reportCreatorId,
+        message: `New message from ${user.name}: ${text}`,
+        createdAt: new Date(),
+        type: "message",
+        chatId
+      }) 
+  }, [selectedReport]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

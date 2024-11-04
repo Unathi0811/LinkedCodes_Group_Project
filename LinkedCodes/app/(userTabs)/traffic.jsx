@@ -127,7 +127,9 @@ const centerMapOnCurrentLocation = () => {
       }
 
       const points = decodePolyline(route.legs[0].steps);
-      setDirections(points);
+      const limitedPoints = points.slice(0, 12000);
+      // console.log('Directions Points:', points.length);
+      setDirections(limitedPoints);
 
       // Set destination coordinates for marker
       const destinationLocation = await getDestinationCoordinates(destination);
@@ -237,7 +239,7 @@ const centerMapOnCurrentLocation = () => {
     } catch (error) {
 
       if (error.response?.status === 400) {
-        setErrorMessage('The place is out side the province. We recommand the use of traffic within a province, or continue without updated traffic information ?');
+        setErrorMessage('The place is outside the province. We recommand the use of traffic within a province, or continue without updated traffic information ?');
         setIsErrorModalVisible(true);
       }
       return [];
@@ -673,7 +675,7 @@ const IncidentItem = ({ item }) => {
                         style={{position:'absolute', right:0,width:'16%',height:25,backgroundColor:'#F2f9FB',borderRadius: 5,alignItems: 'center',justifyContent: 'center',}}
                         onPress={() => setIncidentModalVisible(false)}
                       >
-                        <Text style={styles.buttonText}>Close</Text>
+                        <Text style={styles.IncidentText}>Close</Text>
                       </TouchableOpacity>
                   </View>
 
@@ -873,8 +875,80 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 18,
-    
     color: "#fff",
+  },
+  IncidentText: {
+    fontSize: 18,
+    color: "#202A44",
+  },
+  suggestionsList:{
+    position: 'absolute',
+    top: 90,
+    width: '75%',
+    left: 10,
+    backgroundColor: '#202A44',
+    maxHeight: 140, 
+    zIndex: 1000,
+    borderRadius:20,
+  },
+  suggestionItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  suggestionsText:{
+    color:'#F2f9FB'
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#202A44',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalTitle:{
+    fontSize:30,
+    color:'#F2f9FB',
+    marginBottom: 8,
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+    color:'#F2f9FB'
+  },
+  floatingModal: {
+    position: 'absolute',
+    bottom: 255,
+    left: 4,
+    right: 4,
+    backgroundColor: '#202A44',
+    borderRadius: 10,
+    padding: 15,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    maxHeight: '40%', 
+  },
+  floatingIncidentModal: {
+    position: 'absolute',
+    bottom: 5,
+    left: 4,
+    right: 4,
+    backgroundColor: '#202A44',
+    borderRadius: 10,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    maxHeight: '30%', 
+    padding:10
   },
 });
 
